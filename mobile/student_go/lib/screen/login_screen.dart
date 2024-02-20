@@ -8,18 +8,19 @@ import 'package:student_go/screen/register_screen.dart';
 
 //Comprobar el requesttoken y si tiene redirigir a home
 
-class MyProfilePage extends StatefulWidget {
-  const MyProfilePage({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyProfilePage> createState() => _MyProfilePageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _MyProfilePageState extends State<MyProfilePage> {
+class _LoginScreenState extends State<LoginScreen> {
   // Form
   final _formLogin = GlobalKey<FormState>();
   final userTextController = TextEditingController();
   final passTextController = TextEditingController();
+  String? error;
 
   late AuthRepository authRepository;
   late LoginBloc _loginBloc;
@@ -58,12 +59,18 @@ class _MyProfilePageState extends State<MyProfilePage> {
               builder: (context, state) {
                 if (state is DoLoginSuccess) {
                   return const Text('Login success');
+                } else if (state is DoLoginUserNotFoundException) {
+                  error = "Incorrect username or password";
+                } else if (state is DoLoginBadCredentialsException) {
+                  error = "Incorrect password. Try again!";
                 } else if (state is DoLoginError) {
-                  return const Text('Login error');
+                  error = "Something went wrong. Try again";
                 } else if (state is DoLoginLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
-                return Container(child: _buildLoginForm());
+                return Container(
+                  child: _buildLoginForm(),
+                );
               },
               listener: (BuildContext context, LoginState state) {},
             ),
@@ -115,7 +122,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                labelText: 'abc@gmail.com',
+                labelText: 'Your username',
                 labelStyle: GoogleFonts.actor(),
                 prefixIcon: const Icon(Icons.mail, color: Colors.grey),
               ),
@@ -156,6 +163,13 @@ class _MyProfilePageState extends State<MyProfilePage> {
                 return null;
               },
             ),
+            if (error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Center(
+                    child: Text(error!,
+                        style: const TextStyle(color: Colors.red))),
+              ),
             const SizedBox(
               height: 20,
             ),
@@ -216,7 +230,7 @@ class _MyProfilePageState extends State<MyProfilePage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => RegisterScreen()),
+                                  builder: (context) => const RegisterScreen()),
                             );
                           },
                           child: Text(
