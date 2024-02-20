@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Admin extends User{
+public class Admin extends UserDefault {
 
     public Admin(UUID id, String username, String password, String email, String name,
                      boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,

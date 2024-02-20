@@ -1,9 +1,7 @@
 package com.salesianos.dam.StudentGoApi.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
-import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,7 +11,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Student extends User {
+public class Student extends UserDefault {
 
     private String description;
 

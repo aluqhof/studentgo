@@ -25,7 +25,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class User implements UserDetails {
+public abstract class UserDefault implements UserDetails {
 
     @Id
     @GeneratedValue(generator = "UUID")

@@ -1,6 +1,6 @@
 package com.salesianos.dam.StudentGoApi.security.jwt;
 
-import com.salesianos.dam.StudentGoApi.model.User;
+import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import com.salesianos.dam.StudentGoApi.security.errorhandling.JwtTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -51,13 +51,13 @@ public class JwtProvider {
 
     public String generateToken(Authentication authentication) {
 
-        User user = (User) authentication.getPrincipal();
+        UserDefault user = (UserDefault) authentication.getPrincipal();
 
         return generateToken(user);
 
     }
 
-    public String generateToken(User user) {
+    public String generateToken(UserDefault user) {
         Date tokenExpirationDateTime =
                 Date.from(
                         LocalDateTime

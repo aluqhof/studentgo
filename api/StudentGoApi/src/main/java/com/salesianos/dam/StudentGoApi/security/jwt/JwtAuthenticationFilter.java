@@ -1,6 +1,6 @@
 package com.salesianos.dam.StudentGoApi.security.jwt;
 
-import com.salesianos.dam.StudentGoApi.model.User;
+import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import com.salesianos.dam.StudentGoApi.security.errorhandling.JwtTokenException;
 import com.salesianos.dam.StudentGoApi.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -46,10 +46,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
                 UUID userId = jwtProvider.getUserIdFromJwtToken(token);
 
-                Optional<User> result = userService.findById(userId);
+                Optional<UserDefault> result = userService.findById(userId);
 
                 if (result.isPresent()) {
-                    User user = result.get();
+                    UserDefault user = result.get();
 
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(

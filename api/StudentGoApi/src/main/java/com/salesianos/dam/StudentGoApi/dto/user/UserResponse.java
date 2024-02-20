@@ -1,7 +1,7 @@
 package com.salesianos.dam.StudentGoApi.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.salesianos.dam.StudentGoApi.model.User;
+import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ public class UserResponse {
     public static String getRole(Collection<? extends GrantedAuthority> roleList){
         return roleList.stream().map(GrantedAuthority::getAuthority).toList().get(0);
     }
-    public static UserResponse of(User user){
+    public static UserResponse of(UserDefault user){
 
         return UserResponse.builder()
                 .id(user.getId().toString())

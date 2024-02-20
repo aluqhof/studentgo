@@ -1,10 +1,8 @@
 package com.salesianos.dam.StudentGoApi.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -15,7 +13,7 @@ import java.util.UUID;
 @ToString
 @NoArgsConstructor
 @SuperBuilder
-public class Organizer extends User {
+public class Organizer extends UserDefault {
 
 
     private String description;
