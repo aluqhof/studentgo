@@ -5,7 +5,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/models/dto/login_dto.dart';
 import 'package:student_go/models/dto/register_dto.dart';
 import 'package:student_go/models/response/bad_credentials_exception.dart';
-import 'package:student_go/models/response/bad_request_validation/bad_request_validation.dart';
 import 'package:student_go/models/response/login_response.dart';
 import 'package:student_go/models/response/user_not_found_exception.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
@@ -50,15 +49,13 @@ class AuthRepositoryImpl extends AuthRepository {
       },
       body: registerDto.toJson(),
     );
-    if (response.statusCode == 201) {
+    if (response.statusCode == 201 || response.statusCode == 400) {
       final responseData = jsonDecode(response.body);
       final String authToken = responseData['token'];
+
       await prefs.setString('token', authToken);
+
       return LoginResponse.fromJson(response.body);
-    } else if (response.statusCode == 400) {
-      return Future.error(BadRequestValidation.fromJson(response.body));
-    } else if (response.statusCode == 401) {
-      return Future.error(BadCredentialsException.fromJson(response.body));
     } else {
       throw Exception('Failed to do login');
     }
