@@ -8,8 +8,8 @@ import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import com.salesianos.dam.StudentGoApi.security.jwt.JwtProvider;
 import com.salesianos.dam.StudentGoApi.security.jwt.JwtUserResponse;
-import com.salesianos.dam.StudentGoApi.service.OrganizerService;
-import com.salesianos.dam.StudentGoApi.service.StudentService;
+import com.salesianos.dam.StudentGoApi.service.user.OrganizerService;
+import com.salesianos.dam.StudentGoApi.service.user.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "User", description = "El controlador de user tiene diferentes métodos para obtener información variada" +
-        " sobre los usuarios, tanto como métodos para el registro y login")
+@Tag(name = "User", description = "The user controller has different methods to obtain various information " +
+        "about the users, such as methods for registration and login.")
 public class UserController {
 
     private final StudentService studentService;
@@ -57,7 +57,6 @@ public class UserController {
                                                                         """) }) }),
             @ApiResponse(responseCode = "400 Bad Request", description = "Register was not succesful", content = @Content),
     })
-
     @PostMapping("/auth/register-student")
     public ResponseEntity<JwtUserResponse> registerStudent(@Valid @RequestBody AddStudentRequest addStudentRequest) {
         Student student = studentService.createStudent(addStudentRequest);

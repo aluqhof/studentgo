@@ -2,7 +2,7 @@ package com.salesianos.dam.StudentGoApi.security.jwt;
 
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import com.salesianos.dam.StudentGoApi.security.errorhandling.JwtTokenException;
-import com.salesianos.dam.StudentGoApi.service.UserService;
+import com.salesianos.dam.StudentGoApi.service.user.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

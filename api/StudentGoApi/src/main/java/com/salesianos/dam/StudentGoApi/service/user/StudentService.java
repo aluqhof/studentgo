@@ -1,8 +1,8 @@
-package com.salesianos.dam.StudentGoApi.service;
+package com.salesianos.dam.StudentGoApi.service.user;
 
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.model.Student;
-import com.salesianos.dam.StudentGoApi.repository.StudentRepository;
+import com.salesianos.dam.StudentGoApi.repository.user.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

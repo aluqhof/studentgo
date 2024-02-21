@@ -11,7 +11,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface FieldsValueMatch {
 
-    String message() default "Los valores de los campos no coinciden";
+    String message() default "The passwords don't match";
 
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};

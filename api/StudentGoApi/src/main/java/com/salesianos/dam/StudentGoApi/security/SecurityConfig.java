@@ -89,14 +89,6 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests((authz) -> authz
                         .requestMatchers(
-                                antMatcher("/use/**"),
-                                antMatcher("/cost/**"),
-                                antMatcher("/issues/**"),
-                                antMatcher("/station/**"),
-                                antMatcher("/user/**"),
-                                antMatcher("/bikes/**")
-                        ).hasRole("USER")
-                        .requestMatchers(
                                 antMatcher("/admin/**"))
                         .hasRole("ADMIN")
                         .anyRequest().authenticated());

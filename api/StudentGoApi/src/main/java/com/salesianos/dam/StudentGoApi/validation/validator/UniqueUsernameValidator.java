@@ -1,6 +1,6 @@
 package com.salesianos.dam.StudentGoApi.validation.validator;
 
-import com.salesianos.dam.StudentGoApi.service.UserService;
+import com.salesianos.dam.StudentGoApi.service.user.UserService;
 import com.salesianos.dam.StudentGoApi.validation.annotation.UniqueUsername;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,6 +14,6 @@ public class UniqueUsernameValidator implements ConstraintValidator<UniqueUserna
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return StringUtils.hasText(s) && !userService.userExists(s);
+        return StringUtils.hasText(s) && !userService.userExistsByUsername(s);
     }
 }

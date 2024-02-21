@@ -1,8 +1,8 @@
-package com.salesianos.dam.StudentGoApi.service;
+package com.salesianos.dam.StudentGoApi.service.user;
 
 import com.salesianos.dam.StudentGoApi.dto.user.organizer.AddOrganizerRequest;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
-import com.salesianos.dam.StudentGoApi.repository.OrganizerRepository;
+import com.salesianos.dam.StudentGoApi.repository.user.OrganizerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

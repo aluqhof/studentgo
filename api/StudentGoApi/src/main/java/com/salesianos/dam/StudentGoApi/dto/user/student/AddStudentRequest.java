@@ -1,6 +1,7 @@
 package com.salesianos.dam.StudentGoApi.dto.user.student;
 
 import com.salesianos.dam.StudentGoApi.validation.annotation.FieldsValueMatch;
+import com.salesianos.dam.StudentGoApi.validation.annotation.UniqueEmail;
 import com.salesianos.dam.StudentGoApi.validation.annotation.UniqueUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,6 +25,7 @@ public record AddStudentRequest(
 
         @NotBlank(message = "{addStudentRequest.email.notblank}")
         @Email(message = "{addStudentRequest.email.email}")
+        @UniqueEmail
         String email,
 
         @NotBlank(message = "{addStudentRequest.name.notblank}")

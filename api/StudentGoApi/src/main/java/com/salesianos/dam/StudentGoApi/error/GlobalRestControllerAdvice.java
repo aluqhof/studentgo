@@ -33,7 +33,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .toList();
         ErrorResponse er = ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
                 .title("Invalid data error")
-                .type(URI.create("https://api.bikeapp.com/errors/not-valid"))
+                .type(URI.create("https://api.studentgo.com/errors/not-valid"))
                 .property("Fields errors", validationErrors)
                 .build();
         return ResponseEntity.status(status)
@@ -44,7 +44,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleNotFoundException(EntityNotFoundException exception) {
         return ErrorResponse.builder(exception, HttpStatus.NOT_FOUND, exception.getMessage())
                 .title("Entity not found")
-                .type(URI.create("https://api.bikeapp.com/errors/not-found"))
+                .type(URI.create("https://api.studentgo.com/errors/not-found"))
                 .property("timestamp", Instant.now())
                 .build();
     }
@@ -63,7 +63,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
             InvalidCredentialsException exception) {
         return ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED, exception.getMessage())
                 .title("Username or password incorrect")
-                .type(URI.create("https://api.bikeapp.com/errors/invalid-credentials"))
+                .type(URI.create("https://api.studentgo.com/errors/invalid-credentials"))
                 .property("timestamp", Instant.now())
                 .build();
     }
@@ -72,7 +72,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleAuthenticationException(AuthenticationException exception) {
         return ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED, exception.getMessage())
                 .title("AUTHENTICATION")
-                .type(URI.create("https://api.bikeapp.com/errors/unauthorized-user"))
+                .type(URI.create("https://api.studentgo.com/errors/unauthorized-user"))
                 .property("timestamp", Instant.now())
                 .build();
 
@@ -82,7 +82,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleAccessDeniedException(AccessDeniedException exception) {
         return ErrorResponse.builder(exception, HttpStatus.FORBIDDEN, exception.getMessage())
                 .title("ACCESS DENIED")
-                .type(URI.create("https://api.bikeapp.com/errors/access-denied"))
+                .type(URI.create("https://api.studentgo.com/errors/access-denied"))
                 .property("timestamp", Instant.now())
                 .build();
 
@@ -93,7 +93,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleTokenException(JwtTokenException exception) {
         return ErrorResponse.builder(exception, HttpStatus.FORBIDDEN, exception.getMessage())
                 .title("TOKEN INVALID")
-                .type(URI.create("https://api.bikeapp.com/errors/invalid-token"))
+                .type(URI.create("https://api.studentgo.com/errors/invalid-token"))
                 .property("timestamp", Instant.now())
                 .build();
     }
@@ -102,7 +102,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleUserNotExistsException(UsernameNotFoundException exception) {
         return ErrorResponse.builder(exception, HttpStatus.FORBIDDEN, exception.getMessage())
                 .title("FORBIDDEN")
-                .type(URI.create("https://api.bikeapp.com/errors/forbidden"))
+                .type(URI.create("https://api.studentgo.com/errors/forbidden"))
                 .property("timestamp", Instant.now())
                 .build();
     }

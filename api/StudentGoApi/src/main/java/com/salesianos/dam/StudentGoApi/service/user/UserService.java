@@ -1,7 +1,7 @@
-package com.salesianos.dam.StudentGoApi.service;
+package com.salesianos.dam.StudentGoApi.service.user;
 
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
-import com.salesianos.dam.StudentGoApi.repository.UserRepository;
+import com.salesianos.dam.StudentGoApi.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,8 +18,12 @@ public class UserService {
         return usuarioRepository.findById(id);
     }
 
-    public boolean userExists(String username) {
+    public boolean userExistsByUsername(String username) {
         return usuarioRepository.existsByUsernameIgnoreCase(username);
+    }
+
+    public boolean userExistsByEmail(String email) {
+        return usuarioRepository.existsByEmailIgnoreCase(email);
     }
 
 

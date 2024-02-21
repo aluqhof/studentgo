@@ -1,4 +1,4 @@
-package com.salesianos.dam.StudentGoApi.repository;
+package com.salesianos.dam.StudentGoApi.repository.user;
 
 import com.salesianos.dam.StudentGoApi.model.Student;
 import org.springframework.data.jpa.repository.JpaRepository;

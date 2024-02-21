@@ -12,7 +12,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface UniqueUsername {
 
-    String message() default "El nombre de usuario ya existe";
+    String message() default "The username already exists";
 
     Class<?>[] groups() default {};
 
