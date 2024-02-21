@@ -1,6 +1,7 @@
-import 'package:bloc/bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:student_go/models/dto/register_dto.dart';
+import 'package:student_go/models/response/bad_request_validation/bad_request_validation.dart';
 import 'package:student_go/models/response/login_response.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 
@@ -30,8 +31,12 @@ class RegisterStudentBloc
       final response = await authRepository.register(registerDto);
       emit(DoRegisterStudentSuccess(response));
       return;
-    } on Exception catch (e) {
-      emit(DoRegisterStudentError(e.toString()));
+    } catch (e) {
+      if (e is BadRequestValidation) {
+        emit(DoRegisterStudentBadRequestValidation(e, "Bad Request"));
+      } else {
+        emit(DoRegisterStudentError("An unexpected error occurred"));
+      }
     }
   }
 }

@@ -23,6 +23,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final mailTextController = TextEditingController();
   final passTextController = TextEditingController();
   final confirmPassTextController = TextEditingController();
+  String? error;
 
   late AuthRepository authRepository;
   late RegisterStudentBloc _registerBloc;
@@ -63,8 +64,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
               builder: (context, state) {
                 if (state is DoRegisterStudentSuccess) {
                   return const Text('Register success');
+                } else if (state is DoRegisterStudentBadRequestValidation) {
+                  error =
+                      state.badRequestValidation.body!.fieldsErrors![0].message;
                 } else if (state is DoRegisterStudentError) {
-                  return const Text('Register error');
+                  error = state.errorMessage;
                 } else if (state is DoRegisterStudentLoading) {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -214,6 +218,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
               return null;
             },
           ),
+          if (error != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: Center(
+                  child:
+                      Text(error!, style: const TextStyle(color: Colors.red))),
+            ),
           const SizedBox(
             height: 20,
           ),
