@@ -1,54 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-Future<Position> _determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-
-  // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
-
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
-    }
-  }
-
-  if (permission == LocationPermission.deniedForever) {
-    // Permissions are denied forever, handle appropriately.
-    return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-  }
-
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
-}
-
 class _HomeScreenState extends State<HomeScreen> {
-  // ignore: unused_field
-  late Position _currentPosition;
+  Position? _currentPosition;
+  late String _currentCity = '';
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -59,64 +24,113 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       Position position = await _determinePosition();
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+      Placemark placemark = placemarks.first;
       setState(() {
         _currentPosition = position;
+        _currentCity = placemark.locality ?? 'Unknown';
+        _isLoading = false;
       });
     } catch (e) {
-      throw const Text('Error');
+      setState(() {
+        _isLoading = false;
+      });
+      throw Exception('Error obtaining location: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        actions: <Widget>[
-          const Expanded(
+        appBar: AppBar(
+          actions: <Widget>[
+            const Expanded(
               flex: 1,
               child: Icon(
                 Icons.menu_rounded,
                 color: Colors.white,
                 size: 30,
-              )),
-          Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 6.0),
-                child: Row(
-                  children: [
-                    Text(
-                      'Current Location',
-                      style: GoogleFonts.actor(
+              ),
+            ),
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 6.0),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Current Location',
+                        style: GoogleFonts.actor(
                           textStyle: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold)),
-                    ),
-                    const Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.white,
-                    )
-                  ],
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                'New York, USA',
-                style: GoogleFonts.actor(
-                    textStyle: const TextStyle(color: Colors.white),
-                    fontWeight: FontWeight.w100),
-              ),
-            ],
-          ),
-          const Expanded(
+                Text(
+                  _currentCity,
+                  style: GoogleFonts.actor(
+                    textStyle: const TextStyle(
+                      color: Colors.white,
+                    ),
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+              ],
+            ),
+            const Expanded(
               flex: 1,
               child: Icon(
                 Icons.notifications,
                 color: Colors.white,
                 size: 25,
-              )),
-        ],
-        backgroundColor: const Color.fromRGBO(74, 67, 236, 1),
-      ),
-    );
+              ),
+            ),
+          ],
+          backgroundColor: const Color.fromRGBO(74, 67, 236, 1),
+        ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _currentPosition != null
+                ? Center(
+                    child: Text(
+                      'Current Location: ${_currentPosition!.latitude}, ${_currentPosition!.longitude}',
+                    ),
+                  )
+                : Text('Error'));
   }
+}
+
+Future<Position> _determinePosition() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    throw Exception('Location services are disabled.');
+  }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw Exception('Location permissions are denied');
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    throw Exception('Location permissions are permanently denied.');
+  }
+
+  return await Geolocator.getCurrentPosition();
 }
