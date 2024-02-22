@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:student_go/bloc/register_student/register_student_bloc.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 import 'package:student_go/repository/auth/auth_repository_impl.dart';
+import 'package:student_go/screen/home_screen.dart';
 import 'package:student_go/screen/login_screen.dart';
 
 //Comprobar el requesttoken y si tiene redirigir a home
@@ -63,7 +64,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
               },
               builder: (context, state) {
                 if (state is DoRegisterStudentSuccess) {
-                  return const Text('Register success');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                  );
                 } else if (state is DoRegisterStudentBadRequestValidation) {
                   error =
                       state.badRequestValidation.body!.fieldsErrors![0].message;

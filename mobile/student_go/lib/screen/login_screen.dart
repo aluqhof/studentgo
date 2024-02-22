@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:student_go/bloc/login/login_bloc.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 import 'package:student_go/repository/auth/auth_repository_impl.dart';
+import 'package:student_go/screen/home_screen.dart';
 import 'package:student_go/screen/register_screen.dart';
 
 //Comprobar el requesttoken y si tiene redirigir a home
@@ -58,7 +59,12 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               builder: (context, state) {
                 if (state is DoLoginSuccess) {
-                  return const Text('Login success');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const HomeScreen(),
+                    ),
+                  );
                 } else if (state is DoLoginUserNotFoundException) {
                   error = "Incorrect username or password";
                 } else if (state is DoLoginBadCredentialsException) {
