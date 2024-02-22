@@ -7,58 +7,210 @@
 	},
 	"item": [
 		{
-			"name": "Register student",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"estudiante1\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdakl@gmail.com\",\r\n    \"name\": \"alex\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"name": "auth",
+			"item": [
+				{
+					"name": "Register student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);"
+								],
+								"type": "text/javascript"
+							}
 						}
-					}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"estudiante\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdakl@gmail.com\",\r\n    \"name\": \"alex\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}auth/register-student"
+					},
+					"response": []
 				},
-				"url": "{{BASE_URL}}auth/register-student"
-			},
-			"response": []
+				{
+					"name": "Register organizer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"organizador2\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdafakl@gmail.com\",\r\n    \"name\": \"alex\",\r\n    \"business\": \"Marca\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}auth/register-organizer"
+					},
+					"response": []
+				},
+				{
+					"name": "Login Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"student1\",\r\n    \"password\": \"user1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Login Organizer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"name": "Register organizer",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"estudiante1\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdakl@gmail.com\",\r\n    \"name\": \"alex\",\r\n    \"business\": \"Marca\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+			"name": "event",
+			"item": [
+				{
+					"name": "CreateEvent",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Fiesta casera\",\r\n    \"latitude\": 80,\r\n    \"longitude\": -5,\r\n    \"description\": \"Va a ser una pasaada autentica\",\r\n    \"dateTime\": \"2024-02-28T12:30:00\",\r\n    \"eventTypesIds\": [\r\n        1\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}event/"
+					},
+					"response": []
 				},
-				"url": "{{BASE_URL}}auth/register-organizer"
-			},
-			"response": []
+				{
+					"name": "Get Events in a City",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Upcoming Events in a City",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/upcoming/2"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Upcoming Events Limit 5",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/upcoming-limit/Köln"
+					},
+					"response": []
+				}
+			]
 		},
 		{
-			"name": "Login",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\r\n    \"username\": \"estudiante1\",\r\n    \"password\": \"123456\"\r\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": "{{BASE_URL}}auth/login"
-			},
-			"response": []
+			"name": "Event Type",
+			"item": [
+				{
+					"name": "Get All Event Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event-type/"
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"event": [
@@ -86,6 +238,14 @@
 			"key": "BASE_URL",
 			"value": "http://localhost:8080/",
 			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": ""
+		},
+		{
+			"key": "refresh_token",
+			"value": ""
 		}
 	]
 }
