@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class UserNotFoundException {
+class GeneralException {
   String? type;
   String? title;
   int? status;
@@ -8,7 +8,7 @@ class UserNotFoundException {
   String? instance;
   DateTime? timestamp;
 
-  UserNotFoundException({
+  GeneralException({
     this.type,
     this.title,
     this.status,
@@ -17,8 +17,8 @@ class UserNotFoundException {
     this.timestamp,
   });
 
-  factory UserNotFoundException.fromMap(Map<String, dynamic> data) {
-    return UserNotFoundException(
+  factory GeneralException.fromMap(Map<String, dynamic> data) {
+    return GeneralException(
       type: data['type'] as String?,
       title: data['title'] as String?,
       status: data['status'] as int?,
@@ -41,14 +41,13 @@ class UserNotFoundException {
 
   /// `dart:convert`
   ///
-  /// Parses the string and returns the resulting Json object as [UserNotFoundException].
-  factory UserNotFoundException.fromJson(String data) {
-    return UserNotFoundException.fromMap(
-        json.decode(data) as Map<String, dynamic>);
+  /// Parses the string and returns the resulting Json object as [GeneralException].
+  factory GeneralException.fromJson(String data) {
+    return GeneralException.fromMap(json.decode(data) as Map<String, dynamic>);
   }
 
   /// `dart:convert`
   ///
-  /// Converts [UserNotFoundException] to a JSON string.
+  /// Converts [GeneralException] to a JSON string.
   String toJson() => json.encode(toMap());
 }

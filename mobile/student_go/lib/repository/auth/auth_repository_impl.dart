@@ -7,7 +7,7 @@ import 'package:student_go/models/dto/register_dto.dart';
 import 'package:student_go/models/response/bad_credentials_exception.dart';
 import 'package:student_go/models/response/bad_request_validation/bad_request_validation.dart';
 import 'package:student_go/models/response/login_response.dart';
-import 'package:student_go/models/response/user_not_found_exception.dart';
+import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -31,7 +31,7 @@ class AuthRepositoryImpl extends AuthRepository {
       await prefs.setString('token', authToken);
       return LoginResponse.fromJson(response.body);
     } else if (response.statusCode == 403) {
-      return Future.error(UserNotFoundException.fromJson(response.body));
+      return Future.error(GeneralException.fromJson(response.body));
     } else if (response.statusCode == 401) {
       return Future.error(BadCredentialsException.fromJson(response.body));
     } else {

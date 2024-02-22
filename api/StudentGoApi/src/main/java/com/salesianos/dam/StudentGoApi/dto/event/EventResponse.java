@@ -12,6 +12,8 @@ public record EventResponse(
         String name,
         double latitude,
         double longitude,
+
+        String cityId,
         String description,
         LocalDateTime dateTime,
         String organizer,
@@ -24,6 +26,7 @@ public record EventResponse(
                 e.getName(),
                 e.getLongitude(),
                 e.getLatitude(),
+                e.getCity().getName(),
                 e.getDescription(),
                 e.getDateTime(),
                 e.getAuthor(),

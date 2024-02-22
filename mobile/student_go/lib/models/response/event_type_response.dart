@@ -4,14 +4,16 @@ class EventTypeResponse {
   int? id;
   String? name;
   String? iconRef;
+  String? colorCode;
 
-  EventTypeResponse({this.id, this.name, this.iconRef});
+  EventTypeResponse({this.id, this.name, this.iconRef, this.colorCode});
 
   factory EventTypeResponse.fromMap(Map<String, dynamic> data) {
     return EventTypeResponse(
       id: data['id'] as int?,
       name: data['name'] as String?,
       iconRef: data['iconRef'] as String?,
+      colorCode: data['colorCode'] as String?,
     );
   }
 
@@ -19,6 +21,7 @@ class EventTypeResponse {
         'id': id,
         'name': name,
         'iconRef': iconRef,
+        'colorCode': colorCode,
       };
 
   /// `dart:convert`

@@ -29,6 +29,10 @@ public class Event {
 
     private double longitude;
 
+    @ManyToOne
+    @JoinColumn(name = "city_id")
+    private City city;
+
     private String description;
 
     private LocalDateTime dateTime;

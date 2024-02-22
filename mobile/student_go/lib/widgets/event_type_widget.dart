@@ -14,15 +14,18 @@ class EventTypeWidget extends StatelessWidget {
         width: MediaQuery.of(context).size.width / 3.5,
         child: ElevatedButton.icon(
           onPressed: () {},
-          icon: const Icon(Icons.sports_basketball,
-              size: 22, color: Color.fromRGBO(255, 255, 255, 1)),
+          icon: Icon(
+              IconData(int.parse(eventType.iconRef!),
+                  fontFamily: 'MaterialIcons'),
+              size: 22,
+              color: const Color.fromRGBO(255, 255, 255, 1)),
           label: Text(
-            'Sports',
+            eventType.name!,
             style: GoogleFonts.actor(
                 textStyle: const TextStyle(color: Colors.white, fontSize: 15)),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromRGBO(240, 99, 90, 1),
+            backgroundColor: Color(int.parse(eventType.colorCode!)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),
             ),

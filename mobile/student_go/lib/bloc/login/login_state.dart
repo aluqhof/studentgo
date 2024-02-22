@@ -18,7 +18,7 @@ final class DoLoginError extends LoginState {
 }
 
 final class DoLoginUserNotFoundException extends DoLoginError {
-  final UserNotFoundException userNotFoundException;
+  final GeneralException userNotFoundException;
 
   DoLoginUserNotFoundException(this.userNotFoundException, String message)
       : super(message);

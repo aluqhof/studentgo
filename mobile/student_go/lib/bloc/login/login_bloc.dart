@@ -3,7 +3,7 @@ import 'package:meta/meta.dart';
 import 'package:student_go/models/dto/login_dto.dart';
 import 'package:student_go/models/response/bad_credentials_exception.dart';
 import 'package:student_go/models/response/login_response.dart';
-import 'package:student_go/models/response/user_not_found_exception.dart';
+import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 
 part 'login_event.dart';
@@ -40,7 +40,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       emit(DoLoginSuccess(response));
       return;
     } catch (e) {
-      if (e is UserNotFoundException) {
+      if (e is GeneralException) {
         emit(DoLoginUserNotFoundException(e, "User Not Found Exception"));
       } else if (e is BadCredentialsException) {
         emit(DoLoginBadCredentialsException(e, "Bad Credentials Exception"));

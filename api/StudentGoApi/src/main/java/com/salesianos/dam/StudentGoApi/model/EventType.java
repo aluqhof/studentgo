@@ -21,4 +21,8 @@ public class EventType {
 
     @NaturalId
     private String name;
+
+    private String iconRef;
+
+    private String colorCode;
 }

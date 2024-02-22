@@ -23,7 +23,7 @@ class EventTypeRepositoryImpl extends EventTypeRepository {
           jsonData.map((x) => EventTypeResponse.fromMap(x)).toList();
       return eventTypes;
     } else {
-      throw Exception('Failed to do login');
+      throw Exception('Failed to get event types');
     }
   }
 }
