@@ -7,6 +7,8 @@ final class EventListInitial extends EventListState {}
 
 final class EventListLoading extends EventListState {}
 
+final class TokenNotValidState extends EventListState {}
+
 final class EventListSuccess extends EventListState {
   final ListEventsResponse listEventsResponse;
   EventListSuccess(this.listEventsResponse);

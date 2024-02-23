@@ -183,6 +183,12 @@ class _EventCardHorizontalListState extends State<EventCardHorizontalList> {
           );
         } else if (state is EventListInitial) {
           return const Center(child: CircularProgressIndicator());
+        } else if (state is TokenNotValidState) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+          return const CircularProgressIndicator();
         } else if (state is EventListEntityException) {
           if (state.generalException.status == 401 ||
               state.generalException.status == 403) {

@@ -22,7 +22,7 @@ class EventListBloc extends Bloc<EventListEvent, EventListState> {
       emit(EventListSuccess(response));
     } catch (e) {
       if (e is GeneralException) {
-        emit(EventListEntityException(e, e.title!));
+        emit(TokenNotValidState());
       } else {
         emit(EventListError("An unespected error occurred"));
       }
