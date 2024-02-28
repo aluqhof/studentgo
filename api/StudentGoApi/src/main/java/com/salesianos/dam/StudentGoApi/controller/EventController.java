@@ -1,10 +1,14 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
+import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
-import com.salesianos.dam.StudentGoApi.dto.event.EventResponse;
-import com.salesianos.dam.StudentGoApi.dto.event.ListEventsResponse;
+import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
+import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
+import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
 import com.salesianos.dam.StudentGoApi.model.Event;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
+import com.salesianos.dam.StudentGoApi.model.Student;
+import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 import com.salesianos.dam.StudentGoApi.service.EventService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -16,6 +20,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +30,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,11 +40,12 @@ import java.util.List;
 public class EventController {
 
     private final EventService eventService;
+    private final EventRepository eventRepository;
 
     @Operation(summary = "Add an event (Only Organizer)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201 Created", description = "The event was created succesful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventResponse.class)), examples = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
                             @ExampleObject(value = """
                                     {
                                         "uuid": "23e6942b-62d2-4a37-abf2-6b6d19d4532c",
@@ -57,7 +65,7 @@ public class EventController {
     })
     @PostMapping("/")
     @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<EventResponse> createEvent(@RequestBody @Valid AddEventRequest addEventRequest,@AuthenticationPrincipal Organizer organizer){
+    public ResponseEntity<EventViewResponse> createEvent(@RequestBody @Valid AddEventRequest addEventRequest, @AuthenticationPrincipal Organizer organizer){
         Event newEvent = eventService.createEvent(addEventRequest, organizer);
 
         URI createdURI = ServletUriComponentsBuilder
@@ -67,13 +75,13 @@ public class EventController {
 
         return ResponseEntity
                 .created(createdURI)
-                .body(EventResponse.of(newEvent));
+                .body(EventViewResponse.of(newEvent, eventRepository.findStudentsByEventIdNoPageable(newEvent.getId())));
     }
 
     @Operation(summary = "Get all events in a city")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventResponse.class)), examples = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
                             @ExampleObject(value = """
                                     [
                                         {
@@ -120,45 +128,15 @@ public class EventController {
                                                                         """) }) }),
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
-    @GetMapping("/{cityId}")
-    //Preautorize
-    public ResponseEntity<List<EventResponse>> getEventsByCity(@PathVariable Long cityId){
-        return ResponseEntity.ok(eventService.getAllEventsInCity(cityId).stream().map(EventResponse::of).toList());
-    }
-
-    @Operation(summary = "Get all upcoming events in a city")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ListEventsResponse.class)), examples = {
-                            @ExampleObject(value = """
-                                    {
-                                        "name": "Upcoming Events",
-                                        "result": [
-                                            {
-                                                "uuid": "ae56ec32-98bf-4eb6-821d-741a0816b3bf",
-                                                "name": "Concierto de la niña pastori",
-                                                "latitude": -5.99255572619863,
-                                                "longitude": 37.386207,
-                                                "cityId": "Köln",
-                                                "description": "Algo guapo",
-                                                "dateTime": "2024-02-26T08:00:00",
-                                                "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
-                                                "eventTypes": []
-                                            }
-                                        ]
-                                    }
-                                                                        """) }) }),
-            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
-    })
     @GetMapping("/upcoming/{cityName}")
-    public ResponseEntity<ListEventsResponse> getUpcomingEventsByCity(@PathVariable String cityName){
-        return ResponseEntity.ok(ListEventsResponse.of(eventService.getFutureEventsInCity(cityName), "Upcoming Events"));
+    public ResponseEntity<List<EventViewResponse>> getEventsByCity(@PathVariable String cityName){
+        return ResponseEntity.ok(eventService.getAllEventsInCity(cityName).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
     }
 
-    @Operation(summary = "Get all upcoming events in a city limited")
+    @Operation(summary = "Get Pageable results from upcoming events in a city limited")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ListEventsResponse.class)), examples = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
                             @ExampleObject(value = """
                                     {
                                         "name": "Upcoming Events",
@@ -195,7 +173,171 @@ public class EventController {
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
     @GetMapping("/upcoming-limit/{cityName}")
-    public ResponseEntity<ListEventsResponse> getUpcomingEventsByCityLimit5(@PathVariable String cityName, @RequestParam(defaultValue = "5") int limit){
-        return ResponseEntity.ok(ListEventsResponse.of(eventService.getFutureEventsInCityLimit5(cityName, limit), "Upcoming Events"));
+    public MyPage<EventViewResponse> getUpcomingEventsByCity(@PathVariable String cityName, @PageableDefault(size = 5, page = 0) Pageable pageable){
+        return eventService.getFutureEventsInCity(cityName, pageable);
+    }
+
+    @Operation(summary = "Get Pageable results from recommendended events in a city limited based on user interests")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                         "name": "According to you",
+                                         "result": [
+                                             {
+                                                 "uuid": "a2f6b827-1042-4a7c-a9c3-84f1356d10c4",
+                                                 "name": "Festival de música indie",
+                                                 "latitude": 37.386207,
+                                                 "longitude": -5.99255572619863,
+                                                 "cityId": "Köln",
+                                                 "description": "Algo guapo",
+                                                 "dateTime": "2024-03-02T18:00:00",
+                                                 "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                                 "eventTypes": [
+                                                     "Food"
+                                                 ]
+                                             },
+                                             {
+                                                 "uuid": "d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2",
+                                                 "name": "Exposición de arte contemporáneo",
+                                                 "latitude": 37.38283,
+                                                 "longitude": -5.97317,
+                                                 "cityId": "Köln",
+                                                 "description": "Algo guapo",
+                                                 "dateTime": "2024-03-01T12:00:00",
+                                                 "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                                 "eventTypes": [
+                                                     "Food"
+                                                 ]
+                                             }
+                                         ]
+                                     }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/according-limit/{cityName}")
+    public MyPage<EventViewResponse> getUpcomingEventsByCityAccordingToUser(
+            @PathVariable String cityName,
+            @PageableDefault(size = 5, page = 0) Pageable pageable,
+            @AuthenticationPrincipal Student student) {
+        return eventService.getFutureEventsInCityAccordingToUser(cityName, student, pageable);
+    }
+
+    @Operation(summary = "Get Pageable results from events in a city filter by event types   ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                         "name": "According to you",
+                                         "result": [
+                                             {
+                                                 "uuid": "a2f6b827-1042-4a7c-a9c3-84f1356d10c4",
+                                                 "name": "Festival de música indie",
+                                                 "latitude": 37.386207,
+                                                 "longitude": -5.99255572619863,
+                                                 "cityId": "Köln",
+                                                 "description": "Algo guapo",
+                                                 "dateTime": "2024-03-02T18:00:00",
+                                                 "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                                 "eventTypes": [
+                                                     "Food"
+                                                 ]
+                                             },
+                                             {
+                                                 "uuid": "d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2",
+                                                 "name": "Exposición de arte contemporáneo",
+                                                 "latitude": 37.38283,
+                                                 "longitude": -5.97317,
+                                                 "cityId": "Köln",
+                                                 "description": "Algo guapo",
+                                                 "dateTime": "2024-03-01T12:00:00",
+                                                 "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                                 "eventTypes": [
+                                                     "Food"
+                                                 ]
+                                             }
+                                         ]
+                                     }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/by-event-type/{cityName}/{eventTypeId}")
+    public MyPage<EventViewResponse> getEventsByEventType(
+            @PathVariable String cityName,
+            @PathVariable Long eventTypeId,
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        return eventService.getFutureEventsByEventType(cityName, pageable, eventTypeId);
+    }
+
+    @Operation(summary = "Get Pageable results from students who participate at the event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "name": "Students in Exposición de arte contemporáneo",
+                                        "content": [
+                                            {
+                                                "id": "7f40a32b-344f-4928-9995-8f6d12c34694",
+                                                "username": "student10",
+                                                "name": "student10"
+                                            },
+                                            {
+                                                "id": "e010f144-b376-4dbb-933d-b3ec8332ed0d",
+                                                "username": "student2",
+                                                "name": "student2"
+                                            }
+                                        ],
+                                        "size": 10,
+                                        "totalElements": 2,
+                                        "pageNumber": 0,
+                                        "first": true,
+                                        "last": true
+                                    }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/{eventId}/students")
+    public MyPage<StudentListResponse> getStudentsByEvent(
+            @PathVariable UUID eventId,
+            @PageableDefault(size = 10, page = 0) Pageable pageable) {
+        return eventService.getStudentsByEvent(eventId, pageable);
+    }
+
+
+    @Operation(summary = "Get the details of event")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The event details were provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventDetailsResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "uuid": "a2f6b827-1042-4a7c-a9c3-84f1356d10c4",
+                                        "name": "Festival de música indie",
+                                        "latitude": 37.386207,
+                                        "longitude": -5.99255572619863,
+                                        "description": "Algo guapo",
+                                        "cityId": "Köln",
+                                        "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                        "dateTime": "2024-03-02T18:00:00",
+                                        "eventType": [
+                                            "Food"
+                                        ],
+                                        "students": [
+                                            {
+                                                "id": "4847d54e-f0aa-49b8-bc3e-428bc4d990b8",
+                                                "username": "student11",
+                                                "name": "Student 11"
+                                            }
+                                        ]
+                                    }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/details/{eventId}")
+    public ResponseEntity<EventDetailsResponse> getEventDetails(
+            @PathVariable UUID eventId) {
+        return ResponseEntity.ok(eventService.getEventById(eventId));
     }
 }

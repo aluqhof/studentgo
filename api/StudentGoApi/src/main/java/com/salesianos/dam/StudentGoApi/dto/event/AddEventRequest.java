@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
+//Repasarrrrrrr hay que agregarle más cosas
 public record AddEventRequest(
         @NotBlank(message = "{addEventRequest.name.notblank}")
         String name,

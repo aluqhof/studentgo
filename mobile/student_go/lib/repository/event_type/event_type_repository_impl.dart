@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:http/http.dart';
+import 'package:http_interceptor/http_interceptor.dart';
 import 'package:student_go/models/response/event_type_response.dart';
 import 'package:student_go/repository/event_type/event_type_repository.dart';
 

@@ -10,21 +10,64 @@ part 'event_list_state.dart';
 class EventListBloc extends Bloc<EventListEvent, EventListState> {
   final EventRepository eventRepository;
   EventListBloc(this.eventRepository) : super(EventListInitial()) {
-    on<FetchEventListEvent>(_fetchEventList);
+    on<FetchUpcomingListEvent>(_fetchUpcomingList);
+    on<FetchAccordingListEvent>(_fetchAccordingList);
+    on<FetchEventTypeListEvent>(_fetchEventTypeList);
   }
 
-  void _fetchEventList(
-      FetchEventListEvent event, Emitter<EventListState> emit) async {
+  void _fetchUpcomingList(
+      FetchUpcomingListEvent event, Emitter<EventListState> emit) async {
     emit(EventListLoading());
     try {
-      final response =
-          await eventRepository.getUpcomingEventsLimited(event.city);
-      emit(EventListSuccess(response));
+      final response = await eventRepository.getUpcomingEventsLimited(
+          event.city, event.page, event.size);
+      emit(UpcomingListSuccess(response));
     } catch (e) {
       if (e is GeneralException) {
-        emit(TokenNotValidState());
+        if (e.status == 403) {
+          emit(TokenNotValidState());
+        }
+        emit(UpcomingListEntityException(e, e.title!));
       } else {
-        emit(EventListError("An unespected error occurred"));
+        emit(UpcomingListError("An unespected error occurred"));
+      }
+    }
+  }
+
+  void _fetchAccordingList(
+      FetchAccordingListEvent event, Emitter<EventListState> emit) async {
+    emit(EventListLoading());
+    try {
+      final response = await eventRepository.getAccordingEventsLimited(
+          event.city, event.page, event.size);
+      emit(AccordingListSuccess(response));
+    } catch (e) {
+      if (e is GeneralException) {
+        if (e.status == 403) {
+          emit(TokenNotValidState());
+        }
+        emit(AccordingListEntityException(e, e.title!));
+      } else {
+        emit(AccordingListError("An unespected error occurred"));
+      }
+    }
+  }
+
+  void _fetchEventTypeList(
+      FetchEventTypeListEvent event, Emitter<EventListState> emit) async {
+    emit(EventListLoading());
+    try {
+      final response = await eventRepository.getEventsByEventType(
+          event.city, event.eventTypeId, event.page, event.size);
+      emit(EventTypeListSuccess(response));
+    } catch (e) {
+      if (e is GeneralException) {
+        if (e.status == 403) {
+          emit(TokenNotValidState());
+        }
+        emit(EventTypeListEntityException(e, e.title!));
+      } else {
+        emit(EventTypeListError("An unespected error occurred"));
       }
     }
   }

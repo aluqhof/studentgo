@@ -28,6 +28,8 @@ public class Event {
     private double latitude;
 
     private double longitude;
+    private double price;
+    private String place;
 
     @ManyToOne
     @JoinColumn(name = "city_id")

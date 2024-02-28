@@ -1,6 +1,5 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
-import com.salesianos.dam.StudentGoApi.dto.event.EventResponse;
 import com.salesianos.dam.StudentGoApi.dto.eventType.EventTypeResponse;
 import com.salesianos.dam.StudentGoApi.service.EventTypeService;
 import io.swagger.v3.oas.annotations.Operation;

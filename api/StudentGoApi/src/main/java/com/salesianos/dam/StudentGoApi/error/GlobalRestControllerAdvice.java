@@ -1,7 +1,8 @@
 package com.salesianos.dam.StudentGoApi.error;
 
+
 import com.salesianos.dam.StudentGoApi.error.impl.ApiValidationSubError;
-import com.salesianos.dam.StudentGoApi.exception.InvalidCredentialsException;
+import com.salesianos.dam.StudentGoApi.exception.*;
 import com.salesianos.dam.StudentGoApi.security.errorhandling.JwtTokenException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpHeaders;
@@ -166,16 +167,6 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .property("date", LocalDateTime.now().format(formatter))
                 .build();
     }
-
-    @ExceptionHandler({ NameOfBikeNotFoundException.class })
-    private static ErrorResponse handleNameOfBikeNotFoundException(NameOfBikeNotFoundException exception) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return ErrorResponse.builder(exception, HttpStatus.NOT_FOUND, exception.getMessage())
-                .title("That bicycle name does not exist")
-                .type(URI.create("https://api.bikeapp.com/errors/not-found"))
-                .property("date", LocalDateTime.now().format(formatter))
-                .build();
-    }*/
+    */
 
 }

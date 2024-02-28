@@ -28,6 +28,16 @@ public class Student extends UserDefault {
     @ToString.Exclude
     private List<EventType> interests;
 
+    @ManyToMany
+    @JoinTable(
+            name = "student_event_saved",
+            joinColumns = @JoinColumn(name = "student_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    @ToString.Exclude
+    private List<Event> saved;
+
+
     public Student(UUID id, String username, String password, String email, String name,
                        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                        LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, String description) {

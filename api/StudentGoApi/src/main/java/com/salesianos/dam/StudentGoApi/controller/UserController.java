@@ -106,7 +106,7 @@ public class UserController {
                                                                             "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJiYTAwMzYyYy1mODA4LTRkZmQtOGQwYy0zODZkNmMxNzU3YTkiLCJpYXQiOjE3MDA2NDUyNjQsImV4cCI6MTcwMDczMTY2NH0.2a62n6XejYfeInr-00ywKVfm5me6armBPHA7ehLMwyelHvnLUWRLGmLv6CUN6nZd8QvKMlueIRQEezAqmftcPw"
                                                                         }
                                                                         """) }) }),
-            @ApiResponse(responseCode = "400 Bad Request", description = "Login was not succesful", content = @Content),
+            @ApiResponse(responseCode = "400 Bad Request", description = "Login was not successful", content = @Content),
     })
     @PostMapping("/auth/login")
     public ResponseEntity<JwtUserResponse> login(@RequestBody LoginUser loginUser) {
