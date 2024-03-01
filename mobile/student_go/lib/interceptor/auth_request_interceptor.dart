@@ -10,6 +10,7 @@ class AuthRequestInterceptor implements InterceptorContract {
     try {
       final prefs = await SharedPreferences.getInstance();
       print(prefs.getString('token')!);
+      //prefs.setString('token', '');
       request.headers[HttpHeaders.acceptHeader] =
           'application/json; charset=utf-8';
       request.headers[HttpHeaders.authorizationHeader] =
@@ -22,7 +23,8 @@ class AuthRequestInterceptor implements InterceptorContract {
 
   @override
   Future<BaseResponse> interceptResponse({required BaseResponse response}) {
-    if (response.statusCode == HttpStatus.forbidden) {
+    if (response.statusCode == HttpStatus.forbidden ||
+        response.statusCode == HttpStatus.unauthorized) {
       throw GeneralException();
     }
     return Future.value(response);

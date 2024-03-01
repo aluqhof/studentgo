@@ -51,5 +51,9 @@ public class StudentService {
         student.setSaved(eventsSaved);
         return studentRepository.save(student);
     }
+
+    public List<Event> getAllSavedEventsByStudent(Student student){
+        return studentRepository.findSavedEventsByStudentId(student.getId());
+    }
     
 }
