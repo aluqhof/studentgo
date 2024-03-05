@@ -57,8 +57,8 @@ class StudentRepositoryImp extends StudentRepository {
   @override
   Future<List<EventSavedResponse>> getAllSavedEvents() async {
     try {
-      final response = await _httpClient.put(
-        Uri.parse('http://10.0.2.2:8080/student/saved-events/'),
+      final response = await _httpClient.get(
+        Uri.parse('http://10.0.2.2:8080/student/saved-events'),
         //Uri.parse('http://localhost:8080/auth/login'),
       );
 

@@ -36,7 +36,6 @@ class _SaveButtonEventCardState extends State<SaveButtonEventCard> {
                   borderRadius: BorderRadius.circular(10), color: Colors.white),
               padding: const EdgeInsets.all(8),
               child: const Icon(
-                //Bokmark added
                 Icons.bookmark,
                 color: Color.fromRGBO(240, 99, 90, 1),
               ));
