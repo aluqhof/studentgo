@@ -4,6 +4,8 @@ import 'package:http_interceptor/http_interceptor.dart';
 import 'package:student_go/interceptor/auth_request_interceptor.dart';
 import 'package:student_go/models/response/event_saved_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
+import 'package:student_go/models/response/list_events_response/content.dart';
+import 'package:student_go/models/response/list_events_response/list_events_response.dart';
 import 'package:student_go/models/response/student_info_response/student_info_response.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 
@@ -55,7 +57,7 @@ class StudentRepositoryImp extends StudentRepository {
   }
 
   @override
-  Future<List<EventSavedResponse>> getAllSavedEvents() async {
+  Future<List<Content>> getAllSavedEvents() async {
     try {
       final response = await _httpClient.get(
         Uri.parse('http://10.0.2.2:8080/student/saved-events'),
@@ -64,8 +66,8 @@ class StudentRepositoryImp extends StudentRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-        final List<EventSavedResponse> eventsSaved =
-            jsonData.map((x) => EventSavedResponse.fromMap(x)).toList();
+        final List<Content> eventsSaved =
+            jsonData.map((x) => Content.fromMap(x)).toList();
         return eventsSaved;
       } else {
         throw Exception('Failed to save or unsave event');

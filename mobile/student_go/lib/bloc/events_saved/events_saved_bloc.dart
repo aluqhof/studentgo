@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:student_go/models/response/event_saved_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
+import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/models/response/student_info_response/student_info_response.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 
@@ -16,7 +17,7 @@ class EventsSavedBloc extends Bloc<EventsSavedEvent, EventsSavedState> {
   }
 
   void _fetchEventsSaved(
-      EventsSavedEvent event, Emitter<EventsSavedState> emit) async {
+      FetchEventsSaved event, Emitter<EventsSavedState> emit) async {
     emit(EventsSavedLoading());
     try {
       final response = await studentRepository.getAllSavedEvents();

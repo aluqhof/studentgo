@@ -87,7 +87,9 @@ class _AccordingListVerticalState extends State<AccordingListVertical> {
           ),
         ),
         body: VerticalList(
-            pagingController: _pagingController, bloc: _eventListBloc));
+          pagingController: _pagingController,
+          bloc: _eventListBloc,
+        ));
   }
 
   @override

@@ -1,85 +1,38 @@
-import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
-import 'package:student_go/bloc/all_events_calendar/all_events_calendar_bloc.dart';
-import 'package:student_go/models/response/list_events_response/content.dart';
-import 'package:student_go/repository/event/event_repository.dart';
-import 'package:student_go/repository/event/event_repository_impl.dart';
+import 'package:student_go/bloc/all_events_purchased_by_user/all_events_purchased_user_bloc.dart';
+import 'package:student_go/models/response/event_overview_response/event_overview_response.dart';
+import 'package:student_go/repository/purchase/purchase_repository.dart';
+import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
 import 'package:student_go/screen/event_details_screen.dart';
+import 'package:student_go/widgets/drawer_widget.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-class EventsCalendarScreen extends StatefulWidget {
-  const EventsCalendarScreen({Key? key}) : super(key: key);
+class MyEventsCalendarScreen extends StatefulWidget {
+  const MyEventsCalendarScreen({Key? key}) : super(key: key);
 
   @override
-  State<EventsCalendarScreen> createState() => _EventsCalendarScreenState();
+  State<MyEventsCalendarScreen> createState() => _MyEventsCalendarScreenState();
 }
 
-class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
-  late final ValueNotifier<List<Content>> _selectedEvents;
-  late AllEventsCalendarBloc _calendarBloc;
-  late EventRepository eventRepository;
-  Map<DateTime, List<Content>> _eventsMap = {};
-  late String _currentCity = '';
+class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
+  late final ValueNotifier<List<EventOverviewResponse>> _selectedEvents;
+  late AllEventsPurchasedUserBloc _calendarBloc;
+  late PurchaseRepository purchaseRepository;
+  Map<DateTime, List<EventOverviewResponse>> _eventsMap = {};
   bool _isLoading = true;
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      Position position = await _determinePosition();
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-      Placemark placemark = placemarks.first;
-      setState(() {
-        _currentCity = placemark.locality ?? 'Unknown';
-        _isLoading = false;
-        _calendarBloc = AllEventsCalendarBloc(eventRepository)
-          ..add(FetchAllEventsCalendar(_currentCity));
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      throw Exception('Error obtaining location: $e');
-    }
-  }
-
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      throw Exception('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        throw Exception('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied.');
-    }
-
-    return await Geolocator.getCurrentPosition();
-  }
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
-    eventRepository = EventRepositoryImpl();
+    purchaseRepository = PurchaseRepositoryImpl();
     _selectedEvents = ValueNotifier([]);
-    _calendarBloc = AllEventsCalendarBloc(eventRepository);
+    _calendarBloc = AllEventsPurchasedUserBloc(purchaseRepository)
+      ..add(FetchAllEventsPurchasedUser());
   }
 
   @override
@@ -91,15 +44,36 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocBuilder<AllEventsCalendarBloc, AllEventsCalendarState>(
+      appBar: AppBar(
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: const Icon(
+              Icons.menu_rounded,
+              color: Color.fromARGB(255, 0, 0, 0),
+              size: 30,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+        title: Text(
+          'Calendar',
+          style: GoogleFonts.actor(),
+        ),
+      ),
+      drawer: const DrawerWidget(),
+      body:
+          BlocBuilder<AllEventsPurchasedUserBloc, AllEventsPurchasedUserState>(
         bloc: _calendarBloc,
         builder: (context, state) {
-          if (state is AllEventsCalendarLoading) {
+          if (state is AllEventsPurchasedUserLoading ||
+              state is AllEventsPurchasedUserInitial) {
             return const Center(child: CircularProgressIndicator());
-          } else if (state is AllEventsCalendarSuccess) {
+          } else if (state is AllEventsPurchasedUserSuccess) {
             _eventsMap = _getEventsMap(state.events);
             return _buildCalendar();
-          } else if (state is AllEventsCalendarError) {
+          } else if (state is AllEventsPurchasedUserError) {
             return Center(child: Text(state.errorMessage));
           } else {
             return const Center(child: CircularProgressIndicator());
@@ -205,7 +179,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
             ),
           ),
           Expanded(
-            child: ValueListenableBuilder<List<Content>>(
+            child: ValueListenableBuilder<List<EventOverviewResponse>>(
               valueListenable: _selectedEvents,
               builder: (context, events, _) {
                 return events.isEmpty
@@ -428,7 +402,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
     }
   }
 
-  List<Content> _getEventsForDay(DateTime day) {
+  List<EventOverviewResponse> _getEventsForDay(DateTime day) {
     final eventsForDay = _eventsMap.entries
         .where((entry) => isSameDay(entry.key, day))
         .map((entry) => entry.value)
@@ -437,7 +411,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
     return eventsForDay;
   }
 
-  List<Content> _getEventsForSelectedDay() {
+  List<EventOverviewResponse> _getEventsForSelectedDay() {
     if (_selectedDay != null) {
       return _getEventsForDay(_selectedDay!);
     } else {
@@ -445,8 +419,9 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
     }
   }
 
-  Map<DateTime, List<Content>> _getEventsMap(List<Content> events) {
-    final Map<DateTime, List<Content>> eventsMap = {};
+  Map<DateTime, List<EventOverviewResponse>> _getEventsMap(
+      List<EventOverviewResponse> events) {
+    final Map<DateTime, List<EventOverviewResponse>> eventsMap = {};
 
     for (final event in events) {
       final eventDate = DateTime.parse(event.dateTime!);

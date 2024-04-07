@@ -8,7 +8,7 @@ final class EventsSavedInitial extends EventsSavedState {}
 final class EventsSavedLoading extends EventsSavedState {}
 
 final class EventsSavedSuccess extends EventsSavedState {
-  final List<EventSavedResponse> eventsSaved;
+  final List<Content> eventsSaved;
   EventsSavedSuccess(this.eventsSaved);
 }
 

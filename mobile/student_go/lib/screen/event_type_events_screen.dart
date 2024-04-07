@@ -89,7 +89,9 @@ class _EventTypeEventsScreenState extends State<EventTypeEventsScreen> {
             ),
           ),
           body: VerticalList(
-              pagingController: _pagingController, bloc: _eventListBloc)),
+            pagingController: _pagingController,
+            bloc: _eventListBloc,
+          )),
     );
   }
 

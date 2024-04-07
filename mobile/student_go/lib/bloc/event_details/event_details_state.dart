@@ -17,7 +17,7 @@ final class EventDetailsError extends EventDetailsState {
   EventDetailsError(this.errorMessage);
 }
 
-final class TokenNotValidState extends EventDetailsState {}
+final class TokenNotValidStateEventDetails extends EventDetailsState {}
 
 final class EventDetailsEntityException extends EventDetailsError {
   final GeneralException generalException;

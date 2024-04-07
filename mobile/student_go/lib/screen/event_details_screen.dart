@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
@@ -5,9 +7,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_details/event_details_bloc.dart';
+import 'package:student_go/bloc/purchase/purchase_bloc.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
+import 'package:student_go/repository/purchase/purchase_repository.dart';
+import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
+import 'package:student_go/widgets/people_going_list.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final String eventId;
@@ -20,10 +26,13 @@ class EventDetailsScreen extends StatefulWidget {
 class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late EventRepository eventRepository;
   late EventDetailsBloc _eventDetailsBloc;
+  late PurchaseRepository purchaseRepository;
+  late PurchaseBloc _purchaseBloc;
   late SharedPreferences _prefs;
   late String _street = '';
   late String _city = '';
   late String _postalCode = '';
+  int _counter = 1;
 
   Future<void> _getStreet(double latitude, double longitude) async {
     try {
@@ -47,6 +56,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     eventRepository = EventRepositoryImpl();
     _eventDetailsBloc = EventDetailsBloc(eventRepository)
       ..add(FetchEventDetails(widget.eventId));
+    purchaseRepository = PurchaseRepositoryImpl();
+    _purchaseBloc = PurchaseBloc(purchaseRepository);
     super.initState();
   }
 
@@ -109,174 +120,195 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                            height: 250,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image: AssetImage(
-                                  'assets/img/card_background.jpg',
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet<void>(
+                            context: context,
+                            isScrollControlled: true,
+                            builder: (BuildContext context) {
+                              ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+                              return SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.85,
+                                child: PeopleGoingList(
+                                  students: state.eventDetails.students!,
                                 ),
-                                fit: BoxFit.cover,
+                              );
+                            },
+                          );
+                        },
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              height: 250,
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage(
+                                    'assets/img/card_background.jpg',
+                                  ),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
-                          ),
-                          Positioned(
-                            top: 215,
-                            left: 0,
-                            right: 0,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 40.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(40.0),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.3),
-                                      blurRadius:
-                                          10.0, // Establece el blurRadius en 0
-                                      spreadRadius: 0.0,
-                                      offset: const Offset(0.0,
-                                          5.0), // Desplazamiento hacia abajo
-                                    ),
-                                  ],
-                                ),
-                                height: 70,
-                                width: double.infinity,
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
+                            Positioned(
+                              top: 215,
+                              left: 0,
+                              right: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 40.0),
+                                child: Container(
+                                  decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(40.0),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.3),
+                                        blurRadius:
+                                            10.0, // Establece el blurRadius en 0
+                                        spreadRadius: 0.0,
+                                        offset: const Offset(0.0,
+                                            5.0), // Desplazamiento hacia abajo
+                                      ),
+                                    ],
                                   ),
-                                  surfaceTintColor: Colors.white,
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8.0),
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Positioned(
-                                          left: 50,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 1,
+                                  height: 70,
+                                  width: double.infinity,
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(40.0),
+                                    ),
+                                    surfaceTintColor: Colors.white,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8.0),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Positioned(
+                                            left: 50,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
                                               ),
-                                            ),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                'assets/img/fotoprueba1.jpg',
-                                                width: 35,
-                                                height: 35,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          left: 25,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                'assets/img/fotoprueba2.jpg',
-                                                width: 35,
-                                                height: 35,
-                                                fit: BoxFit.cover,
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/img/fotoprueba1.jpg',
+                                                  width: 35,
+                                                  height: 35,
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        Positioned(
-                                          left: 0,
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 1,
+                                          Positioned(
+                                            left: 25,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
                                               ),
-                                            ),
-                                            child: ClipOval(
-                                              child: Image.asset(
-                                                'assets/img/fotoprueba3.jpg',
-                                                width: 35,
-                                                height: 35,
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          left: 100,
-                                          child: Text(
-                                            state.eventDetails.students!
-                                                        .length >=
-                                                    20
-                                                ? '+20 Going'
-                                                : state.eventDetails.students!
-                                                        .isNotEmpty
-                                                    ? '${state.eventDetails.students!.length} Going'
-                                                    : 'Be the first',
-                                            style: GoogleFonts.actor(
-                                                textStyle: const TextStyle(
-                                              color: Color.fromRGBO(
-                                                  63, 56, 221, 1),
-                                              fontSize: 17,
-                                            )),
-                                          ),
-                                        ),
-                                        Align(
-                                          alignment: Alignment.centerRight,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ElevatedButton(
-                                              style: ButtonStyle(
-                                                  padding:
-                                                      MaterialStateProperty.all<EdgeInsets>(
-                                                          const EdgeInsets.symmetric(
-                                                              horizontal: 25,
-                                                              vertical: 0)),
-                                                  shape: MaterialStateProperty.all<
-                                                          RoundedRectangleBorder>(
-                                                      RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.circular(
-                                                                  10.0))),
-                                                  backgroundColor:
-                                                      MaterialStateProperty.all(
-                                                          Colors.blue)),
-                                              onPressed: () {
-                                                // Lógica para el botón de invitar
-                                              },
-                                              child: Text(
-                                                'Invite',
-                                                style: GoogleFonts.actor(
-                                                    textStyle: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 15)),
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/img/fotoprueba2.jpg',
+                                                  width: 35,
+                                                  height: 35,
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        )
-                                      ],
+                                          Positioned(
+                                            left: 0,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: ClipOval(
+                                                child: Image.asset(
+                                                  'assets/img/fotoprueba3.jpg',
+                                                  width: 35,
+                                                  height: 35,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            left: 100,
+                                            child: Text(
+                                              state.eventDetails.students!
+                                                          .length >=
+                                                      20
+                                                  ? '+20 Going'
+                                                  : state.eventDetails.students!
+                                                          .isNotEmpty
+                                                      ? '${state.eventDetails.students!.length} Going'
+                                                      : 'Be the first',
+                                              style: GoogleFonts.actor(
+                                                  textStyle: const TextStyle(
+                                                color: Color.fromRGBO(
+                                                    63, 56, 221, 1),
+                                                fontSize: 17,
+                                              )),
+                                            ),
+                                          ),
+                                          Align(
+                                            alignment: Alignment.centerRight,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: ElevatedButton(
+                                                style: ButtonStyle(
+                                                    padding:
+                                                        MaterialStateProperty.all<EdgeInsets>(
+                                                            const EdgeInsets.symmetric(
+                                                                horizontal: 25,
+                                                                vertical: 0)),
+                                                    shape: MaterialStateProperty.all<
+                                                            RoundedRectangleBorder>(
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                    10.0))),
+                                                    backgroundColor:
+                                                        MaterialStateProperty
+                                                            .all(Colors.blue)),
+                                                onPressed: () {
+                                                  // Lógica para el botón de invitar
+                                                },
+                                                child: Text(
+                                                  'Invite',
+                                                  style: GoogleFonts.actor(
+                                                      textStyle:
+                                                          const TextStyle(
+                                                              color:
+                                                                  Colors.white,
+                                                              fontSize: 15)),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 55),
                       Padding(
@@ -473,7 +505,330 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         elevation: MaterialStateProperty.all(5),
                       ),
                       onPressed: () {
-                        // Lógica para el botón
+                        showModalBottomSheet<void>(
+                          context: context,
+                          builder: (BuildContext context) {
+                            ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+                            return SafeArea(
+                              child: Wrap(children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(15.0),
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Order Review',
+                                          style: GoogleFonts.actor(
+                                              textStyle: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold)),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Container(
+                                                height: 100,
+                                                width: 100,
+                                                decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                  image: const DecorationImage(
+                                                    image: AssetImage(
+                                                      'assets/img/card_background.jpg',
+                                                    ),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 8.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Align(
+                                                      alignment:
+                                                          Alignment.topLeft,
+                                                      child: Text(
+                                                          truncateString(
+                                                              state.eventDetails
+                                                                  .name!,
+                                                              20),
+                                                          style: GoogleFonts.actor(
+                                                              textStyle: const TextStyle(
+                                                                  fontSize: 18,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500))),
+                                                    ),
+                                                    Text(
+                                                        truncateString(
+                                                            state.eventDetails
+                                                                .place!,
+                                                            20),
+                                                        style: GoogleFonts.actor(
+                                                            textStyle:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .grey))),
+                                                    Text(
+                                                        convertirFormato(state
+                                                            .eventDetails
+                                                            .dateTime!),
+                                                        style: GoogleFonts.actor(
+                                                            textStyle:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        16,
+                                                                    color: Colors
+                                                                        .grey))),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 8.0),
+                                          child: BlocProvider.value(
+                                              value: _purchaseBloc,
+                                              child: BlocBuilder<PurchaseBloc,
+                                                  PurchaseState>(
+                                                builder:
+                                                    (context, statePurchase) {
+                                                  if (statePurchase
+                                                      is PurchaseInitial) {
+                                                    return GestureDetector(
+                                                      onTap: () {
+                                                        _purchaseBloc.add(
+                                                            FetchPurchase(
+                                                                state
+                                                                    .eventDetails
+                                                                    .uuid!,
+                                                                1));
+                                                      },
+                                                      child: Container(
+                                                        width: double.infinity,
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10),
+                                                        decoration: BoxDecoration(
+                                                            color: Colors.blue,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10)),
+                                                        child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      20.0,
+                                                                  vertical: 8),
+                                                          child: Row(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .spaceBetween,
+                                                            children: [
+                                                              Text(
+                                                                'PAY NOW',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                style: GoogleFonts
+                                                                    .actor(
+                                                                        textStyle:
+                                                                            const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                )),
+                                                              ),
+                                                              Text(
+                                                                formatPriceToEuro(state
+                                                                        .eventDetails
+                                                                        .price! *
+                                                                    _counter),
+                                                                style: GoogleFonts
+                                                                    .actor(
+                                                                        textStyle:
+                                                                            const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                )),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  if (statePurchase
+                                                      is PurchaseLoading) {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  }
+                                                  if (statePurchase
+                                                      is PurchaseSuccess) {
+                                                    Navigator.pop(context);
+                                                    WidgetsBinding.instance
+                                                        .addPostFrameCallback(
+                                                            (_) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Container(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                              vertical: 12.0,
+                                                              horizontal: 16.0,
+                                                            ),
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  Colors.white,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8.0),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: Colors
+                                                                      .black
+                                                                      .withOpacity(
+                                                                          0.2),
+                                                                  blurRadius:
+                                                                      6.0,
+                                                                  offset:
+                                                                      const Offset(
+                                                                          0, 3),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: const Text(
+                                                              '¡Compra exitosa!',
+                                                              style: TextStyle(
+                                                                  fontSize:
+                                                                      18.0,
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                          ),
+                                                          duration: const Duration(
+                                                              seconds:
+                                                                  4), // Ajusta la duración según tus necesidades
+                                                          backgroundColor: Colors
+                                                              .transparent, // Fondo transparente para eliminar el fondo del SnackBar
+                                                          elevation:
+                                                              0, // Sin elevación para que la sombra personalizada se aplique
+                                                          behavior: SnackBarBehavior
+                                                              .floating, // SnackBar flotante
+                                                        ),
+                                                      );
+                                                    });
+                                                  }
+                                                  if (statePurchase
+                                                      is PurchaseEntityException) {
+                                                    return AlertDialog(
+                                                      content: Container(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                vertical: 10),
+                                                        child: Column(
+                                                          mainAxisSize: MainAxisSize
+                                                              .min, // Para que el AlertDialog no sea tan alto
+                                                          children: [
+                                                            Text(
+                                                              statePurchase
+                                                                  .generalException
+                                                                  .detail!,
+                                                              style:
+                                                                  const TextStyle(
+                                                                fontSize:
+                                                                    16, // Tamaño de fuente más pequeño
+                                                                color: Colors
+                                                                    .red, // Color de fuente rojo
+                                                              ),
+                                                            ),
+                                                            const SizedBox(
+                                                                height: 10),
+                                                            TextButton(
+                                                              onPressed: () {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pop(); // Cierra el diálogo
+                                                              },
+                                                              style: TextButton
+                                                                  .styleFrom(
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .red, // Color de fondo rojo
+                                                                padding: const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        10), // Ajusta el padding del botón
+                                                              ),
+                                                              child: const Text(
+                                                                'OK',
+                                                                style:
+                                                                    TextStyle(
+                                                                  fontSize:
+                                                                      16, // Tamaño de fuente del botón igual al texto del botón 'PAY NOW'
+                                                                  color: Colors
+                                                                      .white,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }
+                                                  if (statePurchase
+                                                      is PurchaseError) {
+                                                    return Text(statePurchase
+                                                        .errorMessagge);
+                                                  } else {
+                                                    return const Center(
+                                                        child:
+                                                            CircularProgressIndicator());
+                                                  }
+                                                },
+                                              )),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            );
+                          },
+                        );
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -510,7 +865,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               return const Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (state is TokenNotValidState) {
+            } else if (state is TokenNotValidStateEventDetails) {
               Future.microtask(() {
                 Navigator.pushReplacement(
                   context,
@@ -588,5 +943,18 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     String formatoFinal = '$diaSemana, $hora:$minutos$amPm';
 
     return formatoFinal;
+  }
+
+  void _mostrarNotificacion(BuildContext context) {
+    final snackBar = SnackBar(
+      content: const Text('¡Hola! Esta es una notificación dentro de la app.'),
+      action: SnackBarAction(
+        label: 'Cerrar',
+        onPressed: () {
+          // Al hacer clic en "Cerrar"
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

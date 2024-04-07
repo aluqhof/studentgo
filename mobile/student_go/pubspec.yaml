@@ -49,6 +49,9 @@ dependencies:
   table_calendar: ^3.1.0
   google_maps_flutter: ^2.5.3
   collection: ^1.18.0
+  modal_bottom_sheet: ^2.1.2
+  input_quantity: ^2.3.2
+  flutter_swipe_button: ^2.1.1+1
 
 dev_dependencies:
   flutter_test:

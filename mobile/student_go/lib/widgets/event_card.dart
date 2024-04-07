@@ -70,7 +70,7 @@ class _EventCardState extends State<EventCard> {
           } else if (state is EventsSavedSuccess) {
             final eventsSaved = state.eventsSaved;
             final isSaved =
-                eventsSaved.any((event) => event.eventId == widget.result.uuid);
+                eventsSaved.any((event) => event.uuid == widget.result.uuid);
             return _buildCard(isSaved);
           } else if (state is EventsSavedEntityException ||
               state is EventsSavedError) {

@@ -86,7 +86,9 @@ class _UpcomingListVerticalState extends State<UpcomingListVertical> {
           ),
         ),
         body: VerticalList(
-            pagingController: _pagingController, bloc: _eventListBloc));
+          pagingController: _pagingController,
+          bloc: _eventListBloc,
+        ));
   }
 
   @override

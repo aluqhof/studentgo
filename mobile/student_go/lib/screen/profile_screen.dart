@@ -7,6 +7,7 @@ import 'package:student_go/models/response/student_info_response/student_info_re
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
+import 'package:student_go/widgets/drawer_widget.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -32,11 +33,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       value: _studentBloc,
       child: Scaffold(
         appBar: AppBar(
+          leading: Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(
+                Icons.menu_rounded,
+                color: Color.fromARGB(255, 0, 0, 0),
+                size: 30,
+              ),
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            ),
+          ),
           title: Text(
             'Profile',
             style: GoogleFonts.actor(),
           ),
         ),
+        drawer: const DrawerWidget(),
         body: BlocBuilder<StudentBloc, StudentState>(builder: (context, state) {
           if (state is StudentLoading || state is StudentInitial) {
             return const Center(

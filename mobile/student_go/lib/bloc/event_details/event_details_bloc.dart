@@ -22,7 +22,7 @@ class EventDetailsBloc extends Bloc<EventDetailsEvent, EventDetailsState> {
     } catch (e) {
       if (e is GeneralException) {
         if (e.status == 403) {
-          emit(TokenNotValidState());
+          emit(TokenNotValidStateEventDetails());
         }
         emit(EventDetailsEntityException(e, e.title!));
       } else {

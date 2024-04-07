@@ -4,11 +4,16 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_go/bloc/event_type/event_type_bloc.dart';
+import 'package:student_go/bloc/student/student_bloc.dart';
 import 'package:student_go/models/response/event_type_response.dart';
 import 'package:student_go/repository/event_type/event_type_repository.dart';
 import 'package:student_go/repository/event_type/event_type_repository_impl.dart';
+import 'package:student_go/repository/student/student_repository.dart';
+import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
+import 'package:student_go/screen/profile_screen.dart';
 import 'package:student_go/widgets/according_horizontal_list.dart';
+import 'package:student_go/widgets/drawer_widget.dart';
 import 'package:student_go/widgets/upcoming_horizontal_list.dart';
 import 'package:student_go/widgets/event_type_widget.dart';
 
@@ -60,34 +65,6 @@ class _ExploreScreenState extends State<ExploreScreen> {
       });
       throw Exception('Error obtaining location: $e');
     }
-  }
-
-  int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
-    Text(
-      'Index 0: Home',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 1: Business',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
-    Text(
-      'Index 3: Profile',
-      style: optionStyle,
-    )
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   @override
@@ -186,40 +163,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
           ],
           backgroundColor: const Color.fromRGBO(74, 67, 236, 1),
         ),
-        drawer: Drawer(
-          // Add a ListView to the drawer. This ensures the user can scroll
-          // through the options in the drawer if there isn't enough vertical
-          // space to fit everything.
-          child: ListView(
-            // Important: Remove any padding from the ListView.
-            padding: EdgeInsets.zero,
-            children: [
-              const DrawerHeader(
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-                child: Text('Drawer Header'),
-              ),
-              ListTile(
-                title: const Text('Item 1'),
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const LoginScreen()),
-                  );
-                },
-              ),
-              ListTile(
-                title: const Text('Item 2'),
-                onTap: () {
-                  // Update the state of the app.
-                  // ...
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: const DrawerWidget(),
         body: (!_isLoading)
             ? SingleChildScrollView(
                 child: Column(
