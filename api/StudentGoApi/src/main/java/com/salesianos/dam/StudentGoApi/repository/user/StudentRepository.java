@@ -13,4 +13,5 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
     @Query("SELECT s.saved FROM Student s WHERE s.id = :studentId")
     List<Event> findSavedEventsByStudentId(UUID studentId);
 
+
 }

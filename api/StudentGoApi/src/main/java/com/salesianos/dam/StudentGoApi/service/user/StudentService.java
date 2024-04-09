@@ -1,12 +1,17 @@
 package com.salesianos.dam.StudentGoApi.service.user;
 
+import com.salesianos.dam.StudentGoApi.MyPage;
+import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.model.Event;
+import com.salesianos.dam.StudentGoApi.model.EventType;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.repository.EventRepository;
+import com.salesianos.dam.StudentGoApi.repository.EventTypeRepository;
 import com.salesianos.dam.StudentGoApi.repository.user.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +57,11 @@ public class StudentService {
         return studentRepository.save(student);
     }
 
-    public List<Event> getAllSavedEventsByStudent(Student student){
-        return studentRepository.findSavedEventsByStudentId(student.getId());
+    public List<EventViewResponse> getAllSavedEventsByStudent(Student student){
+        List<Event> events = studentRepository.findSavedEventsByStudentId(student.getId());
+        return events.stream()
+                .map(event -> EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(student.getId())))
+                .toList();
     }
     
 }

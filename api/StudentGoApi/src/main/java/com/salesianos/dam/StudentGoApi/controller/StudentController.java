@@ -1,5 +1,6 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
+import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventsSavedResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
 import com.salesianos.dam.StudentGoApi.model.Event;
@@ -39,8 +40,8 @@ public class StudentController {
 
     @GetMapping("/saved-events")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<EventsSavedResponse>> getAllSavedEvents(@AuthenticationPrincipal Student student){
-        return ResponseEntity.ok(studentService.getAllSavedEventsByStudent(student).stream().map(EventsSavedResponse::of).toList());
+    public ResponseEntity<List<EventViewResponse>> getAllSavedEvents(@AuthenticationPrincipal Student student){
+        return ResponseEntity.ok(studentService.getAllSavedEventsByStudent(student));
     }
 
 }
