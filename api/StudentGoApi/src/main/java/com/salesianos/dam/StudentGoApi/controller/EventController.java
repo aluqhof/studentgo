@@ -129,8 +129,8 @@ public class EventController {
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
     @GetMapping("/upcoming/{cityName}")
-    public ResponseEntity<List<EventViewResponse>> getEventsByCity(@PathVariable String cityName){
-        return ResponseEntity.ok(eventService.getAllEventsInCity(cityName).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
+    public ResponseEntity<List<EventViewResponse>> getEventsByCity(@PathVariable String cityName, @RequestParam(value = "eventName", required = false) String eventName){
+        return ResponseEntity.ok(eventService.getAllUpcomingEventsInCity(cityName, eventName).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
     }
 
     @Operation(summary = "Get Pageable results from upcoming events in a city limited")
@@ -140,41 +140,81 @@ public class EventController {
                             @ExampleObject(value = """
                                     {
                                         "name": "Upcoming Events",
-                                        "result": [
+                                        "content": [
                                             {
-                                                "uuid": "ae56ec32-98bf-4eb6-821d-741a0816b3bf",
-                                                "name": "Concierto de la niña pastori",
-                                                "latitude": -5.99255572619863,
-                                                "longitude": 37.386207,
+                                                "uuid": "d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2",
+                                                "name": "Exposición de arte contemporáneo",
+                                                "latitude": 50.934741,
+                                                "longitude": 6.97958,
                                                 "cityId": "Köln",
-                                                "description": "Algo guapo",
-                                                "dateTime": "2024-02-26T08:00:00",
-                                                "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
-                                                "eventTypes": [
-                                                    "Gaming"
+                                                "dateTime": "2024-04-14T12:00:00",
+                                                "eventType": [
+                                                    {
+                                                        "id": 3,
+                                                        "name": "Food",
+                                                        "iconRef": "0xe533",
+                                                        "colorCode": "0xff29d697"
+                                                    }
+                                                ],
+                                                "students": [
+                                                    {
+                                                        "id": "7f40a32b-344f-4928-9995-8f6d12c34694",
+                                                        "username": "student10",
+                                                        "name": "Student 10"
+                                                    },
+                                                    {
+                                                        "id": "e010f144-b376-4dbb-933d-b3ec8332ed0d",
+                                                        "username": "student2",
+                                                        "name": "Student 2"
+                                                    }
                                                 ]
                                             },
                                             {
-                                                "uuid": "39ff97ef-c4e2-4980-92a7-9d67b4d03749",
-                                                "name": "Feria de artesanía",
-                                                "latitude": -5.99631554987113,
-                                                "longitude": 37.3824023,
+                                                "uuid": "ae56ec32-98bf-4eb6-821d-741a0816b3bf",
+                                                "name": "Concierto de la niña pastori",
+                                                "latitude": 37.386207,
+                                                "longitude": -5.99255572619863,
                                                 "cityId": "Köln",
-                                                "description": "Algo guapo",
-                                                "dateTime": "2024-02-27T10:00:00",
-                                                "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
-                                                "eventTypes": [
-                                                    "Gaming"
+                                                "dateTime": "2024-04-26T08:00:00",
+                                                "eventType": [
+                                                    {
+                                                        "id": 4,
+                                                        "name": "Gaming",
+                                                        "iconRef": "0xe5e8",
+                                                        "colorCode": "0xff46cdfb"
+                                                    }
+                                                ],
+                                                "students": [
+                                                    {
+                                                        "id": "04d0595e-45d5-4f63-8b53-1d79e9d84a5d",
+                                                        "username": "student1",
+                                                        "name": "Student 1"
+                                                    },
+                                                    {
+                                                        "id": "23b9773b-b123-4f48-8a6d-ef732806d1f5",
+                                                        "username": "student8",
+                                                        "name": "Student 8"
+                                                    },
+                                                    {
+                                                        "id": "dc98d909-98fd-44da-8944-f2e84ecb1695",
+                                                        "username": "student7",
+                                                        "name": "Student 7"
+                                                    }
                                                 ]
                                             }
-                                        ]
+                                        ],
+                                        "size": 5,
+                                        "totalElements": 2,
+                                        "pageNumber": 0,
+                                        "first": true,
+                                        "last": true
                                     }
                                                                         """) }) }),
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
     @GetMapping("/upcoming-limit/{cityName}")
     public MyPage<EventViewResponse> getUpcomingEventsByCity(@PathVariable String cityName, @PageableDefault(size = 5, page = 0) Pageable pageable){
-        return eventService.getFutureEventsInCity(cityName, pageable);
+        return eventService.getAllUpcomingEventsInCityPaged(cityName, pageable);
     }
 
     @Operation(summary = "Get Pageable results from recommendended events in a city limited based on user interests")

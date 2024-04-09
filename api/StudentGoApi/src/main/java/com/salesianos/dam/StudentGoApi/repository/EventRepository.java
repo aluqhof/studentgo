@@ -11,14 +11,17 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-public interface EventRepository extends JpaRepository<Event, UUID> {
+public interface  EventRepository extends JpaRepository<Event, UUID> {
 
-    @Query("SELECT e FROM Event e WHERE e.city.id = :id AND e.dateTime > CURRENT_TIMESTAMP")
-    List<Event> findEventsByCityId(@Param("id") Long cityId);
+    @Query("SELECT e FROM Event e WHERE e.city.id = :id AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
+    List<Event> findFutureEventsByCity(@Param("id") Long cityId);
+
+    @Query("SELECT e FROM Event e WHERE e.city.id = :id AND e.dateTime > CURRENT_TIMESTAMP AND e.name LIKE %:name% ORDER BY e.dateTime ASC")
+    List<Event> findFutureEventsByCityIdAndName(@Param("id") Long cityId, @Param("name")String name);
 
 
     @Query("SELECT e FROM Event e WHERE e.city.id = :cityId AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
-    Page<Event> findAllFutureEventsByCityId(@Param("cityId") Long cityId, Pageable pageable);
+    Page<Event> findFutureEventsByCityPaged(@Param("cityId") Long cityId, Pageable pageable);
     //Esto deberia ir en orden de popularidad del organizador (reviews, eventos realizados...)
 
     @Query("SELECT e FROM Event e " +

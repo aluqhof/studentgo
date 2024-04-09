@@ -52,15 +52,19 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public List<Event> getAllEventsInCity(String cityName){
-        Long cityId = cityRepository.findFirstByNameIgnoreCase(cityName)
-                .orElseThrow(() -> new NotFoundException("city")).getId();
-        return eventRepository.findEventsByCityId(cityId);
+    public List<Event> getAllUpcomingEventsInCity(String cityName, String query){
+        if(query == null){
+            return eventRepository.findFutureEventsByCity(cityRepository.findFirstByNameIgnoreCase(cityName)
+                    .orElseThrow(() -> new NotFoundException("city")).getId());
+        }else {
+            return eventRepository.findFutureEventsByCityIdAndName(cityRepository.findFirstByNameIgnoreCase(cityName)
+                    .orElseThrow(() -> new NotFoundException("city")).getId(), query);
+        }
     }
 
-    public MyPage<EventViewResponse> getFutureEventsInCity(String cityName, Pageable pageable){
-        Page<Event> events =  eventRepository.findAllFutureEventsByCityId(cityRepository.findFirstByNameIgnoreCase(cityName)
-                .orElseThrow(() -> new NotFoundException("city")).getId(), pageable);
+    public MyPage<EventViewResponse> getAllUpcomingEventsInCityPaged(String cityName, Pageable pageable){
+        Page<Event> events =  eventRepository.findFutureEventsByCityPaged(cityRepository.findFirstByNameIgnoreCase(cityName)
+                    .orElseThrow(() -> new NotFoundException("city")).getId(), pageable);
         return MyPage.of(events
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
     }

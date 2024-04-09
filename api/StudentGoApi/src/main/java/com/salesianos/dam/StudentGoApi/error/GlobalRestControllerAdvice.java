@@ -108,6 +108,26 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(NumberOfTicketsLowerThan0Exception.class)
+    public ErrorResponse handleNumberOfTicketsException(
+            NumberOfTicketsLowerThan0Exception exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Number of tickets error")
+                .type(URI.create("https://api.studentgo.com/errors/number-of-tickets-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(EventAlreadyPurchasedException.class)
+    public ErrorResponse handleEventAlreadyPurchased(
+            EventAlreadyPurchasedException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Event already purchased error error")
+                .type(URI.create("https://api.studentgo.com/errors/event-already-purchased-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
     /*
     @ExceptionHandler({InvalidPinExcepcion.class})
     public ErrorResponse handleInvalidPin(InvalidPinExcepcion exception) {
