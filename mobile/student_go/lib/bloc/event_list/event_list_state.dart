@@ -56,3 +56,20 @@ final class EventTypeListEntityException extends UpcomingListError {
   EventTypeListEntityException(this.generalException, String errorMessage)
       : super(errorMessage);
 }
+
+final class UpcomingListSearchableSuccess extends EventListState {
+  final List<Content> listEventsResponse;
+  UpcomingListSearchableSuccess(this.listEventsResponse);
+}
+
+final class UpcomingListSearchableError extends EventListState {
+  final String errorMessage;
+  UpcomingListSearchableError(this.errorMessage);
+}
+
+final class UpcomingListsearchableEntityException extends UpcomingListError {
+  final GeneralException generalException;
+  UpcomingListsearchableEntityException(
+      this.generalException, String errorMessage)
+      : super(errorMessage);
+}

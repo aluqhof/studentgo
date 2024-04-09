@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/models/response/list_events_response/list_events_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/repository/event/event_repository.dart';
@@ -13,6 +14,7 @@ class EventListBloc extends Bloc<EventListEvent, EventListState> {
     on<FetchUpcomingListEvent>(_fetchUpcomingList);
     on<FetchAccordingListEvent>(_fetchAccordingList);
     on<FetchEventTypeListEvent>(_fetchEventTypeList);
+    on<FetchUpcomingListSearchableEvent>(_fetchUpcomingSearchableList);
   }
 
   void _fetchUpcomingList(
@@ -68,6 +70,25 @@ class EventListBloc extends Bloc<EventListEvent, EventListState> {
         emit(EventTypeListEntityException(e, e.title!));
       } else {
         emit(EventTypeListError("An unespected error occurred"));
+      }
+    }
+  }
+
+  void _fetchUpcomingSearchableList(FetchUpcomingListSearchableEvent event,
+      Emitter<EventListState> emit) async {
+    emit(EventListLoading());
+    try {
+      final response = await eventRepository.getUpcomingEventsLimitedSearchable(
+          event.city, event.page, event.size, event.name);
+      emit(UpcomingListSearchableSuccess(response));
+    } catch (e) {
+      if (e is GeneralException) {
+        if (e.status == 403) {
+          emit(TokenNotValidState());
+        }
+        emit(UpcomingListsearchableEntityException(e, e.title!));
+      } else {
+        emit(UpcomingListSearchableError("An unespected error occurred"));
       }
     }
   }
