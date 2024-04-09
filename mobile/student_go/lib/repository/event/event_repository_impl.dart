@@ -152,4 +152,34 @@ class EventRepositoryImpl extends EventRepository {
       throw Exception('Something wrong');
     }
   }
+
+  @override
+  Future<List<Content>> getUpcomingEventsLimitedSearchable(
+      String city, int page, int size, String name) async {
+    try {
+      final response = await _httpClient.get(
+        Uri.parse('http://10.0.2.2:8080/event/upcoming/$city?&eventName=$name'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        final List<Content> events =
+            jsonData.map((x) => Content.fromMap(x)).toList();
+        return events;
+      } else if (response.statusCode == 404 ||
+          response.statusCode == 400 ||
+          response.statusCode == 401 ||
+          response.statusCode == 403) {
+        throw GeneralException.fromJson(response.body);
+      } else {
+        throw Exception('Failed to get events');
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        rethrow;
+      } else {
+        throw Exception('Something wrong');
+      }
+    }
+  }
 }

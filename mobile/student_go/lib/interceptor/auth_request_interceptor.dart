@@ -9,15 +9,13 @@ class AuthRequestInterceptor implements InterceptorContract {
   Future<BaseRequest> interceptRequest({required BaseRequest request}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      print(prefs.getString('token')!);
+      //print(prefs.getString('token')!);
       //prefs.setString('token', '');
       request.headers[HttpHeaders.acceptHeader] =
           'application/json; charset=utf-8';
       request.headers[HttpHeaders.contentTypeHeader] = 'application/json;';
       request.headers[HttpHeaders.authorizationHeader] =
           'Bearer ${prefs.getString('token')!}';
-
-      print(request.headers);
     } catch (e) {
       print(e);
     }

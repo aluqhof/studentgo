@@ -16,4 +16,6 @@ abstract class EventRepository {
 
   Future<EventDetailsResponse> getEventDetails(String eventId);
   Future<List<Content>> getAllEvents(String cityName);
+  Future<List<Content>> getUpcomingEventsLimitedSearchable(
+      String city, int page, int size, String name);
 }

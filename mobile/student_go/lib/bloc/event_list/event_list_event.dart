@@ -24,3 +24,11 @@ final class FetchEventTypeListEvent extends EventListEvent {
   final int size;
   FetchEventTypeListEvent(this.city, this.eventTypeId, this.page, this.size);
 }
+
+final class FetchUpcomingListSearchableEvent extends EventListEvent {
+  final String city;
+  final int page;
+  final int size;
+  final String name;
+  FetchUpcomingListSearchableEvent(this.city, this.page, this.size, this.name);
+}

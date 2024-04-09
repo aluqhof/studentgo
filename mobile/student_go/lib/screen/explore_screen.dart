@@ -12,6 +12,7 @@ import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/screen/profile_screen.dart';
+import 'package:student_go/screen/search_screen.dart';
 import 'package:student_go/widgets/according_horizontal_list.dart';
 import 'package:student_go/widgets/drawer_widget.dart';
 import 'package:student_go/widgets/upcoming_horizontal_list.dart';
@@ -188,6 +189,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 Expanded(
                                   flex: 2,
                                   child: TextField(
+                                    readOnly: true,
                                     decoration: InputDecoration(
                                       icon: const Icon(
                                         Icons.search,
@@ -205,6 +207,15 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         borderSide: BorderSide.none,
                                       ),
                                     ),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SearchScreen(
+                                                  currentCity: _currentCity,
+                                                )),
+                                      );
+                                    },
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -285,8 +296,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 20.0, bottom: 20),
-                          child: AccordingHorizontalList(
-                              cityName: _currentCity), //isLoading: _isLoading
+                          child:
+                              AccordingHorizontalList(cityName: _currentCity),
                         ),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 20.0),
