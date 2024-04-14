@@ -5,7 +5,6 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_list/event_list_bloc.dart';
 import 'package:student_go/bloc/event_type/event_type_bloc.dart';
@@ -577,7 +576,23 @@ class _SearchScreenState extends State<SearchScreen> {
                       Expanded(
                         flex: 2,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              _searchController.text = '';
+
+                              _eventListBloc.add(
+                                  FetchUpcomingListSearchableEvent(
+                                      _currentCity,
+                                      '',
+                                      List.empty(),
+                                      DateTime.now(),
+                                      DateTime.now()
+                                          .add(const Duration(days: 365)),
+                                      0,
+                                      1000000));
+                            });
+                            Navigator.of(context).pop();
+                          },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 18, horizontal: 20),

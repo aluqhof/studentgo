@@ -41,7 +41,7 @@ dependencies:
   google_fonts: 6.1.0
   meta: ^1.10.0
   geolocator: ^11.0.0
-  geocoding: ^2.2.0
+  geocoding: ^3.0.0
   http_interceptor: ^2.0.0-beta.8
   skeletonizer: ^1.0.1
   intl: ^0.19.0
@@ -54,6 +54,8 @@ dependencies:
   flutter_swipe_button: ^2.1.1+1
   syncfusion_flutter_datepicker: ^25.1.39
   google_places_flutter: ^2.0.8
+  flutter_typeahead: ^5.2.0
+  fluttertoast: ^8.2.5
   
 dev_dependencies:
   flutter_test:
@@ -64,7 +66,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
