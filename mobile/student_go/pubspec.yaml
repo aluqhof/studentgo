@@ -38,7 +38,7 @@ dependencies:
   flutter_bloc: ^8.1.4
   shared_preferences: ^2.2.2
   http: ^1.2.0
-  google_fonts: ^6.1.0
+  google_fonts: 6.1.0
   meta: ^1.10.0
   geolocator: ^11.0.0
   geocoding: ^2.2.0
@@ -52,7 +52,9 @@ dependencies:
   modal_bottom_sheet: ^2.1.2
   input_quantity: ^2.3.2
   flutter_swipe_button: ^2.1.1+1
-
+  syncfusion_flutter_datepicker: ^25.1.39
+  google_places_flutter: ^2.0.8
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

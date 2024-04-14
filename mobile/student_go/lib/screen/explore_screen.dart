@@ -212,8 +212,9 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) => SearchScreen(
-                                                  currentCity: _currentCity,
-                                                )),
+                                                currentCity: _currentCity,
+                                                currentCountry: _currentCountry,
+                                                focusSearch: true)),
                                       );
                                     },
                                   ),
@@ -222,7 +223,16 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                 Expanded(
                                   flex: 1,
                                   child: ElevatedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => SearchScreen(
+                                                currentCity: _currentCity,
+                                                currentCountry: _currentCountry,
+                                                focusSearch: false)),
+                                      );
+                                    },
                                     icon: Container(
                                       width: 25,
                                       height: 25,
