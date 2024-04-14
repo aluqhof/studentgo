@@ -21,6 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -122,8 +123,37 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     public ErrorResponse handleEventAlreadyPurchased(
             EventAlreadyPurchasedException exception) {
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Event already purchased error error")
+                .title("Event already purchased error")
                 .type(URI.create("https://api.studentgo.com/errors/event-already-purchased-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(PriceRangeFilterException.class)
+    public ErrorResponse handlePriceRangeFilterException(
+            PriceRangeFilterException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Price range filter error")
+                .type(URI.create("https://api.studentgo.com/errors/price-range-filter-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(DateRangeFilterException.class)
+    public ErrorResponse handleDateRangeFilterException(
+            DateRangeFilterException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Date range filter error")
+                .type(URI.create("https://api.studentgo.com/errors/date-range-filter-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResponse handleDateTimeParseException(IllegalArgumentException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Illegal argument exception")
+                .type(URI.create("https://api.studentgo.com/errors/illegal-argument-exception"))
                 .property("timestamp", Instant.now())
                 .build();
     }

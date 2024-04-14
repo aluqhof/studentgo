@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,8 +17,25 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
     @Query("SELECT e FROM Event e WHERE e.city.id = :id AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
     List<Event> findFutureEventsByCity(@Param("id") Long cityId);
 
-    @Query("SELECT e FROM Event e WHERE e.city.id = :id AND e.dateTime > CURRENT_TIMESTAMP AND e.name LIKE %:name% ORDER BY e.dateTime ASC")
-    List<Event> findFutureEventsByCityIdAndName(@Param("id") Long cityId, @Param("name")String name);
+    @Query("SELECT e FROM Event e " +
+            "JOIN e.eventTypes et " +
+            "WHERE e.city.id = :cityId AND " +
+            "(:name IS NULL OR e.name LIKE %:name%) AND " +
+            "(:eventTypeIds IS NULL OR et.id IN :eventTypeIds) AND " +
+            "(COALESCE(:startDate, CURRENT_TIMESTAMP) <= e.dateTime) AND " +
+            "(COALESCE(:endDate, CURRENT_TIMESTAMP) >= e.dateTime) AND " +
+            "(:minPrice IS NULL OR e.price >= :minPrice) AND " +
+            "(:maxPrice IS NULL OR e.price <= :maxPrice) " +
+            "ORDER BY e.dateTime ASC")
+    List<Event> findFutureEventsByCityFiltered(
+            @Param("cityId") Long cityId,
+            @Param("name") String name,
+            @Param("eventTypeIds") List<Long> eventTypeIds,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate,
+            @Param("minPrice") double minPrice,
+            @Param("maxPrice") double maxPrice
+    );
 
 
     @Query("SELECT e FROM Event e WHERE e.city.id = :cityId AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")

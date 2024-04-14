@@ -129,8 +129,14 @@ public class EventController {
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
     @GetMapping("/upcoming/{cityName}")
-    public ResponseEntity<List<EventViewResponse>> getEventsByCity(@PathVariable String cityName, @RequestParam(value = "eventName", required = false) String eventName){
-        return ResponseEntity.ok(eventService.getAllUpcomingEventsInCity(cityName, eventName).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
+    public ResponseEntity<List<EventViewResponse>> getEventsByCity(@PathVariable String cityName, @RequestParam(value = "eventName", required = false) String eventName,
+                                                                   @RequestParam(value = "eventTypes", required = false) List<Long> eventTypeIds,
+                                                                   @RequestParam(value = "start", required = false) String startDate,
+                                                                   @RequestParam(value = "end", required = false) String endDate,
+                                                                   @RequestParam(value = "min", required = false) Double minPrice,
+                                                                   @RequestParam(value = "max", required = false) Double maxPrice
+                                                                   ){
+        return ResponseEntity.ok(eventService.getAllUpcomingEventsInCity(cityName, eventName, eventTypeIds, startDate, endDate, minPrice, maxPrice).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
     }
 
     @Operation(summary = "Get Pageable results from upcoming events in a city limited")

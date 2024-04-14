@@ -5,11 +5,10 @@ import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
 import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
+import com.salesianos.dam.StudentGoApi.exception.DateRangeFilterException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
-import com.salesianos.dam.StudentGoApi.model.Event;
-import com.salesianos.dam.StudentGoApi.model.EventType;
-import com.salesianos.dam.StudentGoApi.model.Organizer;
-import com.salesianos.dam.StudentGoApi.model.Student;
+import com.salesianos.dam.StudentGoApi.exception.PriceRangeFilterException;
+import com.salesianos.dam.StudentGoApi.model.*;
 import com.salesianos.dam.StudentGoApi.repository.CityRepository;
 import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 import com.salesianos.dam.StudentGoApi.repository.EventTypeRepository;
@@ -20,7 +19,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -52,14 +55,78 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-    public List<Event> getAllUpcomingEventsInCity(String cityName, String query){
-        if(query == null){
-            return eventRepository.findFutureEventsByCity(cityRepository.findFirstByNameIgnoreCase(cityName)
-                    .orElseThrow(() -> new NotFoundException("city")).getId());
-        }else {
-            return eventRepository.findFutureEventsByCityIdAndName(cityRepository.findFirstByNameIgnoreCase(cityName)
-                    .orElseThrow(() -> new NotFoundException("city")).getId(), query);
+    public List<Event> getAllUpcomingEventsInCity(String cityName, String searchQuery,
+                                                  List<Long> eventTypes, String start, String end,
+                                                  Double min, Double max) {
+        List<EventType> eventTypeObjects;
+        String eventName;
+        LocalDateTime startDate;
+        LocalDateTime endDate;
+        double minPrice;
+        double maxPrice;
+
+        City city = cityRepository.findFirstByNameIgnoreCase(cityName)
+                .orElseThrow(() -> new NotFoundException("City not found"));
+
+        if (searchQuery == null || searchQuery.isEmpty()) {
+            eventName = "";
+        } else {
+            eventName = searchQuery;
         }
+
+        if (eventTypes != null && !eventTypes.isEmpty()) {
+            eventTypeObjects = eventTypes.stream()
+                    .map(eventTypeId -> eventTypeRepository.findById(eventTypeId)
+                            .orElseThrow(() -> new NotFoundException("Event Type not found")))
+                    .toList();
+        } else {
+            eventTypeObjects = eventTypeRepository.findAll();
+        }
+
+        try {
+            startDate = start != null && !start.isEmpty() ? LocalDateTime.parse(start) : LocalDateTime.now();
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid start date format. Please provide the date in the format yyyy-MM-dd'T'HH:mm:ss");
+        }
+
+        try {
+            endDate = end != null && !end.isEmpty() ? LocalDateTime.parse(end) : LocalDateTime.now().plusYears(1);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Invalid end date format. Please provide the date in the format yyyy-MM-dd'T'HH:mm:ss");
+        }
+
+        if (min == null || min < 0) {
+            minPrice = 0;
+        } else {
+            minPrice = min;
+        }
+
+        if (max == null || max < 0) {
+            Optional<Double> maxPriceOptional = eventRepository.findAll()
+                    .stream()
+                    .map(Event::getPrice)
+                    .max(Comparator.naturalOrder());
+
+            maxPrice = maxPriceOptional.orElse(0.0);
+        } else {
+            maxPrice = max;
+        }
+
+        if (minPrice >= maxPrice) {
+            throw new PriceRangeFilterException("The min price cannot be higher or equal than the max price");
+        }
+
+        if (startDate.isAfter(endDate) || startDate.isEqual(endDate)) {
+            throw new DateRangeFilterException("The start date cannot be higher or equal than the end date");
+        }
+
+        if(startDate.isBefore(LocalDateTime.now()) || endDate.isAfter(LocalDateTime.now().plusYears(1))){
+            throw new DateRangeFilterException("The date selected is out of range");
+        }
+
+        return eventRepository.findFutureEventsByCityFiltered(city.getId(), eventName,
+                eventTypeObjects.stream().map(EventType::getId).toList(), startDate,
+                endDate, minPrice, maxPrice);
     }
 
     public MyPage<EventViewResponse> getAllUpcomingEventsInCityPaged(String cityName, Pageable pageable){

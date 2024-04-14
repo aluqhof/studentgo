@@ -27,8 +27,12 @@ final class FetchEventTypeListEvent extends EventListEvent {
 
 final class FetchUpcomingListSearchableEvent extends EventListEvent {
   final String city;
-  final int page;
-  final int size;
   final String name;
-  FetchUpcomingListSearchableEvent(this.city, this.page, this.size, this.name);
+  final List<int> eventTypes;
+  final DateTime startDate;
+  final DateTime endDate;
+  final double minPrice;
+  final double maxPrice;
+  FetchUpcomingListSearchableEvent(this.city, this.name, this.eventTypes,
+      this.startDate, this.endDate, this.minPrice, this.maxPrice);
 }

@@ -111,7 +111,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
 
   Widget _buildCalendar() {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: const EdgeInsets.only(top: 20.0),
       child: Column(
         children: [
           TableCalendar(

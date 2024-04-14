@@ -78,8 +78,14 @@ class EventListBloc extends Bloc<EventListEvent, EventListState> {
       Emitter<EventListState> emit) async {
     emit(EventListLoading());
     try {
-      final response = await eventRepository.getUpcomingEventsLimitedSearchable(
-          event.city, event.page, event.size, event.name);
+      final response = await eventRepository.getUpcomingEventsFiltered(
+          event.city,
+          event.name,
+          event.eventTypes,
+          event.startDate,
+          event.endDate,
+          event.minPrice,
+          event.maxPrice);
       emit(UpcomingListSearchableSuccess(response));
     } catch (e) {
       if (e is GeneralException) {
