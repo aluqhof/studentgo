@@ -41,6 +41,7 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
   late TextEditingController _searchController;
   bool loadingLocation = true;
   Color colorLocation = const Color.fromARGB(255, 35, 150, 245);
+  int? _selectedEventTypeId;
 
   @override
   void initState() {
@@ -136,6 +137,41 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
         backgroundColor: const Color.fromARGB(255, 132, 34, 224),
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  void filterByEventType(int eventTypeId) {
+    if (eventTypeId == -1) {
+      _eventListBloc.add(FetchUpcomingListSearchableEvent(
+          _currentCity,
+          '',
+          List.empty(),
+          DateTime.now(),
+          DateTime.now().add(const Duration(days: 365)),
+          0,
+          1000000));
+      setState(() {
+        _searchController.text = '';
+        setState(() {
+          _selectedEventTypeId = null;
+        });
+      });
+    } else {
+      List<int> eventTypeList = [eventTypeId];
+      _eventListBloc.add(FetchUpcomingListSearchableEvent(
+          _currentCity,
+          '',
+          eventTypeList,
+          DateTime.now(),
+          DateTime.now().add(const Duration(days: 365)),
+          0,
+          1000000));
+      setState(() {
+        _searchController.text = '';
+        setState(() {
+          _selectedEventTypeId = eventTypeId;
+        });
+      });
+    }
   }
 
   @override
@@ -281,7 +317,12 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
                     top: 95,
                     child: SizedBox(
                       width: MediaQuery.of(context).size.width,
-                      child: const EventTypeWidgetMap(),
+                      child: EventTypeWidgetMap(
+                        onPressed: (int id) {
+                          filterByEventType(id);
+                        },
+                        selectedEventTypeId: _selectedEventTypeId,
+                      ),
                     ),
                   ),
                 ],
