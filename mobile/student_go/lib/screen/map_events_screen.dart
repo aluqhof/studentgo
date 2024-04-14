@@ -7,13 +7,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:student_go/bloc/all_events_calendar/all_events_calendar_bloc.dart';
+import 'package:student_go/bloc/event_list/event_list_bloc.dart';
 import 'package:student_go/models/response/event_type_response.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
+import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/widgets/event_card_vertical_list.dart';
 import 'package:student_go/widgets/event_type_widget_map.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MapEventsScreen extends StatefulWidget {
   const MapEventsScreen({Key? key}) : super(key: key);
@@ -23,22 +26,38 @@ class MapEventsScreen extends StatefulWidget {
 }
 
 class _MapEventsScreenState extends State<MapEventsScreen> {
-  late AllEventsCalendarBloc _calendarBloc;
+  late EventListBloc _eventListBloc;
   late EventRepository eventRepository;
-  late String _currentCity = '';
+  String _currentCity = '';
+  String _currentCountry = '';
   late CameraPosition _initialCameraPosition;
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
   Content? _selectedEvent;
   Set<Marker> _markers = {};
   bool _showEventCard = false;
+  String name = '';
+  late FocusNode focusNode;
+  late TextEditingController _searchController;
+  bool loadingLocation = true;
+  Color colorLocation = const Color.fromARGB(255, 35, 150, 245);
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    focusNode = FocusNode();
+    _searchController = TextEditingController();
     eventRepository = EventRepositoryImpl();
-    _calendarBloc = AllEventsCalendarBloc(eventRepository);
+    _eventListBloc = EventListBloc(eventRepository)
+      ..add(FetchUpcomingListSearchableEvent(
+          _currentCity,
+          name,
+          List.empty(),
+          DateTime.now(),
+          DateTime.now().add(const Duration(days: 365)),
+          0,
+          1000000));
   }
 
   Future<void> _getCurrentLocation() async {
@@ -51,8 +70,16 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
       Placemark placemark = placemarks.first;
       setState(() {
         _currentCity = placemark.locality ?? 'Unknown';
-        _calendarBloc = AllEventsCalendarBloc(eventRepository)
-          ..add(FetchAllEventsCalendar(_currentCity));
+        _currentCountry = placemark.country ?? 'Unknown';
+        _eventListBloc = _eventListBloc = EventListBloc(eventRepository)
+          ..add(FetchUpcomingListSearchableEvent(
+              _currentCity,
+              name,
+              List.empty(),
+              DateTime.now(),
+              DateTime.now().add(const Duration(days: 365)),
+              0,
+              1000000));
         _initialCameraPosition = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
           zoom: 12,
@@ -87,21 +114,45 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
     return await Geolocator.getCurrentPosition();
   }
 
+  void updateLocation() async {
+    await _getCurrentLocation();
+
+    _eventListBloc.add(FetchUpcomingListSearchableEvent(
+        _currentCity,
+        '',
+        List.empty(),
+        DateTime.now(),
+        DateTime.now().add(const Duration(days: 365)),
+        0,
+        1000000));
+    setState(() {
+      _searchController.text = '';
+      colorLocation = const Color.fromARGB(255, 132, 34, 224);
+    });
+    Fluttertoast.showToast(
+        msg: "Current Location: $_currentCity, $_currentCountry",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        backgroundColor: const Color.fromARGB(255, 132, 34, 224),
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocProvider.value(
-      value: _calendarBloc,
+      value: _eventListBloc,
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        body: BlocBuilder<AllEventsCalendarBloc, AllEventsCalendarState>(
-          bloc: _calendarBloc,
+        body: BlocBuilder<EventListBloc, EventListState>(
+          bloc: _eventListBloc,
           builder: (context, state) {
-            if (state is AllEventsCalendarLoading) {
+            if (state is EventListLoading) {
               return const Center(child: CircularProgressIndicator());
-            } else if (state is AllEventsCalendarSuccess) {
+            } else if (state is UpcomingListSearchableSuccess) {
               return Stack(
                 children: [
-                  _buildMap(state.events),
+                  _buildMap(state.listEventsResponse),
                   if (_showEventCard) _buildEventCard(),
                   Positioned(
                     top: 40,
@@ -113,33 +164,112 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
                         children: [
                           Expanded(
                             flex: 5,
-                            child: TextField(
-                              decoration: InputDecoration(
-                                hintText: 'Find for Music, Food, Sports...',
-                                filled: true,
-                                fillColor: Colors.white,
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none,
-                                ),
-                                isDense: true, // Added this
-                                contentPadding: const EdgeInsets.all(12),
-                              ),
+                            child: TypeAheadField<String>(
+                              builder: (context, controller, focusNode) {
+                                return TextField(
+                                    controller: _searchController,
+                                    focusNode: focusNode,
+                                    autofocus: false,
+                                    onSubmitted: (value) {
+                                      focusNode.unfocus();
+                                      _eventListBloc.add(
+                                          FetchUpcomingListSearchableEvent(
+                                              _currentCity,
+                                              value,
+                                              List.empty(),
+                                              DateTime.now(),
+                                              DateTime.now().add(
+                                                  const Duration(days: 365)),
+                                              0,
+                                              1000000));
+                                    },
+                                    /*onChanged: (value) {
+                                      _eventListBloc.add(
+                                          FetchUpcomingListSearchableEvent(
+                                              _currentCity,
+                                              value,
+                                              List.empty(),
+                                              DateTime.now(),
+                                              DateTime.now().add(
+                                                  const Duration(days: 365)),
+                                              0,
+                                              1000000));
+                                    },*/
+                                    decoration: InputDecoration(
+                                      hintText:
+                                          'Find for Music, Food, Sports...',
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      isDense: true,
+                                      contentPadding: const EdgeInsets.all(12),
+                                    ));
+                              },
+                              loadingBuilder: (context) =>
+                                  const Text('Loading...'),
+                              errorBuilder: (context, error) =>
+                                  const Text('Unespected error'),
+                              emptyBuilder: (context) => const Text(
+                                  'No events found according your query'),
+                              suggestionsCallback: (pattern) async {
+                                return Future.value(state.listEventsResponse
+                                    .where((event) =>
+                                        event.name != null &&
+                                        event.name!
+                                            .toLowerCase()
+                                            .contains(pattern.toLowerCase()))
+                                    .map((e) => e.name!)
+                                    .toList());
+                              },
+                              itemBuilder: (context, suggestion) {
+                                return ListTile(
+                                  title: Text(suggestion),
+                                );
+                              },
+                              onSelected: (suggestion) {
+                                setState(() {
+                                  _searchController.text = suggestion;
+                                });
+                                focusNode.unfocus();
+                                _eventListBloc.add(
+                                    FetchUpcomingListSearchableEvent(
+                                        _currentCity,
+                                        suggestion,
+                                        List.empty(),
+                                        DateTime.now(),
+                                        DateTime.now()
+                                            .add(const Duration(days: 365)),
+                                        0,
+                                        1000000));
+                              },
+                              /*transitionBuilder:
+                                  (context, suggestionsBox, controller) {
+                                return suggestionsBox;
+                              },*/
                             ),
                           ),
                           const SizedBox(width: 8),
                           Expanded(
                             flex: 1,
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: const Color.fromARGB(255, 255, 255, 255),
-                              ),
-                              padding: const EdgeInsets.all(8),
-                              child: const Icon(
-                                Icons.my_location,
-                                color: Colors.blue,
+                            child: GestureDetector(
+                              onTap: () {
+                                updateLocation();
+                              },
+                              child: Container(
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color:
+                                      const Color.fromARGB(255, 255, 255, 255),
+                                ),
+                                padding: const EdgeInsets.all(8),
+                                child: Icon(
+                                  Icons.my_location,
+                                  color: colorLocation,
+                                ),
                               ),
                             ),
                           )
@@ -156,8 +286,16 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
                   ),
                 ],
               );
-            } else if (state is AllEventsCalendarError) {
+            } else if (state is UpcomingListSearchableError) {
               return Center(child: Text(state.errorMessage));
+            } else if (state is TokenNotValidState) {
+              Future.microtask(() {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator());
             } else {
               return const Center(child: CircularProgressIndicator());
             }
@@ -181,7 +319,13 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
             children: [
               GoogleMap(
                 mapType: MapType.terrain,
-                initialCameraPosition: _initialCameraPosition,
+                initialCameraPosition: events.length != 1
+                    ? _initialCameraPosition
+                    : CameraPosition(
+                        target:
+                            LatLng(events[0].latitude!, events[0].longitude!),
+                        zoom: 12,
+                      ),
                 onMapCreated: (GoogleMapController controller) {
                   _controller.complete(controller);
                 },
