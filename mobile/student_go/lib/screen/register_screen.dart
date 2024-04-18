@@ -71,8 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   );
                 } else if (state is DoRegisterStudentBadRequestValidation) {
-                  error =
-                      state.badRequestValidation.body!.fieldsErrors![0].message;
+                  error = state.badRequestValidation.fieldsErrors![0].message;
                 } else if (state is DoRegisterStudentError) {
                   error = state.errorMessage;
                 } else if (state is DoRegisterStudentLoading) {
