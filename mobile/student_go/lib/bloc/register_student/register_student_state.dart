@@ -19,7 +19,7 @@ final class DoRegisterStudentError extends RegisterStudentState {
 
 final class DoRegisterStudentBadRequestValidation
     extends DoRegisterStudentError {
-  final BadRequestValidation badRequestValidation;
+  final ValidationException badRequestValidation;
   DoRegisterStudentBadRequestValidation(
       this.badRequestValidation, String errorMessage)
       : super(errorMessage);

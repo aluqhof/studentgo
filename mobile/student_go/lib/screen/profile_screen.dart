@@ -6,6 +6,7 @@ import 'package:student_go/bloc/student/student_bloc.dart';
 import 'package:student_go/models/response/student_info_response/student_info_response.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
+import 'package:student_go/screen/edit_profile_screen.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/widgets/drawer_widget.dart';
 
@@ -58,7 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             );
           } else if (state is StudentSuccess) {
             return Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 children: [
                   Center(
@@ -149,7 +150,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               BorderRadius.circular(10), // Bordes redondeados
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        _navigateAndRefreshProfile(context);
+                      },
                       icon: const Icon(
                         Icons.edit_outlined,
                         size: 24.0,
@@ -157,7 +160,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: Text(
                         'Edit Profile',
                         style: GoogleFonts.actor(
-                            textStyle: TextStyle(fontSize: 16)),
+                            textStyle: const TextStyle(fontSize: 16)),
                       ),
                     ),
                   ),
@@ -185,32 +188,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Interest',
-                            style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20))),
-                        ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              size: 19,
-                            ),
-                            label: const Text(
-                              'CHANGE',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                                surfaceTintColor:
-                                    const Color.fromARGB(129, 54, 176, 247),
-                                foregroundColor:
-                                    const Color.fromRGBO(86, 105, 255, 1),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 0, horizontal: 14)))
-                      ],
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text('Interest',
+                          style: GoogleFonts.actor(
+                              textStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 20))),
                     ),
                   ),
                   Padding(
@@ -295,5 +278,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }),
       ),
     );
+  }
+
+  Route _createRoute() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          const EditProfileScreen(),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // Comienza desde el lado derecho
+        const end = Offset
+            .zero; // Termina en el centro (pantalla completamente visible)
+        const curve =
+            Curves.ease; // Puedes cambiar la curva de animación si deseas
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  void _fetchStudentData() {
+    _studentBloc.add(FetchStudent());
+  }
+
+  void _navigateAndRefreshProfile(BuildContext context) {
+    Navigator.of(context).push(_createRoute()).then((_) {
+      // Llama al método para recargar la información del perfil
+      _fetchStudentData();
+    });
   }
 }

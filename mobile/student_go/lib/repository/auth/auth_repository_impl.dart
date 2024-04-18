@@ -5,9 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/models/dto/login_dto.dart';
 import 'package:student_go/models/dto/register_dto.dart';
 import 'package:student_go/models/response/bad_credentials_exception.dart';
-import 'package:student_go/models/response/bad_request_validation/bad_request_validation.dart';
 import 'package:student_go/models/response/login_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
+import 'package:student_go/models/response/validation_exception/validation_exception.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
@@ -56,7 +56,7 @@ class AuthRepositoryImpl extends AuthRepository {
       await prefs.setString('token', authToken);
       return LoginResponse.fromJson(response.body);
     } else if (response.statusCode == 400) {
-      return Future.error(BadRequestValidation.fromJson(response.body));
+      return Future.error(ValidationException.fromJson(response.body));
     } else {
       throw Exception('Failed to do login');
     }

@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-class GeneralException {
+class GeneralException implements Exception {
   String? type;
   String? title;
   int? status;
