@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.net.URI;
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 
 @RestControllerAdvice
@@ -39,7 +38,7 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .property("Fields errors", validationErrors)
                 .build();
         return ResponseEntity.status(status)
-                .body(er);
+                .body(er.getBody()  );
     }
 
     @ExceptionHandler({ EntityNotFoundException.class })
@@ -154,6 +153,24 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
                 .title("Illegal argument exception")
                 .type(URI.create("https://api.studentgo.com/errors/illegal-argument-exception"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(TextLengthException.class)
+    public ErrorResponse handleUsernameLengthException(TextLengthException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Text length error")
+                .type(URI.create("https://api.studentgo.com/errors/text-length-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ErrorResponse handleUsernameExistsException(UsernameAlreadyExistsException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Username exists error")
+                .type(URI.create("https://api.studentgo.com/errors/username-exists-error"))
                 .property("timestamp", Instant.now())
                 .build();
     }
