@@ -1,7 +1,7 @@
 package com.salesianos.dam.StudentGoApi.exception;
 
-public class UsernameLengthException extends RuntimeException{
-    public UsernameLengthException(String message) {
+public class TextLengthException extends RuntimeException{
+    public TextLengthException(String message) {
         super(message);
     }
 }
