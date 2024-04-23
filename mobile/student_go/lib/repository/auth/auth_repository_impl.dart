@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,24 +42,52 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<LoginResponse> register(RegisterDto registerDto) async {
-    final SharedPreferences prefs = await _prefs;
-    final response = await _httpClient.post(
-      Uri.parse('http://10.0.2.2:8080/auth/register-student'),
-      //Uri.parse('http://localhost:8080/auth/register-student'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-      body: registerDto.toJson(),
-    );
-    if (response.statusCode == 201) {
-      final responseData = jsonDecode(response.body);
-      final String authToken = responseData['token'];
-      await prefs.setString('token', authToken);
-      return LoginResponse.fromJson(response.body);
-    } else if (response.statusCode == 400) {
-      return Future.error(ValidationException.fromJson(response.body));
-    } else {
-      throw Exception('Failed to do login');
+    try {
+      final SharedPreferences prefs = await _prefs;
+      final response = await _httpClient.post(
+        Uri.parse('http://10.0.2.2:8080/auth/register-student'),
+        //Uri.parse('http://localhost:8080/auth/register-student'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+        body: registerDto.toJson(),
+      );
+
+      if (response.statusCode == 201) {
+        final responseData = jsonDecode(response.body);
+        final String authToken = responseData['token'];
+        await prefs.setString('token', authToken);
+        return LoginResponse.fromJson(response.body);
+      } else {
+        var decodedResponse = jsonDecode(response.body);
+        if (decodedResponse.containsKey('type') &&
+            decodedResponse.containsKey('title') &&
+            decodedResponse.containsKey('status') &&
+            decodedResponse.containsKey('detail') &&
+            decodedResponse.containsKey('instance')) {
+          if (decodedResponse.containsKey('Fields errors')) {
+            throw ValidationException.fromMap(decodedResponse);
+          } else {
+            throw GeneralException.fromMap(decodedResponse);
+          }
+        } else {
+          throw Exception('Failed to change username');
+        }
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        rethrow;
+      } else if (e is ValidationException) {
+        rethrow;
+      } else if (e is SocketException) {
+        throw Exception('No Internet connection');
+      } else if (e is HttpException) {
+        throw Exception('Failed to connect to the server');
+      } else if (e is FormatException) {
+        throw Exception('Bad response format');
+      } else {
+        rethrow;
+      }
     }
   }
 }

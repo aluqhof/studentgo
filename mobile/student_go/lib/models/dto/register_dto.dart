@@ -6,14 +6,15 @@ class RegisterDto {
   String? verifyPassword;
   String? email;
   String? name;
+  List<int>? interests;
 
-  RegisterDto({
-    this.username,
-    this.password,
-    this.verifyPassword,
-    this.email,
-    this.name,
-  });
+  RegisterDto(
+      {this.username,
+      this.password,
+      this.verifyPassword,
+      this.email,
+      this.name,
+      this.interests});
 
   factory RegisterDto.fromMap(Map<String, dynamic> data) => RegisterDto(
         username: data['username'] as String?,
@@ -21,6 +22,7 @@ class RegisterDto {
         verifyPassword: data['verifyPassword'] as String?,
         email: data['email'] as String?,
         name: data['name'] as String?,
+        interests: data['interests'] as List<int>?,
       );
 
   Map<String, dynamic> toMap() => {
@@ -29,6 +31,7 @@ class RegisterDto {
         'verifyPassword': verifyPassword,
         'email': email,
         'name': name,
+        'interests': interests,
       };
 
   /// `dart:convert`
