@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/student/student_bloc.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
@@ -217,25 +218,31 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         style: GoogleFonts.actor(
                             textStyle: TextStyle(fontSize: 18)),
                       ),
-                      onTap: () {
-                        Navigator.pushReplacement(
+                      onTap: () async {
+                        await clearToken();
+                        /*Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const LoginScreen(),
                           ),
-                        );
+                        );*/
                       },
                     ),
                   ],
                 ),
               );
             }
-            return Center(
+            return const Center(
               child: CircularProgressIndicator(),
             );
           },
         ),
       ),
     );
+  }
+
+  Future<void> clearToken() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
   }
 }

@@ -24,3 +24,9 @@ final class DoRegisterStudentBadRequestValidation
       this.badRequestValidation, String errorMessage)
       : super(errorMessage);
 }
+
+final class DoRegisterStudentGeneralException extends DoRegisterStudentError {
+  final GeneralException generalException;
+  DoRegisterStudentGeneralException(this.generalException, String errorMessage)
+      : super(errorMessage);
+}

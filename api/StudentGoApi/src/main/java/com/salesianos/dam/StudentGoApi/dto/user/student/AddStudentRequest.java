@@ -5,7 +5,10 @@ import com.salesianos.dam.StudentGoApi.validation.annotation.UniqueEmail;
 import com.salesianos.dam.StudentGoApi.validation.annotation.UniqueUsername;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 @FieldsValueMatch(
         field = "password", fieldMatch = "verifyPassword",
@@ -29,6 +32,10 @@ public record AddStudentRequest(
         String email,
 
         @NotBlank(message = "{addStudentRequest.name.notblank}")
-        String name
+        String name,
+
+        @Size(min = 1, message = "{addStudentRequest.interests.minSize}")
+        @NotEmpty(message = "{addStudentRequest.interests.notempty}")
+        List<Long> interests
 ) {
 }

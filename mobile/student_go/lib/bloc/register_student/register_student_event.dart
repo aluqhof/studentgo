@@ -9,6 +9,7 @@ class DoRegisterStudentEvent extends RegisterStudentEvent {
   final String email;
   final String password;
   final String confirmPassword;
+  final List<int> interests;
   DoRegisterStudentEvent(this.fullName, this.username, this.email,
-      this.password, this.confirmPassword);
+      this.password, this.confirmPassword, this.interests);
 }

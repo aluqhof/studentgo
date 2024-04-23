@@ -4,22 +4,19 @@ class FieldsError {
   String? object;
   String? message;
   String? field;
-  String? rejectedValue;
 
-  FieldsError({this.object, this.message, this.field, this.rejectedValue});
+  FieldsError({this.object, this.message, this.field});
 
   factory FieldsError.fromMap(Map<String, dynamic> data) => FieldsError(
         object: data['object'] as String?,
         message: data['message'] as String?,
         field: data['field'] as String?,
-        rejectedValue: data['rejectedValue'] as String?,
       );
 
   Map<String, dynamic> toMap() => {
         'object': object,
         'message': message,
         'field': field,
-        'rejectedValue': rejectedValue,
       };
 
   /// `dart:convert`

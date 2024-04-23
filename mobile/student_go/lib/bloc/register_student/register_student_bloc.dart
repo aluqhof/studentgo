@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:student_go/models/dto/register_dto.dart';
+import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/models/response/login_response.dart';
 import 'package:student_go/models/response/validation_exception/validation_exception.dart';
 import 'package:student_go/repository/auth/auth_repository.dart';
@@ -27,13 +28,16 @@ class RegisterStudentBloc
           password: event.password,
           verifyPassword: event.confirmPassword,
           email: event.email,
-          name: event.fullName);
+          name: event.fullName,
+          interests: event.interests);
       final response = await authRepository.register(registerDto);
       emit(DoRegisterStudentSuccess(response));
       return;
     } catch (e) {
       if (e is ValidationException) {
-        emit(DoRegisterStudentBadRequestValidation(e, "Bad Request"));
+        emit(DoRegisterStudentBadRequestValidation(e, e.title!));
+      } else if (e is GeneralException) {
+        emit(DoRegisterStudentGeneralException(e, e.title!));
       } else {
         emit(DoRegisterStudentError("An unexpected error occurred"));
       }

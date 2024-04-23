@@ -25,14 +25,23 @@ public class StudentService {
     private final PasswordEncoder passwordEncoder;
     private final StudentRepository studentRepository;
     private final EventRepository eventRepository;
+    private final EventTypeRepository eventTypeRepository;
 
     public Student createStudent(AddStudentRequest addStudentRequest) {
+
+        List<Long> interestIds = addStudentRequest.interests();
+
+
+        List<EventType> interests = interestIds.stream()
+                .map(i-> eventTypeRepository.findById(i).orElseThrow(() ->  new NotFoundException("Event Type")))
+                .toList();
 
         Student user = new Student();
         user.setUsername(addStudentRequest.username());
         user.setPassword(passwordEncoder.encode(addStudentRequest.password()));
         user.setEmail(addStudentRequest.email());
         user.setName(addStudentRequest.name());
+        user.setInterests(interests);
 
         return studentRepository.save(user);
     }
