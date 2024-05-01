@@ -43,6 +43,8 @@ public abstract class UserDefault implements UserDetails {
     @Column(unique = true)
     private String email;
 
+    private String urlPhoto = "nophoto.png";
+
     private String name;
 
     private boolean accountNonExpired = true;

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/bloc/student/student_bloc.dart';
-import 'package:student_go/models/response/student_info_response/student_info_response.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/edit_profile_screen.dart';
@@ -20,18 +19,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   late StudentRepository studentRepository;
   late StudentBloc _studentBloc;
+  late ProfileImageBloc _profileImageBloc;
 
   @override
   void initState() {
     studentRepository = StudentRepositoryImp();
     _studentBloc = StudentBloc(studentRepository)..add(FetchStudent());
+    _profileImageBloc = ProfileImageBloc(studentRepository)
+      ..add(FetchProfileImage());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _studentBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _studentBloc),
+        BlocProvider.value(value: _profileImageBloc)
+      ],
       child: Scaffold(
         appBar: AppBar(
           leading: Builder(
@@ -63,22 +68,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1,
-                        ),
-                      ),
-                      child: ClipOval(
-                        child: Image.asset(
-                          'assets/img/fotoprueba2.jpg',
-                          width: 100,
-                          height: 100,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    child: BlocBuilder<ProfileImageBloc, ProfileImageState>(
+                      builder: (context, stateImage) {
+                        if (stateImage is ProfileImageInitial ||
+                            stateImage is ProfileImageLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (stateImage is ProfileImageSuccess) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.memory(
+                                stateImage.image,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: Image.asset(
+                                'assets/img/nophoto.png',
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ),
                   Padding(
@@ -140,8 +174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       style: ElevatedButton.styleFrom(
                         surfaceTintColor: const Color.fromARGB(
                             0, 255, 255, 255), // Color de fondo blanco
-                        foregroundColor:
-                            Color.fromRGBO(86, 105, 255, 1), // Color del texto
+                        foregroundColor: const Color.fromRGBO(
+                            86, 105, 255, 1), // Color del texto
                         side: const BorderSide(
                             color: Color.fromRGBO(86, 105, 255, 1),
                             width: 1), // Borde de color morado
@@ -230,33 +264,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   )
-                  /*Container(
-                    width: 300,
-                    height: 200,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: state.studentInfoResponse.interests!
-                          .length, // Cantidad de elementos en tu lista
-                      itemBuilder: (context, index) {
-                        return Container(
-                          height: 30, // Alto de cada elemento en la lista
-                          margin: const EdgeInsets.symmetric(
-                              horizontal:
-                                  4), // Margen horizontal entre elementos
-                          color: Colors
-                              .blue, // Color de fondo de los elementos (puedes cambiarlo)
-                          child: Center(
-                            child: Text(
-                              state.studentInfoResponse.interests![index].name!,
-                              style: const TextStyle(
-                                  color: Colors
-                                      .white), // Color del texto (puedes cambiarlo)
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  )*/
                 ],
               ),
             );
@@ -302,14 +309,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _fetchStudentData() {
+  void _fetchData() {
     _studentBloc.add(FetchStudent());
+    _profileImageBloc.add(FetchProfileImage());
   }
 
   void _navigateAndRefreshProfile(BuildContext context) {
     Navigator.of(context).push(_createRoute()).then((_) {
-      // Llama al método para recargar la información del perfil
-      _fetchStudentData();
+      _fetchData();
     });
   }
 }

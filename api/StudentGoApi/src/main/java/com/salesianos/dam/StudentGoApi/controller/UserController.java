@@ -1,5 +1,6 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
+import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.ChangeUsernameRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.ChangeUsernameResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.LoginUser;
@@ -7,14 +8,18 @@ import com.salesianos.dam.StudentGoApi.dto.user.UpdateProfileRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.organizer.AddOrganizerRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
+import com.salesianos.dam.StudentGoApi.exception.FileTypeException;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
+import com.salesianos.dam.StudentGoApi.repository.user.UserRepository;
 import com.salesianos.dam.StudentGoApi.security.jwt.JwtProvider;
 import com.salesianos.dam.StudentGoApi.security.jwt.JwtUserResponse;
+import com.salesianos.dam.StudentGoApi.service.StorageService;
 import com.salesianos.dam.StudentGoApi.service.user.OrganizerService;
 import com.salesianos.dam.StudentGoApi.service.user.StudentService;
 import com.salesianos.dam.StudentGoApi.service.user.UserService;
+import com.salesianos.dam.StudentGoApi.utils.MediaTypeUrlResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -24,6 +29,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,6 +39,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.io.File;
+import java.net.URI;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,6 +57,8 @@ public class UserController {
     private final JwtProvider jwtProvider;
     private final OrganizerService organizerService;
     private final UserService userService;
+    private final StorageService storageService;
+    private final UserRepository userRepository;
 
     @Operation(summary = "Register student")
     @ApiResponses(value = {
@@ -174,6 +188,54 @@ public class UserController {
     public StudentInfoResponse updateStudentProfile(@AuthenticationPrincipal Student user,
                                                     @RequestBody @Valid UpdateProfileRequest updateProfileRequest){
         return StudentInfoResponse.of(userService.updateProfile(user, updateProfileRequest));
+    }
+
+    @PostMapping("/upload-profile-image")
+    public ResponseEntity<?> upload(@RequestPart("file") MultipartFile file, @AuthenticationPrincipal UserDefault user) {
+
+        FileResponse response = uploadFile(file);
+        user.setUrlPhoto(file.getOriginalFilename());
+        userRepository.save(user);
+        //if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
+          //  throw new FileTypeException("The file must be of type image");
+        //}
+
+        return ResponseEntity.created(URI.create(response.getUri())).body(response);
+    }
+
+    @GetMapping("/delete-photo")
+    public ResponseEntity<?> deletePhoto(@AuthenticationPrincipal UserDefault user) {
+
+        user.setUrlPhoto("nophoto.png");
+        userRepository.save(user);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private FileResponse uploadFile(MultipartFile file) {
+        String name = storageService.store(file);
+        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/download/")
+                .path(name)
+                .toUriString();
+
+        return FileResponse.builder()
+                .name(name)
+                .size(file.getSize())
+                .type(file.getContentType())
+                .uri(uri)
+                .build();
+    }
+
+    @GetMapping("/download-profile-photo")
+    public ResponseEntity<Resource> getFile(@AuthenticationPrincipal UserDefault user){
+
+        MediaTypeUrlResource resource =
+                (MediaTypeUrlResource) storageService.loadAsResource(user.getUrlPhoto());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Content-Type", resource.getType())
+                .body(resource);
     }
 
 }
