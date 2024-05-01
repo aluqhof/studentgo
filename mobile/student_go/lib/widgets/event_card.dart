@@ -4,6 +4,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:student_go/bloc/events_saved/events_saved_bloc.dart';
+import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
@@ -26,6 +27,7 @@ class _EventCardState extends State<EventCard> {
   late StudentRepository studentRepository;
   late EventsSavedBloc _eventsSavedBloc;
   bool isEventSaved = false;
+  late ProfileImageBloc _profileImageBloc;
 
   Future<void> _getStreet() async {
     try {
@@ -55,12 +57,16 @@ class _EventCardState extends State<EventCard> {
     studentRepository = StudentRepositoryImp();
     _eventsSavedBloc = EventsSavedBloc(studentRepository)
       ..add(FetchEventsSaved());
+    _profileImageBloc = ProfileImageBloc(studentRepository);
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _eventsSavedBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _eventsSavedBloc),
+        // BlocProvider.value(value: _profileImageBloc)
+      ],
       child: BlocBuilder<EventsSavedBloc, EventsSavedState>(
         builder: (context, state) {
           if (state is EventsSavedInitial || state is EventsSavedLoading) {
@@ -88,6 +94,85 @@ class _EventCardState extends State<EventCard> {
 
   Widget _buildCard(bool isSaved) {
     isEventSaved = isSaved;
+    List<Widget> stackChildren = [];
+
+    for (int i = 0; i < widget.result.students!.length && i < 3; i++) {
+      stackChildren.add(
+        BlocProvider(
+          create: (context) => ProfileImageBloc(studentRepository)
+            ..add(FetchProfileImageById(widget.result.students![i].id!)),
+          child: BlocBuilder<ProfileImageBloc, ProfileImageState>(
+            builder: (context, state) {
+              if (state is ProfileImageInitial ||
+                  state is ProfileImageLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ProfileImageSuccess) {
+                return Positioned(
+                  left: 20 * i.toDouble(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.memory(
+                        state.image,
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Positioned(
+                  left: 20 * i.toDouble(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/img/nophoto.png',
+                        width: 30,
+                        height: 30,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    }
+
+    if (widget.result.students!.length > 3) {
+      stackChildren.add(
+        Positioned(
+          left: 80,
+          child: Text(
+            '+${widget.result.students!.length - 3} more',
+            style: GoogleFonts.actor(
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(63, 56, 221, 1),
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: GestureDetector(
@@ -213,81 +298,8 @@ class _EventCardState extends State<EventCard> {
                         width: double.infinity,
                         height: 30,
                         child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Positioned(
-                              left: 40,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/img/fotoprueba1.jpg',
-                                    width: 30,
-                                    height: 30,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 20,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/img/fotoprueba2.jpg',
-                                    width: 30,
-                                    height: 30,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 0,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/img/fotoprueba3.jpg',
-                                    width: 30,
-                                    height: 30,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: 80,
-                              child: Text(
-                                '+20 Going',
-                                style: GoogleFonts.actor(
-                                    textStyle: const TextStyle(
-                                  color: Color.fromRGBO(63, 56, 221, 1),
-                                  fontSize: 12,
-                                )),
-                              ),
-                            ),
-                          ],
-                        ),
+                            alignment: Alignment.center,
+                            children: stackChildren),
                       ),
                     ),
                     const SizedBox(
