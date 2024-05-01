@@ -9,6 +9,7 @@ import com.salesianos.dam.StudentGoApi.dto.user.organizer.AddOrganizerRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
 import com.salesianos.dam.StudentGoApi.exception.FileTypeException;
+import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
@@ -45,6 +46,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.io.File;
 import java.net.URI;
 import java.util.Objects;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -230,6 +232,18 @@ public class UserController {
     @GetMapping("/download-profile-photo")
     public ResponseEntity<Resource> getFile(@AuthenticationPrincipal UserDefault user){
 
+        MediaTypeUrlResource resource =
+                (MediaTypeUrlResource) storageService.loadAsResource(user.getUrlPhoto());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Content-Type", resource.getType())
+                .body(resource);
+    }
+
+    @GetMapping("/download-profile-photo/{id}")
+    public ResponseEntity<Resource> getFileByUserId(@PathVariable("id") String uuid){
+
+        UserDefault user = userRepository.findById(UUID.fromString(uuid)).orElseThrow(() -> new NotFoundException("User"));
         MediaTypeUrlResource resource =
                 (MediaTypeUrlResource) storageService.loadAsResource(user.getUrlPhoto());
 
