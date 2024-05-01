@@ -17,5 +17,6 @@ abstract class StudentRepository {
   Future<StudentInfoResponse> updateProfile(
       UpdateProfileRequest updateProfileRequest);
   Future<Uint8List> getUserPhoto();
+  Future<Uint8List> getUserPhotoById(String id);
   Future<UploadResponse> uploadProfilePhoto(XFile image);
 }

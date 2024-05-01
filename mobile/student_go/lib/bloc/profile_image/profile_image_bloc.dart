@@ -13,6 +13,7 @@ class ProfileImageBloc extends Bloc<ProfileImageEvent, ProfileImageState> {
   final StudentRepository studentRepository;
   ProfileImageBloc(this.studentRepository) : super(ProfileImageInitial()) {
     on<FetchProfileImage>(_fetchProfileImage);
+    on<FetchProfileImageById>(_fetchProfileImageId);
   }
 
   void _fetchProfileImage(
@@ -20,6 +21,26 @@ class ProfileImageBloc extends Bloc<ProfileImageEvent, ProfileImageState> {
     emit(ProfileImageLoading());
     try {
       final response = await studentRepository.getUserPhoto();
+      emit(ProfileImageSuccess(response));
+    } catch (e) {
+      if (e is GeneralException) {
+        if (e.status == 403) {
+          emit(TokenNotValidStateProfileImage());
+        }
+        emit(ProfileImageEntityException(e, e.title!));
+      } else if (e is ValidationException) {
+        emit(ProfileImageValidationException(e, e.title!));
+      } else {
+        emit(ProfileImageError("An unespected error occurred"));
+      }
+    }
+  }
+
+  void _fetchProfileImageId(
+      FetchProfileImageById event, Emitter<ProfileImageState> emit) async {
+    emit(ProfileImageLoading());
+    try {
+      final response = await studentRepository.getUserPhotoById(event.id);
       emit(ProfileImageSuccess(response));
     } catch (e) {
       if (e is GeneralException) {

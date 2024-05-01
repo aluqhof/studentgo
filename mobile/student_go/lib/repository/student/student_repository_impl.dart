@@ -197,7 +197,45 @@ class StudentRepositoryImp extends StudentRepository {
             decodedResponse.containsKey('instance')) {
           throw GeneralException.fromMap(decodedResponse);
         } else {
-          throw Exception('Failed to change username');
+          throw Exception('Failed to load photo');
+        }
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        rethrow;
+      } else if (e is ValidationException) {
+        rethrow;
+      } else if (e is SocketException) {
+        throw Exception('No Internet connection');
+      } else if (e is HttpException) {
+        throw Exception('Failed to connect to the server');
+      } else if (e is FormatException) {
+        throw Exception('Bad response format');
+      } else {
+        rethrow;
+      }
+    }
+  }
+
+  @override
+  Future<Uint8List> getUserPhotoById(String id) async {
+    try {
+      final response = await _httpClient.get(
+        Uri.parse('http://10.0.2.2:8080/download-profile-photo/$id'),
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        var decodedResponse = jsonDecode(response.body);
+        if (decodedResponse.containsKey('type') &&
+            decodedResponse.containsKey('title') &&
+            decodedResponse.containsKey('status') &&
+            decodedResponse.containsKey('detail') &&
+            decodedResponse.containsKey('instance')) {
+          throw GeneralException.fromMap(decodedResponse);
+        } else {
+          throw Exception('Failed load photo');
         }
       }
     } catch (e) {
