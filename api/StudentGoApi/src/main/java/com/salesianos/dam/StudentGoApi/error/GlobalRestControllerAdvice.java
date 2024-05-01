@@ -50,6 +50,15 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler({ StorageException.class })
+    public ErrorResponse handleStorageException(StorageException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Storage Exception")
+                .type(URI.create("https://api.studentgo.com/errors/storage-exception"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
     /*@ExceptionHandler({ InUseException.class })
     public ErrorResponse handleAlreadyInUseException(InUseException exception) {
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
@@ -65,6 +74,16 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
         return ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED, exception.getMessage())
                 .title("Username or password incorrect")
                 .type(URI.create("https://api.studentgo.com/errors/invalid-credentials"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(FileTypeException.class)
+    public ErrorResponse handleFileTypeException(
+            FileTypeException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("File Type Exception")
+                .type(URI.create("https://api.studentgo.com/errors/invalid-file-type"))
                 .property("timestamp", Instant.now())
                 .build();
     }

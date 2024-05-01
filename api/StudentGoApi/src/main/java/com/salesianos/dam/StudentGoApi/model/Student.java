@@ -38,10 +38,10 @@ public class Student extends UserDefault {
     private List<Event> saved;
 
 
-    public Student(UUID id, String username, String password, String email, String name,
+    public Student(UUID id, String username, String password, String email, String urlPhoto, String name,
                        boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                        LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, String description) {
-        super(id, username, password, email, name, accountNonExpired, accountNonLocked, credentialsNonExpired,
+        super(id, username, password, email, urlPhoto, name, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled, createdAt, lastPasswordChangeAt);
         this.description = description;
 

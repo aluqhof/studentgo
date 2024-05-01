@@ -8,6 +8,7 @@ class StudentInfoResponse {
   String? username;
   String? name;
   String? description;
+  String? userPhoto;
   List<EventTypeResponse>? interests;
   List<Event>? events;
 
@@ -16,6 +17,7 @@ class StudentInfoResponse {
       this.username,
       this.name,
       this.description,
+      this.userPhoto,
       this.interests,
       this.events});
 
@@ -25,6 +27,7 @@ class StudentInfoResponse {
         username: data['username'] as String?,
         name: data['name'] as String?,
         description: data['description'] as String?,
+        userPhoto: data['userPhoto'] as String?,
         interests: (data['interests'] as List<dynamic>?)
             ?.map((e) => EventTypeResponse.fromMap(e as Map<String, dynamic>))
             .toList(),
@@ -38,6 +41,7 @@ class StudentInfoResponse {
         'username': username,
         'name': name,
         'description': description,
+        'userPhoto': userPhoto,
         'interests': interests?.map((e) => e.toMap()).toList(),
         'events': events?.map((e) => e.toMap()).toList(),
       };

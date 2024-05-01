@@ -4,9 +4,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_type/event_type_bloc.dart';
+import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/bloc/student/student_bloc.dart';
 import 'package:student_go/bloc/update_profile/update_profile_bloc.dart';
+import 'package:student_go/bloc/upload_profile_photo/upload_profile_photo_bloc.dart';
 import 'package:student_go/models/response/event_type_response.dart';
 import 'package:student_go/models/response/validation_exception/fields_error.dart';
 import 'package:student_go/repository/event_type/event_type_repository.dart';
@@ -15,6 +18,8 @@ import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/edit_username_screen.dart';
 import 'package:student_go/screen/login_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -30,7 +35,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _nameController;
   late TextEditingController _usernameController;
   late TextEditingController _descriptionController;
-  late TextEditingController _interestController;
   bool validationError = false;
   List<FieldsError> validationErrors = [];
   bool _isSubmitting = false;
@@ -41,6 +45,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List<EventTypeResponse> interestList = [];
   late EventTypeBloc _eventTypeBloc;
   late EventTypeRepository eventTypeRepository;
+  late ProfileImageBloc _profileImageBloc;
+  late UploadProfilePhotoBloc _uploadProfilePhotoBloc;
 
   @override
   void initState() {
@@ -49,8 +55,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _nameController = TextEditingController();
     _usernameController = TextEditingController();
     _descriptionController = TextEditingController();
-    _interestController = TextEditingController();
     _updateProfileBloc = UpdateProfileBloc(studentRepository);
+    _profileImageBloc = ProfileImageBloc(studentRepository)
+      ..add(FetchProfileImage());
     _studentBloc.stream.listen((state) {
       if (state is StudentSuccess) {
         _nameController.text = state.studentInfoResponse.name!;
@@ -61,6 +68,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     eventTypeRepository = EventTypeRepositoryImpl();
     _eventTypeBloc = EventTypeBloc(eventTypeRepository)
       ..add(FetchEventTypeEvent());
+    _uploadProfilePhotoBloc = UploadProfilePhotoBloc(studentRepository);
+    _uploadProfilePhotoBloc.stream.listen((state) {
+      if (state is UploadProfilePhotoSuccess) {
+        _profileImageBloc.add(FetchProfileImage());
+        Navigator.of(context).pop();
+      } else if (state is UploadProfilePhotoEntityException) {
+        _showErrorSnackBar(state.generalException.detail!);
+      } else if (state is UploadProfilePhotoValidationException) {
+        //processValidationErrors(state);
+        _showErrorSnackBar(state.validationException.fieldsErrors![0].message!);
+      } else if (state is UploadProfilePhotoError) {
+        _showErrorSnackBar(state.errorMessage);
+      } else {
+        null;
+      }
+    });
     _updateProfileBloc.stream.listen((state) {
       validationErrors = [];
       validationError = false;
@@ -149,6 +172,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         providers: [
           BlocProvider.value(value: _studentBloc),
           BlocProvider.value(value: _eventTypeBloc),
+          BlocProvider.value(value: _profileImageBloc),
           BlocProvider(create: (_) => _updateProfileBloc),
         ],
         child: BlocBuilder<StudentBloc, StudentState>(
@@ -175,13 +199,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           overlayColor:
                               MaterialStateProperty.resolveWith<Color?>(
                             (Set<MaterialState> states) {
-                              // If the button is pressed, hovered, or focused, return transparent color
                               if (states.contains(MaterialState.pressed) ||
                                   states.contains(MaterialState.hovered) ||
                                   states.contains(MaterialState.focused)) {
                                 return Colors.transparent;
                               }
-                              return null; // Defer to the widget's default.
+                              return null;
                             },
                           ),
                         ),
@@ -209,31 +232,169 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         padding: const EdgeInsets.all(20),
                         child: Column(
                           children: [
-                            Center(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/img/fotoprueba2.jpg',
-                                    width: 60,
-                                    height: 60,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
+                            Center(child: BlocBuilder<ProfileImageBloc,
+                                ProfileImageState>(
+                              builder: (context, stateImage) {
+                                if (stateImage is ProfileImageInitial ||
+                                    stateImage is ProfileImageLoading) {
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                } else if (stateImage is ProfileImageSuccess) {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.memory(
+                                        stateImage.image,
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1,
+                                      ),
+                                    ),
+                                    child: ClipOval(
+                                      child: Image.asset(
+                                        'assets/img/nophoto.png',
+                                        width: 60,
+                                        height: 60,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            )),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
                               child: Center(
                                 child: GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    showModalBottomSheet<void>(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              children: [
+                                                ListTile(
+                                                  leading: const Icon(
+                                                      Icons.photo_library,
+                                                      color: Colors.black),
+                                                  title: Text(
+                                                      'Choose from the library',
+                                                      style: GoogleFonts.actor(
+                                                          textStyle:
+                                                              const TextStyle(
+                                                                  color: Colors
+                                                                      .black))),
+                                                  onTap: () {
+                                                    getImageFromLibrary(
+                                                        context);
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  leading: const Icon(
+                                                    Icons.camera_alt,
+                                                    color: Colors.black,
+                                                  ),
+                                                  title: Text(
+                                                    'Take a Photo',
+                                                    style: GoogleFonts.actor(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .black)),
+                                                  ),
+                                                  onTap: () {
+                                                    takePhoto(context);
+                                                  },
+                                                ),
+                                                ListTile(
+                                                  leading: const Icon(
+                                                    Icons.delete,
+                                                    color: Colors.red,
+                                                  ),
+                                                  title: Text(
+                                                    'Delete Photo',
+                                                    style: GoogleFonts.actor(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                color: Colors
+                                                                    .red)),
+                                                  ),
+                                                  onTap: () async {
+                                                    try {
+                                                      final prefs =
+                                                          await SharedPreferences
+                                                              .getInstance();
+
+                                                      final url = Uri.parse(
+                                                          'http://10.0.2.2:8080/delete-photo');
+                                                      final response =
+                                                          await http.get(
+                                                        url,
+                                                        headers: {
+                                                          'Authorization':
+                                                              'Bearer ${prefs.getString('token')!}', // Asegúrate de reemplazar esto con tu token real
+                                                        },
+                                                      );
+
+                                                      if (response.statusCode ==
+                                                          204) {
+                                                        _profileImageBloc.add(
+                                                            FetchProfileImage());
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                      } else {
+                                                        Navigator.of(context)
+                                                            .pop();
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          SnackBar(
+                                                            content: Text(
+                                                                'Failed to delete photo'),
+                                                            backgroundColor:
+                                                                Colors.red,
+                                                          ),
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      ScaffoldMessenger.of(
+                                                              context)
+                                                          .showSnackBar(
+                                                        SnackBar(
+                                                          content: Text(
+                                                              'Error occurred: $e'),
+                                                          backgroundColor:
+                                                              Colors.red,
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        });
+                                  },
                                   child: Text(
                                     'Change profile image',
                                     style: GoogleFonts.actor(
@@ -557,14 +718,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  void _fetchStudentData() {
+  void _fetchData() {
     _studentBloc.add(FetchStudent());
+    _profileImageBloc.add(FetchProfileImage());
   }
 
   void _navigateAndRefreshProfile(BuildContext context) {
     Navigator.of(context).push(_createRoute()).then((_) {
-      // Llama al método para recargar la información del perfil
-      _fetchStudentData();
+      _fetchData();
     });
+  }
+
+  Future<void> getImageFromLibrary(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      _uploadProfilePhotoBloc.add(FetchProfilePhotoUpload(pickedFile));
+    }
+  }
+
+  Future<void> takePhoto(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      _uploadProfilePhotoBloc.add(FetchProfilePhotoUpload(pickedFile));
+    }
   }
 }

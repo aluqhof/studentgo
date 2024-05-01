@@ -1,15 +1,14 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
 import com.salesianos.dam.StudentGoApi.dto.event.EventOverviewResponse;
-import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.purchase.BuyTickets;
 import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseDoneResponse;
 import com.salesianos.dam.StudentGoApi.model.Purchase;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.service.PurchaseService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

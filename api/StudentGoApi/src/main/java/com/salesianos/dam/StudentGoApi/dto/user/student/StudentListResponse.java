@@ -5,13 +5,15 @@ import com.salesianos.dam.StudentGoApi.model.Student;
 public record StudentListResponse(
         String id,
         String username,
-        String name
+        String name,
+        String userPhoto
 ){
     public static StudentListResponse of(Student student){
         return new StudentListResponse(
                 student.getId().toString(),
                 student.getUsername(),
-                student.getName()
+                student.getName(),
+                student.getUrlPhoto()
         );
     }
 }

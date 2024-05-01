@@ -20,10 +20,10 @@ public class Organizer extends UserDefault {
 
     private String business;
 
-    public Organizer(UUID id, String username, String password, String email, String name,
+    public Organizer(UUID id, String username, String password, String email, String urlPhoto, String name,
                       boolean accountNonExpired, boolean accountNonLocked, boolean credentialsNonExpired, boolean enabled,
                       LocalDateTime createdAt, LocalDateTime lastPasswordChangeAt, String description, String business) {
-        super(id, username, password, email, name, accountNonExpired, accountNonLocked, credentialsNonExpired,
+        super(id, username, password, email, urlPhoto, name, accountNonExpired, accountNonLocked, credentialsNonExpired,
                 enabled, createdAt, lastPasswordChangeAt);
         this.description = description;
         this.business = business;

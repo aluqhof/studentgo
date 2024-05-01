@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/bloc/student/student_bloc.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
@@ -21,6 +22,7 @@ class DrawerWidget extends StatefulWidget {
 class _DrawerWidgetState extends State<DrawerWidget> {
   late StudentRepository studentRepository;
   late StudentBloc _studentBloc;
+  late ProfileImageBloc _profileImageBloc;
 
   @override
   void initState() {
@@ -28,13 +30,18 @@ class _DrawerWidgetState extends State<DrawerWidget> {
     super.initState();
     studentRepository = StudentRepositoryImp();
     _studentBloc = StudentBloc(studentRepository)..add(FetchStudent());
+    _profileImageBloc = ProfileImageBloc(studentRepository)
+      ..add(FetchProfileImage());
   }
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      child: BlocProvider.value(
-        value: _studentBloc,
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: _studentBloc),
+          BlocProvider.value(value: _profileImageBloc)
+        ],
         child: BlocBuilder<StudentBloc, StudentState>(
           builder: (context, state) {
             if (state is StudentInitial || state is StudentLoading) {
@@ -56,25 +63,51 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                         child: Column(
                           children: [
                             Align(
-                              alignment: Alignment.centerLeft,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: ClipOval(
-                                  child: Image.asset(
-                                    'assets/img/fotoprueba2.jpg',
-                                    width: 70,
-                                    height: 70,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              ),
-                            ),
+                                alignment: Alignment.centerLeft,
+                                child: BlocBuilder<ProfileImageBloc,
+                                    ProfileImageState>(
+                                  builder: (context, stateImage) {
+                                    if (stateImage is ProfileImageInitial ||
+                                        stateImage is ProfileImageLoading) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    } else if (stateImage
+                                        is ProfileImageSuccess) {
+                                      return Container(
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: ClipOval(
+                                          child: Image.memory(
+                                            stateImage.image,
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      );
+                                    } else {
+                                      return Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 1,
+                                          ),
+                                        ),
+                                        child: ClipOval(
+                                          child: Image.asset(
+                                            'assets/img/nophoto.png',
+                                            width: 60,
+                                            height: 60,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                )),
                             Padding(
                               padding: const EdgeInsets.only(top: 8.0),
                               child: Align(

@@ -12,6 +12,7 @@ public record StudentInfoResponse(
         String username,
         String name,
         String description,
+        String userPhoto,
         List<EventTypeResponse> interests,
         List<EventShortResponse> events
 ) {
@@ -22,6 +23,7 @@ public record StudentInfoResponse(
                 student.getUsername(),
                 student.getName(),
                 student.getDescription(),
+                student.getUrlPhoto(),
                 student.getInterests().stream().map(EventTypeResponse::of).toList(),
                 student.getSaved().stream().map(EventShortResponse::of).toList()
         );
