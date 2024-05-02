@@ -39,6 +39,8 @@ public class Event {
 
     private LocalDateTime dateTime;
 
+    private List<String> urlPhotos;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Purchase> purchaseList;
 

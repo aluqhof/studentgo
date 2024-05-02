@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:student_go/models/response/event_details_response/event_details_response.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/models/response/list_events_response/list_events_response.dart';
@@ -24,4 +26,6 @@ abstract class EventRepository {
       DateTime? endDate,
       double minPrice,
       double maxPrice);
+
+  Future<Uint8List> getEventPhoto(String eventId, int index);
 }

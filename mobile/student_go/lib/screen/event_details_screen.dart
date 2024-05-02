@@ -7,13 +7,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_details/event_details_bloc.dart';
+import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/bloc/purchase/purchase_bloc.dart';
+import 'package:student_go/models/response/event_details_response/event_details_response.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
 import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/widgets/people_going_list.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final String eventId;
@@ -33,6 +36,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late String _city = '';
   late String _postalCode = '';
   int _counter = 1;
+  late EventImageBloc _eventImageBloc;
 
   Future<void> _getStreet(double latitude, double longitude) async {
     try {
@@ -58,6 +62,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
       ..add(FetchEventDetails(widget.eventId));
     purchaseRepository = PurchaseRepositoryImpl();
     _purchaseBloc = PurchaseBloc(purchaseRepository);
+    _eventImageBloc = EventImageBloc(eventRepository);
     super.initState();
   }
 
@@ -91,7 +96,6 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                       const Color.fromRGBO(255, 255, 255, 0.3)),
                               padding: const EdgeInsets.all(8),
                               child: const Icon(
-                                //Bokmark added
                                 Icons.share,
                                 color: Color.fromRGBO(255, 255, 255, 1),
                               )),
@@ -140,17 +144,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-                            Container(
-                              height: 250,
-                              decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(
-                                    'assets/img/card_background.jpg',
-                                  ),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                            fetchImages(state.eventDetails),
                             Positioned(
                               top: 215,
                               left: 0,
@@ -898,8 +892,112 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         ));
   }
 
+  Widget fetchImages(EventDetailsResponse eventDetailsResponse) {
+    int countImages = 0;
+    if (eventDetailsResponse.urlPhotos != null &&
+        eventDetailsResponse.urlPhotos!.isNotEmpty) {
+      countImages = eventDetailsResponse.urlPhotos!.length;
+    }
+
+    if (countImages == 0) {
+      return Container(
+        height: 250,
+        decoration: const BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(
+              'assets/img/card_background.jpg',
+            ),
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    if (countImages == 1) {
+      return BlocProvider(
+        create: (context) => EventImageBloc(eventRepository)
+          ..add(FetchEventImage(eventDetailsResponse.uuid!, 0)),
+        child: BlocBuilder<EventImageBloc, EventImageState>(
+          builder: (context, state) {
+            if (state is EventImageInitial || state is EventImageLoading) {
+              return const SizedBox(
+                height: 250,
+                child: Center(child: CircularProgressIndicator()),
+              );
+            } else if (state is EventImageSuccess) {
+              return Container(
+                height: 250,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: MemoryImage(state.image),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            } else {
+              return Container(
+                height: 250,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/img/card_background.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      );
+    }
+
+    List<Widget> imageSliders = List.generate(
+      countImages,
+      (index) => BlocProvider<EventImageBloc>(
+        create: (context) => EventImageBloc(eventRepository)
+          ..add(FetchEventImage(eventDetailsResponse.uuid!, index)),
+        child: BlocBuilder<EventImageBloc, EventImageState>(
+          builder: (context, state) {
+            if (state is EventImageInitial || state is EventImageLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is EventImageSuccess) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: MemoryImage(state.image),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            } else {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/img/card_background.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            }
+          },
+        ),
+      ),
+    );
+
+    return CarouselSlider(
+      items: imageSliders,
+      options: CarouselOptions(
+        autoPlay: true,
+        enlargeCenterPage: true,
+        height: 250,
+        viewportFraction: 1,
+        initialPage: 0,
+      ),
+    );
+  }
+
   String formatPriceToEuro(double price) {
-    // Formatear el precio a euros con dos decimales
     String formattedPrice = '${price.toStringAsFixed(2)} €';
 
     return formattedPrice;

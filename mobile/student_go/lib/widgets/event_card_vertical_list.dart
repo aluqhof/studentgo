@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
+import 'package:student_go/repository/event/event_repository.dart';
+import 'package:student_go/repository/event/event_repository_impl.dart';
 import 'package:student_go/screen/event_details_screen.dart';
 
 class EventCardVerticalList extends StatefulWidget {
@@ -19,6 +23,8 @@ class _EventCardVerticalListState extends State<EventCardVerticalList> {
   late String _street = '';
   late String _city = '';
   late String _postalCode = '';
+  late EventRepository _eventRepository;
+  late EventImageBloc _eventImageBloc;
   //bool _isLoading = true;
 
   Future<Position> _determinePosition() async {
@@ -70,106 +76,139 @@ class _EventCardVerticalListState extends State<EventCardVerticalList> {
   void initState() {
     super.initState();
     _getStreet();
+    _eventRepository = EventRepositoryImpl();
+    _eventImageBloc = EventImageBloc(_eventRepository)
+      ..add(FetchEventImage(widget.result.uuid!, 0));
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => EventDetailsScreen(
-                    eventId: widget.result.uuid!,
-                  )),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        surfaceTintColor: Colors.white,
-        child: SizedBox(
-          height: 120,
-          width: double.infinity, // Mantén el ancho como double.infinity
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      image: const DecorationImage(
-                        image: AssetImage('assets/img/card_background.jpg'),
-                        fit: BoxFit.cover,
+    return BlocProvider.value(
+      value: _eventImageBloc,
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => EventDetailsScreen(
+                      eventId: widget.result.uuid!,
+                    )),
+          );
+        },
+        child: Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          surfaceTintColor: Colors.white,
+          child: SizedBox(
+            height: 120,
+            width: double.infinity, // Mantén el ancho como double.infinity
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: BlocBuilder<EventImageBloc, EventImageState>(
+                      builder: (context, state) {
+                        if (state is EventImageInitial ||
+                            state is EventImageLoading) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        } else if (state is EventImageSuccess) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: DecorationImage(
+                                image: MemoryImage(state.image),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              image: const DecorationImage(
+                                image: AssetImage(
+                                    'assets/img/card_background.jpg'),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6.0,
+                        horizontal: 12,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                formatDateTime(widget.result.dateTime!),
+                                style: GoogleFonts.actor(
+                                  textStyle: const TextStyle(
+                                    color: Color.fromRGBO(86, 105, 255, 1),
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                widget.result.name!,
+                                style: GoogleFonts.actor(
+                                  textStyle: const TextStyle(
+                                    fontSize: 18,
+                                    height: 1.1,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 18,
+                                color: Color.fromRGBO(116, 118, 136, 1),
+                              ),
+                              const SizedBox(width: 2),
+                              Text(
+                                truncateString(
+                                  '$_street, $_postalCode, $_city',
+                                  40,
+                                ),
+                                style: GoogleFonts.actor(
+                                  textStyle: const TextStyle(
+                                    color: Color.fromRGBO(116, 118, 136, 1),
+                                    fontSize: 12,
+                                  ),
+                                  fontWeight: FontWeight.w100,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6.0,
-                      horizontal: 12,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Text(
-                              formatDateTime(widget.result.dateTime!),
-                              style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                  color: Color.fromRGBO(86, 105, 255, 1),
-                                ),
-                              ),
-                            ),
-                            Text(
-                              widget.result.name!,
-                              style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                  fontSize: 18,
-                                  height: 1.1,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 18,
-                              color: Color.fromRGBO(116, 118, 136, 1),
-                            ),
-                            const SizedBox(width: 2),
-                            Text(
-                              truncateString(
-                                '$_street, $_postalCode, $_city',
-                                40,
-                              ),
-                              style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                  color: Color.fromRGBO(116, 118, 136, 1),
-                                  fontSize: 12,
-                                ),
-                                fontWeight: FontWeight.w100,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
