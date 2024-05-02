@@ -88,6 +88,16 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(ImageNotFoundException.class)
+    public ErrorResponse handleImageNotFoundException(
+            ImageNotFoundException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.NOT_FOUND, exception.getMessage())
+                .title("Image not found")
+                .type(URI.create("https://api.studentgo.com/errors/image-not-found"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
     @ExceptionHandler({ AuthenticationException.class })
     public ErrorResponse handleAuthenticationException(AuthenticationException exception) {
         return ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED, exception.getMessage())

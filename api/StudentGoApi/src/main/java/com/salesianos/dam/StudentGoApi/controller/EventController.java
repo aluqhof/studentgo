@@ -4,12 +4,18 @@ import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
 import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
+import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
+import com.salesianos.dam.StudentGoApi.exception.ImageNotFoundException;
+import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.model.Event;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
 import com.salesianos.dam.StudentGoApi.model.Student;
+import com.salesianos.dam.StudentGoApi.model.UserDefault;
 import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 import com.salesianos.dam.StudentGoApi.service.EventService;
+import com.salesianos.dam.StudentGoApi.service.StorageService;
+import com.salesianos.dam.StudentGoApi.utils.MediaTypeUrlResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,15 +26,20 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,6 +52,7 @@ public class EventController {
 
     private final EventService eventService;
     private final EventRepository eventRepository;
+    private final StorageService storageService;
 
     @Operation(summary = "Add an event (Only Organizer)")
     @ApiResponses(value = {
@@ -385,5 +397,76 @@ public class EventController {
     public ResponseEntity<EventDetailsResponse> getEventDetails(
             @PathVariable UUID eventId) {
         return ResponseEntity.ok(eventService.getEventById(eventId));
+    }
+
+    //SOLO ORGANIZADOR O ADMIN
+    @PostMapping("/upload/event-photos/{idEvent}")
+    public ResponseEntity<?> upload(@RequestPart("files") MultipartFile[] files, @PathVariable("idEvent") String idEvent) {
+
+        List<FileResponse> result = Arrays.stream(files)
+                .map(this::uploadFile)
+                .toList();
+        Event event = eventRepository.findById(UUID.fromString(idEvent)).orElseThrow(() -> new NotFoundException("Event"));
+
+        List<String> eventPhotos = event.getUrlPhotos();
+        if (eventPhotos == null) {
+            eventPhotos = new ArrayList<>(); // Use ArrayList for modifiability
+        }
+
+        for (MultipartFile file : files) {
+            String filename = file.getOriginalFilename();
+            if (filename != null && !filename.isBlank()) {
+                eventPhotos.add(filename);
+            }
+        }
+
+        event.setUrlPhotos(eventPhotos);
+
+        eventRepository.save(event);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(result);
+    }
+
+    private FileResponse uploadFile(MultipartFile file) {
+        String name = storageService.store(file);
+        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/download/")
+                .path(name)
+                .toUriString();
+
+        return FileResponse.builder()
+                .name(name)
+                .size(file.getSize())
+                .type(file.getContentType())
+                .uri(uri)
+                .build();
+    }
+
+    @GetMapping("/download-event-photo/{idEvent}/number/{index}")
+    public ResponseEntity<Resource> getFile(@PathVariable("idEvent") String eventId, @PathVariable("index") int number){
+
+        Event event = eventRepository.findById(UUID.fromString(eventId)).orElseThrow(() -> new NotFoundException("Event"));
+
+        String imageUrl;
+        List<String> urlPhotos = event.getUrlPhotos() == null ? new ArrayList<>() :  event.getUrlPhotos();
+
+        if (number < 0 || number >= urlPhotos.size()) {
+            throw new ImageNotFoundException("Image not found for index: " + number);
+        }
+
+        if (urlPhotos.get(number).isBlank()) {
+            throw new ImageNotFoundException("Image URL is blank at index: " + number);
+        }
+
+        imageUrl = urlPhotos.get(number);
+
+        MediaTypeUrlResource resource =
+                (MediaTypeUrlResource) storageService.loadAsResource(imageUrl);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Content-Type", resource.getType())
+                .body(resource);
     }
 }

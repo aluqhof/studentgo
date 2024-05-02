@@ -24,7 +24,9 @@ public record EventDetailsResponse (
         LocalDateTime dateTime,
         OrganizerShortResponse organizer,
         List<String> eventType,
-        List<StudentListResponse> students
+        List<StudentListResponse> students,
+
+        List<String> urlPhotos
 ){
     public static EventDetailsResponse of(Event e, List<Student> students, Organizer organizer){
         return new EventDetailsResponse(
@@ -39,7 +41,8 @@ public record EventDetailsResponse (
                 e.getDateTime(),
                 OrganizerShortResponse.of(organizer),
                 e.getEventTypes().stream().map(EventType::getName).toList(),
-                students.stream().map(StudentListResponse::of).toList()
+                students.stream().map(StudentListResponse::of).toList(),
+                e.getUrlPhotos()
         );
     }
 }

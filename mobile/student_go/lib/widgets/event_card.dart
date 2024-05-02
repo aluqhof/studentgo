@@ -3,9 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/bloc/events_saved/events_saved_bloc.dart';
 import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
+import 'package:student_go/repository/event/event_repository.dart';
+import 'package:student_go/repository/event/event_repository_impl.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/event_details_screen.dart';
@@ -26,8 +29,9 @@ class _EventCardState extends State<EventCard> {
   //bool _isLoading = true;
   late StudentRepository studentRepository;
   late EventsSavedBloc _eventsSavedBloc;
+  late EventRepository _eventRepository;
   bool isEventSaved = false;
-  late ProfileImageBloc _profileImageBloc;
+  late EventImageBloc _eventImageBloc;
 
   Future<void> _getStreet() async {
     try {
@@ -55,9 +59,11 @@ class _EventCardState extends State<EventCard> {
     super.initState();
     _getStreet();
     studentRepository = StudentRepositoryImp();
+    _eventRepository = EventRepositoryImpl();
     _eventsSavedBloc = EventsSavedBloc(studentRepository)
       ..add(FetchEventsSaved());
-    _profileImageBloc = ProfileImageBloc(studentRepository);
+    _eventImageBloc = EventImageBloc(_eventRepository)
+      ..add(FetchEventImage(widget.result.uuid!, 0));
   }
 
   @override
@@ -65,7 +71,6 @@ class _EventCardState extends State<EventCard> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _eventsSavedBloc),
-        // BlocProvider.value(value: _profileImageBloc)
       ],
       child: BlocBuilder<EventsSavedBloc, EventsSavedState>(
         builder: (context, state) {
@@ -173,169 +178,204 @@ class _EventCardState extends State<EventCard> {
         ),
       );
     }
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => EventDetailsScreen(
-                      eventId: widget.result.uuid!,
-                    )),
-          );
-        },
-        child: SizedBox(
-          height: 300,
-          width: 275,
-          child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              surfaceTintColor: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: const DecorationImage(
-                              image:
-                                  AssetImage('assets/img/card_background.jpg'),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          width: double.infinity,
-                          height: 170,
-                        ),
-                        Positioned(
-                          top: 10,
-                          left: 10,
-                          child: SizedBox(
-                            width: 230,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
+    return BlocProvider.value(
+      value: _eventImageBloc,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => EventDetailsScreen(
+                        eventId: widget.result.uuid!,
+                      )),
+            );
+          },
+          child: SizedBox(
+            height: 300,
+            width: 275,
+            child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                surfaceTintColor: Colors.white,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Stack(
+                        children: [
+                          BlocBuilder<EventImageBloc, EventImageState>(
+                            builder: (context, state) {
+                              if (state is EventImageInitial ||
+                                  state is EventImageLoading) {
+                                return Container(
                                   decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white),
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 12),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        obtenerDia(widget.result.dateTime!),
-                                        style: GoogleFonts.openSans(
-                                            textStyle: const TextStyle(
-                                                color: Color.fromRGBO(
-                                                    240, 99, 90, 1),
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold)),
-                                      ),
-                                      Text(
-                                          obtenerMes(widget.result.dateTime!)
-                                              .toUpperCase(),
-                                          style: GoogleFonts.actor(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  width: double.infinity,
+                                  height: 170,
+                                  child: const Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              } else if (state is EventImageSuccess) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    image: DecorationImage(
+                                      image: MemoryImage(state.image),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  width: double.infinity,
+                                  height: 170,
+                                );
+                              } else {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    image: const DecorationImage(
+                                      image: AssetImage(
+                                          'assets/img/card_background.jpg'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                  width: double.infinity,
+                                  height: 170,
+                                );
+                              }
+                            },
+                          ),
+                          Positioned(
+                            top: 10,
+                            left: 10,
+                            child: SizedBox(
+                              width: 230,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8, horizontal: 12),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          obtenerDia(widget.result.dateTime!),
+                                          style: GoogleFonts.openSans(
                                               textStyle: const TextStyle(
                                                   color: Color.fromRGBO(
                                                       240, 99, 90, 1),
-                                                  fontWeight: FontWeight.w400)))
-                                    ],
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    _eventsSavedBloc.add(
-                                        BookmarkEvent(widget.result.uuid!));
-                                    _eventsSavedBloc.add(FetchEventsSaved());
-                                    setState(() {
-                                      isEventSaved = !isEventSaved;
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                    ),
-                                    padding: const EdgeInsets.all(8),
-                                    child: Icon(
-                                      Icons.bookmark,
-                                      color: isEventSaved
-                                          ? const Color.fromARGB(
-                                              255, 247, 230, 5)
-                                          : const Color.fromRGBO(
-                                              240, 99, 90, 1),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold)),
+                                        ),
+                                        Text(
+                                            obtenerMes(widget.result.dateTime!)
+                                                .toUpperCase(),
+                                            style: GoogleFonts.actor(
+                                                textStyle: const TextStyle(
+                                                    color: Color.fromRGBO(
+                                                        240, 99, 90, 1),
+                                                    fontWeight:
+                                                        FontWeight.w400)))
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          truncateString(widget.result.name!, 21),
-                          style: GoogleFonts.actor(
-                              textStyle: const TextStyle(
-                                  fontSize: 22, fontWeight: FontWeight.w500)),
-                          textAlign: TextAlign.start,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 30,
-                        child: Stack(
-                            alignment: Alignment.center,
-                            children: stackChildren),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6.0),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on,
-                              size: 18,
-                              color: Color.fromRGBO(116, 118, 136, 1),
-                            ),
-                            const SizedBox(
-                              width: 2,
-                            ),
-                            Text(
-                              truncateString(
-                                  '$_street, $_postalCode, $_city', 40),
-                              style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                    color: Color.fromRGBO(116, 118, 136, 1),
-                                    fontSize: 12),
-                                fontWeight: FontWeight.w100,
+                                  GestureDetector(
+                                    onTap: () {
+                                      _eventsSavedBloc.add(
+                                          BookmarkEvent(widget.result.uuid!));
+                                      _eventsSavedBloc.add(FetchEventsSaved());
+                                      setState(() {
+                                        isEventSaved = !isEventSaved;
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                      ),
+                                      padding: const EdgeInsets.all(8),
+                                      child: Icon(
+                                        Icons.bookmark,
+                                        color: isEventSaved
+                                            ? const Color.fromARGB(
+                                                255, 247, 230, 5)
+                                            : const Color.fromRGBO(
+                                                240, 99, 90, 1),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: Text(
+                            truncateString(widget.result.name!, 21),
+                            style: GoogleFonts.actor(
+                                textStyle: const TextStyle(
+                                    fontSize: 22, fontWeight: FontWeight.w500)),
+                            textAlign: TextAlign.start,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: 30,
+                          child: Stack(
+                              alignment: Alignment.center,
+                              children: stackChildren),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6.0),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.location_on,
+                                size: 18,
+                                color: Color.fromRGBO(116, 118, 136, 1),
+                              ),
+                              const SizedBox(
+                                width: 2,
+                              ),
+                              Text(
+                                truncateString(
+                                    '$_street, $_postalCode, $_city', 40),
+                                style: GoogleFonts.actor(
+                                  textStyle: const TextStyle(
+                                      color: Color.fromRGBO(116, 118, 136, 1),
+                                      fontSize: 12),
+                                  fontWeight: FontWeight.w100,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ),
         ),
       ),
     );

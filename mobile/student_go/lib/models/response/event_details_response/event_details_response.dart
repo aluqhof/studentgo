@@ -17,21 +17,22 @@ class EventDetailsResponse {
   Organizer? organizer;
   List<dynamic>? eventType;
   List<Student>? students;
+  List<dynamic>? urlPhotos;
 
-  EventDetailsResponse({
-    this.uuid,
-    this.name,
-    this.latitude,
-    this.longitude,
-    this.description,
-    this.cityId,
-    this.price,
-    this.place,
-    this.dateTime,
-    this.organizer,
-    this.eventType,
-    this.students,
-  });
+  EventDetailsResponse(
+      {this.uuid,
+      this.name,
+      this.latitude,
+      this.longitude,
+      this.description,
+      this.cityId,
+      this.price,
+      this.place,
+      this.dateTime,
+      this.organizer,
+      this.eventType,
+      this.students,
+      this.urlPhotos});
 
   factory EventDetailsResponse.fromMap(Map<String, dynamic> data) =>
       EventDetailsResponse(
@@ -51,6 +52,7 @@ class EventDetailsResponse {
         students: (data['students'] as List<dynamic>?)
             ?.map((e) => Student.fromMap(e as Map<String, dynamic>))
             .toList(),
+        urlPhotos: data['urlPhotos'] as List<dynamic>?,
       );
 
   Map<String, dynamic> toMap() => {
@@ -66,6 +68,7 @@ class EventDetailsResponse {
         'organizer': organizer?.toMap(),
         'eventType': eventType,
         'students': students?.map((e) => e.toMap()).toList(),
+        'urlPhotos': urlPhotos
       };
 
   /// `dart:convert`

@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:student_go/interceptor/auth_request_interceptor.dart';
@@ -6,6 +8,7 @@ import 'package:student_go/models/response/event_details_response/event_details_
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/models/response/list_events_response/list_events_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
+import 'package:student_go/models/response/validation_exception/validation_exception.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:intl/intl.dart';
 
@@ -202,6 +205,45 @@ class EventRepositoryImpl extends EventRepository {
         rethrow;
       } else {
         throw Exception('Something wrong');
+      }
+    }
+  }
+
+  @override
+  Future<Uint8List> getEventPhoto(String eventId, int index) async {
+    try {
+      final response = await _httpClient.get(
+        Uri.parse(
+            'http://10.0.2.2:8080/event/download-event-photo/$eventId/number/$index'),
+      );
+
+      if (response.statusCode == 200) {
+        return response.bodyBytes;
+      } else {
+        var decodedResponse = jsonDecode(response.body);
+        if (decodedResponse.containsKey('type') &&
+            decodedResponse.containsKey('title') &&
+            decodedResponse.containsKey('status') &&
+            decodedResponse.containsKey('detail') &&
+            decodedResponse.containsKey('instance')) {
+          throw GeneralException.fromMap(decodedResponse);
+        } else {
+          throw Exception('Failed load photo');
+        }
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        rethrow;
+      } else if (e is ValidationException) {
+        rethrow;
+      } else if (e is SocketException) {
+        throw Exception('No Internet connection');
+      } else if (e is HttpException) {
+        throw Exception('Failed to connect to the server');
+      } else if (e is FormatException) {
+        throw Exception('Bad response format');
+      } else {
+        rethrow;
       }
     }
   }
