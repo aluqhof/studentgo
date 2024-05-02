@@ -10,6 +10,7 @@ import 'package:student_go/screen/events_saved_screen.dart';
 import 'package:student_go/screen/home_screen.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/screen/my_events_calendar_screen.dart';
+import 'package:student_go/screen/my_tickets_page.dart';
 import 'package:student_go/screen/profile_screen.dart';
 
 class DrawerWidget extends StatefulWidget {
@@ -160,6 +161,25 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => const ProfileScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                        Icons.local_activity_outlined,
+                        size: 26,
+                      ), // Icono a la izquierda
+                      title: Text(
+                        'My Tickets',
+                        style: GoogleFonts.actor(
+                            textStyle: const TextStyle(fontSize: 18)),
+                      ),
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyTicketsPage(),
                           ),
                         );
                       },
