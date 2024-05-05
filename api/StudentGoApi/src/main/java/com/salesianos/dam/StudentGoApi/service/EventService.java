@@ -50,6 +50,7 @@ public class EventService {
                         .map(e -> eventTypeRepository.findById(e)
                                 .orElseThrow(() -> new NotFoundException("event type")))
                         .toList())
+                .maxCapacity(addEventRequest.maxCapacity())
                 .build();
 
         return eventRepository.save(event);

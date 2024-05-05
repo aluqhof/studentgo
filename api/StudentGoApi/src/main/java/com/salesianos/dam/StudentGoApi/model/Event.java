@@ -41,6 +41,8 @@ public class Event {
 
     private List<String> urlPhotos;
 
+    private int maxCapacity;
+
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Purchase> purchaseList;
 

@@ -1,13 +1,12 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
-import com.salesianos.dam.StudentGoApi.dto.event.EventOverviewResponse;
-import com.salesianos.dam.StudentGoApi.dto.purchase.BuyTickets;
+import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseOverviewResponse;
 import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseDoneResponse;
+import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseTicket;
 import com.salesianos.dam.StudentGoApi.model.Purchase;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.service.PurchaseService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,11 +26,11 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
 
-    @PostMapping("/")
+    @PostMapping("/{eventId}")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<PurchaseDoneResponse> buyTicketsForAnEvent(@AuthenticationPrincipal Student student,
-                                                                     @RequestBody @NotNull /*VALIDAR*/ BuyTickets buyTickets){
-        Purchase purchase = purchaseService.buyEventTicket(student, buyTickets.eventId(), buyTickets.numberOfTickets());
+                                                                     @PathVariable("eventId") String eventId){
+        Purchase purchase = purchaseService.buyEventTicket(student, eventId);
 
         URI createdURI = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -45,7 +44,12 @@ public class PurchaseController {
 
     @GetMapping("/all-by-student")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<List<EventOverviewResponse>> getAllEventsPurchaseByStudent(@AuthenticationPrincipal Student student){
-        return ResponseEntity.ok(purchaseService.findEventsPurchasedByUser(student).stream().map(EventOverviewResponse::of).toList());
+    public ResponseEntity<List<PurchaseOverviewResponse>> getAllPurchasesByStudent(@AuthenticationPrincipal Student student){
+        return ResponseEntity.ok(purchaseService.findEventsPurchasedByUser(student).stream().map(PurchaseOverviewResponse::of).toList());
+    }
+
+    @GetMapping("/purchase-details/{id}")
+    public ResponseEntity<PurchaseTicket> getPurchaseTicket(@PathVariable("id") String purchaseId){
+        return ResponseEntity.ok(purchaseService.getPurchase(purchaseId));
     }
 }

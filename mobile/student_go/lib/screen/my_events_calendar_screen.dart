@@ -5,7 +5,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:student_go/bloc/all_events_purchased_by_user/all_events_purchased_user_bloc.dart';
-import 'package:student_go/models/response/event_overview_response/event_overview_response.dart';
+import 'package:student_go/models/response/purchase_overview_response/purchase_overview_response.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
 import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
 import 'package:student_go/screen/event_details_screen.dart';
@@ -20,10 +20,10 @@ class MyEventsCalendarScreen extends StatefulWidget {
 }
 
 class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
-  late final ValueNotifier<List<EventOverviewResponse>> _selectedEvents;
+  late final ValueNotifier<List<PurchaseOverviewResponse>> _selectedEvents;
   late AllEventsPurchasedUserBloc _calendarBloc;
   late PurchaseRepository purchaseRepository;
-  Map<DateTime, List<EventOverviewResponse>> _eventsMap = {};
+  Map<DateTime, List<PurchaseOverviewResponse>> _eventsMap = {};
   bool _isLoading = true;
 
   @override
@@ -71,7 +71,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
               state is AllEventsPurchasedUserInitial) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is AllEventsPurchasedUserSuccess) {
-            _eventsMap = _getEventsMap(state.events);
+            _eventsMap = _getEventsMap(state.purchases);
             return _buildCalendar();
           } else if (state is AllEventsPurchasedUserError) {
             return Center(child: Text(state.errorMessage));
@@ -179,7 +179,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
             ),
           ),
           Expanded(
-            child: ValueListenableBuilder<List<EventOverviewResponse>>(
+            child: ValueListenableBuilder<List<PurchaseOverviewResponse>>(
               valueListenable: _selectedEvents,
               builder: (context, events, _) {
                 return events.isEmpty
@@ -200,7 +200,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => EventDetailsScreen(
-                                            eventId: event.uuid!,
+                                            eventId: event.eventId!,
                                           )),
                                 );
                               },
@@ -402,7 +402,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
     }
   }
 
-  List<EventOverviewResponse> _getEventsForDay(DateTime day) {
+  List<PurchaseOverviewResponse> _getEventsForDay(DateTime day) {
     final eventsForDay = _eventsMap.entries
         .where((entry) => isSameDay(entry.key, day))
         .map((entry) => entry.value)
@@ -411,7 +411,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
     return eventsForDay;
   }
 
-  List<EventOverviewResponse> _getEventsForSelectedDay() {
+  List<PurchaseOverviewResponse> _getEventsForSelectedDay() {
     if (_selectedDay != null) {
       return _getEventsForDay(_selectedDay!);
     } else {
@@ -419,9 +419,9 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
     }
   }
 
-  Map<DateTime, List<EventOverviewResponse>> _getEventsMap(
-      List<EventOverviewResponse> events) {
-    final Map<DateTime, List<EventOverviewResponse>> eventsMap = {};
+  Map<DateTime, List<PurchaseOverviewResponse>> _getEventsMap(
+      List<PurchaseOverviewResponse> events) {
+    final Map<DateTime, List<PurchaseOverviewResponse>> eventsMap = {};
 
     for (final event in events) {
       final eventDate = DateTime.parse(event.dateTime!);

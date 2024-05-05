@@ -1,10 +1,7 @@
 package com.salesianos.dam.StudentGoApi.dto.event;
 
 import com.salesianos.dam.StudentGoApi.validation.annotation.ValidCoordinates;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +25,10 @@ public record AddEventRequest(
         Long cityId,
 
         @NotEmpty(message = "{addEventRequest.eventTypeIds.notempty}")
-        List<Long> eventTypesIds
+        List<Long> eventTypesIds,
+
+        @NotNull(message = "{addEventRequest.maxCapacity.notnull}")
+        @Min(value = 0, message = "{addEventRequest.maxCapacity.min}")
+        int maxCapacity
 ) {
 }

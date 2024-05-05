@@ -22,11 +22,12 @@ public class Purchase {
     @Column(columnDefinition = "uuid")
     private UUID uuid;
 
-    private int numberOfTickets;
-
     private double totalPrice;
 
     private LocalDateTime dateTime;
+
+    @Column(length = 1000)
+    private String qrCode;
 
     @ManyToOne
     @JoinColumn(name = "event_id")

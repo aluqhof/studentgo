@@ -43,7 +43,7 @@ dependencies:
   geolocator: ^11.0.0
   geocoding: ^3.0.0
   http_interceptor: ^2.0.0-beta.8
-  skeletonizer: ^1.0.1
+  skeletonizer: ^1.1.2+1
   intl: ^0.19.0
   infinite_scroll_pagination: ^4.0.0
   table_calendar: ^3.1.0
@@ -59,6 +59,8 @@ dependencies:
   flutter_spinkit: ^5.2.1
   image_picker: ^1.0.8
   carousel_slider: ^4.2.1
+  ticket_widget: ^1.0.2
+  qr_flutter: ^4.1.0
   
 dev_dependencies:
   flutter_test:

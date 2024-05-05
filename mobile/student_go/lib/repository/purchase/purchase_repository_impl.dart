@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:http_interceptor/http_interceptor.dart';
 import 'package:student_go/interceptor/auth_request_interceptor.dart';
-import 'package:student_go/models/dto/purchase_dto.dart';
-import 'package:student_go/models/response/event_overview_response/event_overview_response.dart';
+import 'package:student_go/models/response/purchase_overview_response/purchase_overview_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/models/response/purchase_response.dart';
+import 'package:student_go/models/response/purchase_ticket_response/purchase_ticket_response.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
 
 class PurchaseRepositoryImpl extends PurchaseRepository {
@@ -14,11 +14,10 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   ]);
 
   @override
-  Future<PurchaseResponse> doEventPurchase(PurchaseDto purchase) async {
+  Future<PurchaseResponse> doEventPurchase(String eventId) async {
     try {
-      final response = await _httpClient.post(
-          Uri.parse('http://10.0.2.2:8080/purchase/'),
-          body: purchase.toJson());
+      final response = await _httpClient
+          .post(Uri.parse('http://10.0.2.2:8080/purchase/$eventId'));
       if (response.statusCode == 201) {
         return PurchaseResponse.fromJson(response.body);
       } else if (response.statusCode == 404 ||
@@ -39,7 +38,7 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   }
 
   @override
-  Future<List<EventOverviewResponse>> getAllEventsPurchasedByUser() async {
+  Future<List<PurchaseOverviewResponse>> getAllEventsPurchasedByUser() async {
     try {
       final response = await _httpClient.get(
         Uri.parse('http://10.0.2.2:8080/purchase/all-by-student'),
@@ -48,8 +47,8 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
 
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
-        final List<EventOverviewResponse> events =
-            jsonData.map((x) => EventOverviewResponse.fromMap(x)).toList();
+        final List<PurchaseOverviewResponse> events =
+            jsonData.map((x) => PurchaseOverviewResponse.fromMap(x)).toList();
         return events;
       } else if (response.statusCode == 404 ||
           response.statusCode == 400 ||
@@ -64,6 +63,31 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
         rethrow;
       }
       throw Exception('Something wrong');
+    }
+  }
+
+  @override
+  Future<PurchaseTicketResponse> getPurchase(String purchaseId) async {
+    try {
+      final response = await _httpClient.get(Uri.parse(
+          'http://10.0.2.2:8080/purchase/purchase-details/$purchaseId'));
+
+      if (response.statusCode == 200) {
+        return PurchaseTicketResponse.fromJson(response.body);
+      } else if (response.statusCode == 404 ||
+          response.statusCode == 400 ||
+          response.statusCode == 401 ||
+          response.statusCode == 403) {
+        throw GeneralException.fromJson(response.body);
+      } else {
+        throw Exception('Failed to get purchase');
+      }
+    } catch (e) {
+      if (e is GeneralException) {
+        rethrow;
+      } else {
+        throw Exception('Something wrong');
+      }
     }
   }
 }

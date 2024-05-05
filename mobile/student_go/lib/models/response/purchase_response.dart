@@ -3,7 +3,6 @@ import 'dart:convert';
 class PurchaseResponse {
   String? id;
   DateTime? dateTime;
-  int? numberOfTickets;
   double? totalPrice;
   String? eventId;
   String? author;
@@ -11,7 +10,6 @@ class PurchaseResponse {
   PurchaseResponse({
     this.id,
     this.dateTime,
-    this.numberOfTickets,
     this.totalPrice,
     this.eventId,
     this.author,
@@ -23,7 +21,6 @@ class PurchaseResponse {
       dateTime: data['dateTime'] == null
           ? null
           : DateTime.parse(data['dateTime'] as String),
-      numberOfTickets: data['numberOfTickets'] as int?,
       totalPrice: data['totalPrice'] as double?,
       eventId: data['eventId'] as String?,
       author: data['author'] as String?,
@@ -33,7 +30,6 @@ class PurchaseResponse {
   Map<String, dynamic> toMap() => {
         'id': id,
         'dateTime': dateTime?.toIso8601String(),
-        'numberOfTickets': numberOfTickets,
         'totalPrice': totalPrice,
         'eventId': eventId,
         'author': author,

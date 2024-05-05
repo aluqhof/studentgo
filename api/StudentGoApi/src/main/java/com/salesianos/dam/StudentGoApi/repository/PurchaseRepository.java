@@ -13,4 +13,8 @@ public interface PurchaseRepository extends JpaRepository<Purchase, UUID> {
 
     @Query("SELECT p.event FROM Purchase p WHERE p.author = :studentId")
     List<Event> findEventsPurchasedByStudentId(@Param("studentId") String studentId);
+
+    @Query("SELECT p FROM Purchase p WHERE p.author = :studentId")
+    List<Purchase> findPurchasesByStudentId(@Param("studentId") String studentId);
 }
+
