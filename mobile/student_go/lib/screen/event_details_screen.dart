@@ -479,379 +479,413 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                     left: 40.0,
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: ElevatedButton(
-                      style: ButtonStyle(
-                        padding: MaterialStateProperty.all<EdgeInsets>(
-                          const EdgeInsets.symmetric(
-                              horizontal: 25, vertical: 15),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(Colors.blue),
-                        shape:
-                            MaterialStateProperty.all<RoundedRectangleBorder>(
-                          RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: ElevatedButton(
+                          style: ButtonStyle(
+                            padding: MaterialStateProperty.all<EdgeInsets>(
+                              const EdgeInsets.symmetric(
+                                  horizontal: 25, vertical: 15),
+                            ),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.blue),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                              ),
+                            ),
+                            backgroundColor: MaterialStateProperty.all(
+                                state.eventDetails.maxCapacity! <=
+                                        state.eventDetails.students!.length
+                                    ? Colors.red
+                                    : Colors.blue),
+                            shadowColor: MaterialStateProperty.all(
+                                Colors.white), // Color de la sombra blanca
+                            elevation: MaterialStateProperty.all(5),
                           ),
-                        ),
-                        backgroundColor: MaterialStateProperty.all(Colors.blue),
-                        shadowColor: MaterialStateProperty.all(
-                            Colors.white), // Color de la sombra blanca
-                        elevation: MaterialStateProperty.all(5),
-                      ),
-                      onPressed: () {
-                        showModalBottomSheet<void>(
-                          context: context,
-                          builder: (BuildContext context) {
-                            ImageFilter.blur(sigmaX: 20, sigmaY: 20);
-                            return SafeArea(
-                              child: Wrap(children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(15.0),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: Column(
-                                      children: [
-                                        Text(
-                                          'Order Review',
-                                          style: GoogleFonts.actor(
-                                              textStyle: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Container(
-                                                height: 100,
-                                                width: 100,
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                  image: const DecorationImage(
-                                                    image: AssetImage(
-                                                      'assets/img/card_background.jpg',
-                                                    ),
-                                                    fit: BoxFit.cover,
+                          onPressed: () {
+                            state.eventDetails.maxCapacity! >
+                                    state.eventDetails.students!.length
+                                ? showModalBottomSheet<void>(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      ImageFilter.blur(sigmaX: 20, sigmaY: 20);
+                                      return SafeArea(
+                                        child: Wrap(children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: SizedBox(
+                                              width: double.infinity,
+                                              child: Column(
+                                                children: [
+                                                  Text(
+                                                    'Order Review',
+                                                    style: GoogleFonts.actor(
+                                                        textStyle:
+                                                            const TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold)),
                                                   ),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 8.0),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Align(
-                                                      alignment:
-                                                          Alignment.topLeft,
-                                                      child: Text(
-                                                          truncateString(
-                                                              state.eventDetails
-                                                                  .name!,
-                                                              20),
-                                                          style: GoogleFonts.actor(
-                                                              textStyle: const TextStyle(
-                                                                  fontSize: 18,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500))),
-                                                    ),
-                                                    Text(
-                                                        truncateString(
-                                                            state.eventDetails
-                                                                .place!,
-                                                            20),
-                                                        style: GoogleFonts.actor(
-                                                            textStyle:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .grey))),
-                                                    Text(
-                                                        convertirFormato(state
-                                                            .eventDetails
-                                                            .dateTime!),
-                                                        style: GoogleFonts.actor(
-                                                            textStyle:
-                                                                const TextStyle(
-                                                                    fontSize:
-                                                                        16,
-                                                                    color: Colors
-                                                                        .grey))),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8.0),
-                                          child: BlocProvider.value(
-                                              value: _purchaseBloc,
-                                              child: BlocBuilder<PurchaseBloc,
-                                                  PurchaseState>(
-                                                builder:
-                                                    (context, statePurchase) {
-                                                  if (statePurchase
-                                                      is PurchaseInitial) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        _purchaseBloc.add(
-                                                            FetchPurchase(
-                                                                state
-                                                                    .eventDetails
-                                                                    .uuid!,
-                                                                1));
-                                                      },
-                                                      child: Container(
-                                                        width: double.infinity,
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 10),
-                                                        decoration: BoxDecoration(
-                                                            color: Colors.blue,
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 8.0),
+                                                    child: Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Container(
+                                                          height: 100,
+                                                          width: 100,
+                                                          decoration:
+                                                              BoxDecoration(
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        10)),
-                                                        child: Padding(
+                                                                        10),
+                                                            image:
+                                                                const DecorationImage(
+                                                              image: AssetImage(
+                                                                'assets/img/card_background.jpg',
+                                                              ),
+                                                              fit: BoxFit.cover,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Padding(
                                                           padding:
                                                               const EdgeInsets
                                                                   .symmetric(
                                                                   horizontal:
-                                                                      20.0,
-                                                                  vertical: 8),
-                                                          child: Row(
+                                                                      8.0),
+                                                          child: Column(
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
-                                                                    .spaceBetween,
+                                                                    .start,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
-                                                              Text(
-                                                                'PAY NOW',
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                style: GoogleFonts
-                                                                    .actor(
-                                                                        textStyle:
-                                                                            const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 20,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                )),
+                                                              Align(
+                                                                alignment:
+                                                                    Alignment
+                                                                        .topLeft,
+                                                                child: Text(
+                                                                    truncateString(
+                                                                        state
+                                                                            .eventDetails
+                                                                            .name!,
+                                                                        20),
+                                                                    style: GoogleFonts.actor(
+                                                                        textStyle: const TextStyle(
+                                                                            fontSize:
+                                                                                18,
+                                                                            fontWeight:
+                                                                                FontWeight.w500))),
                                                               ),
                                                               Text(
-                                                                formatPriceToEuro(state
-                                                                        .eventDetails
-                                                                        .price! *
-                                                                    _counter),
-                                                                style: GoogleFonts
-                                                                    .actor(
-                                                                        textStyle:
-                                                                            const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 20,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500,
-                                                                )),
-                                                              )
+                                                                  truncateString(
+                                                                      state
+                                                                          .eventDetails
+                                                                          .place!,
+                                                                      20),
+                                                                  style: GoogleFonts.actor(
+                                                                      textStyle: const TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.grey))),
+                                                              Text(
+                                                                  convertirFormato(state
+                                                                      .eventDetails
+                                                                      .dateTime!),
+                                                                  style: GoogleFonts.actor(
+                                                                      textStyle: const TextStyle(
+                                                                          fontSize:
+                                                                              16,
+                                                                          color:
+                                                                              Colors.grey))),
                                                             ],
                                                           ),
                                                         ),
-                                                      ),
-                                                    );
-                                                  }
-                                                  if (statePurchase
-                                                      is PurchaseLoading) {
-                                                    return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(),
-                                                    );
-                                                  }
-                                                  if (statePurchase
-                                                      is PurchaseSuccess) {
-                                                    Navigator.pop(context);
-                                                    WidgetsBinding.instance
-                                                        .addPostFrameCallback(
-                                                            (_) {
-                                                      ScaffoldMessenger.of(
-                                                              context)
-                                                          .showSnackBar(
-                                                        SnackBar(
-                                                          content: Container(
-                                                            padding:
-                                                                const EdgeInsets
-                                                                    .symmetric(
-                                                              vertical: 12.0,
-                                                              horizontal: 16.0,
-                                                            ),
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          8.0),
-                                                              boxShadow: [
-                                                                BoxShadow(
-                                                                  color: Colors
-                                                                      .black
-                                                                      .withOpacity(
-                                                                          0.2),
-                                                                  blurRadius:
-                                                                      6.0,
-                                                                  offset:
-                                                                      const Offset(
-                                                                          0, 3),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding: const EdgeInsets
+                                                        .symmetric(
+                                                        vertical: 8.0),
+                                                    child: BlocProvider.value(
+                                                        value: _purchaseBloc,
+                                                        child: BlocBuilder<
+                                                            PurchaseBloc,
+                                                            PurchaseState>(
+                                                          builder: (context,
+                                                              statePurchase) {
+                                                            if (statePurchase
+                                                                is PurchaseInitial) {
+                                                              return GestureDetector(
+                                                                onTap: () {
+                                                                  _purchaseBloc.add(
+                                                                      FetchPurchase(state
+                                                                          .eventDetails
+                                                                          .uuid!));
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  width: double
+                                                                      .infinity,
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          10),
+                                                                  decoration: BoxDecoration(
+                                                                      color: Colors
+                                                                          .blue,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10)),
+                                                                  child:
+                                                                      Padding(
+                                                                    padding: const EdgeInsets
+                                                                        .symmetric(
+                                                                        horizontal:
+                                                                            20.0,
+                                                                        vertical:
+                                                                            8),
+                                                                    child: Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Text(
+                                                                          'PAY NOW',
+                                                                          textAlign:
+                                                                              TextAlign.center,
+                                                                          style: GoogleFonts.actor(
+                                                                              textStyle: const TextStyle(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          )),
+                                                                        ),
+                                                                        Text(
+                                                                          formatPriceToEuro(state.eventDetails.price! *
+                                                                              _counter),
+                                                                          style: GoogleFonts.actor(
+                                                                              textStyle: const TextStyle(
+                                                                            color:
+                                                                                Colors.white,
+                                                                            fontSize:
+                                                                                20,
+                                                                            fontWeight:
+                                                                                FontWeight.w500,
+                                                                          )),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                              ],
-                                                            ),
-                                                            child: const Text(
-                                                              '¡Compra exitosa!',
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      18.0,
-                                                                  color: Colors
-                                                                      .black),
-                                                            ),
-                                                          ),
-                                                          duration: const Duration(
-                                                              seconds:
-                                                                  4), // Ajusta la duración según tus necesidades
-                                                          backgroundColor: Colors
-                                                              .transparent, // Fondo transparente para eliminar el fondo del SnackBar
-                                                          elevation:
-                                                              0, // Sin elevación para que la sombra personalizada se aplique
-                                                          behavior: SnackBarBehavior
-                                                              .floating, // SnackBar flotante
-                                                        ),
-                                                      );
-                                                    });
-                                                  }
-                                                  if (statePurchase
-                                                      is PurchaseEntityException) {
-                                                    return AlertDialog(
-                                                      content: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                vertical: 10),
-                                                        child: Column(
-                                                          mainAxisSize: MainAxisSize
-                                                              .min, // Para que el AlertDialog no sea tan alto
-                                                          children: [
-                                                            Text(
-                                                              statePurchase
-                                                                  .generalException
-                                                                  .detail!,
-                                                              style:
-                                                                  const TextStyle(
-                                                                fontSize:
-                                                                    16, // Tamaño de fuente más pequeño
-                                                                color: Colors
-                                                                    .red, // Color de fuente rojo
-                                                              ),
-                                                            ),
-                                                            const SizedBox(
-                                                                height: 10),
-                                                            TextButton(
-                                                              onPressed: () {
-                                                                Navigator.of(
+                                                              );
+                                                            }
+                                                            if (statePurchase
+                                                                is PurchaseLoading) {
+                                                              return const Center(
+                                                                child:
+                                                                    CircularProgressIndicator(),
+                                                              );
+                                                            }
+                                                            if (statePurchase
+                                                                is PurchaseSuccess) {
+                                                              Navigator.pop(
+                                                                  context);
+                                                              WidgetsBinding
+                                                                  .instance
+                                                                  .addPostFrameCallback(
+                                                                      (_) {
+                                                                ScaffoldMessenger.of(
                                                                         context)
-                                                                    .pop(); // Cierra el diálogo
-                                                              },
-                                                              style: TextButton
-                                                                  .styleFrom(
-                                                                backgroundColor:
-                                                                    Colors
-                                                                        .red, // Color de fondo rojo
-                                                                padding: const EdgeInsets
-                                                                    .symmetric(
-                                                                    vertical:
-                                                                        10), // Ajusta el padding del botón
-                                                              ),
-                                                              child: const Text(
-                                                                'OK',
-                                                                style:
-                                                                    TextStyle(
-                                                                  fontSize:
-                                                                      16, // Tamaño de fuente del botón igual al texto del botón 'PAY NOW'
-                                                                  color: Colors
-                                                                      .white,
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                    content:
+                                                                        Container(
+                                                                      padding:
+                                                                          const EdgeInsets
+                                                                              .symmetric(
+                                                                        vertical:
+                                                                            12.0,
+                                                                        horizontal:
+                                                                            16.0,
+                                                                      ),
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8.0),
+                                                                        boxShadow: [
+                                                                          BoxShadow(
+                                                                            color:
+                                                                                Colors.black.withOpacity(0.2),
+                                                                            blurRadius:
+                                                                                6.0,
+                                                                            offset:
+                                                                                const Offset(0, 3),
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                      child:
+                                                                          const Text(
+                                                                        '¡Compra exitosa!',
+                                                                        style: TextStyle(
+                                                                            fontSize:
+                                                                                18.0,
+                                                                            color:
+                                                                                Colors.black),
+                                                                      ),
+                                                                    ),
+                                                                    duration: const Duration(
+                                                                        seconds:
+                                                                            4), // Ajusta la duración según tus necesidades
+                                                                    backgroundColor:
+                                                                        Colors
+                                                                            .transparent, // Fondo transparente para eliminar el fondo del SnackBar
+                                                                    elevation:
+                                                                        0, // Sin elevación para que la sombra personalizada se aplique
+                                                                    behavior:
+                                                                        SnackBarBehavior
+                                                                            .floating, // SnackBar flotante
+                                                                  ),
+                                                                );
+                                                              });
+                                                            }
+                                                            if (statePurchase
+                                                                is PurchaseEntityException) {
+                                                              return AlertDialog(
+                                                                content:
+                                                                    Container(
+                                                                  padding: const EdgeInsets
+                                                                      .symmetric(
+                                                                      vertical:
+                                                                          10),
+                                                                  child: Column(
+                                                                    mainAxisSize:
+                                                                        MainAxisSize
+                                                                            .min, // Para que el AlertDialog no sea tan alto
+                                                                    children: [
+                                                                      Text(
+                                                                        statePurchase
+                                                                            .generalException
+                                                                            .detail!,
+                                                                        style:
+                                                                            const TextStyle(
+                                                                          fontSize:
+                                                                              16, // Tamaño de fuente más pequeño
+                                                                          color:
+                                                                              Colors.red, // Color de fuente rojo
+                                                                        ),
+                                                                      ),
+                                                                      const SizedBox(
+                                                                          height:
+                                                                              10),
+                                                                      TextButton(
+                                                                        onPressed:
+                                                                            () {
+                                                                          Navigator.of(context)
+                                                                              .pop(); // Cierra el diálogo
+                                                                        },
+                                                                        style: TextButton
+                                                                            .styleFrom(
+                                                                          backgroundColor:
+                                                                              Colors.red, // Color de fondo rojo
+                                                                          padding: const EdgeInsets
+                                                                              .symmetric(
+                                                                              vertical: 10), // Ajusta el padding del botón
+                                                                        ),
+                                                                        child:
+                                                                            const Text(
+                                                                          'OK',
+                                                                          style:
+                                                                              TextStyle(
+                                                                            fontSize:
+                                                                                16, // Tamaño de fuente del botón igual al texto del botón 'PAY NOW'
+                                                                            color:
+                                                                                Colors.white,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-                                                  if (statePurchase
-                                                      is PurchaseError) {
-                                                    return Text(statePurchase
-                                                        .errorMessagge);
-                                                  } else {
-                                                    return const Center(
-                                                        child:
-                                                            CircularProgressIndicator());
-                                                  }
-                                                },
-                                              )),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ]),
-                            );
+                                                              );
+                                                            }
+                                                            if (statePurchase
+                                                                is PurchaseError) {
+                                                              return Text(
+                                                                  statePurchase
+                                                                      .errorMessagge);
+                                                            } else {
+                                                              return const Center(
+                                                                  child:
+                                                                      CircularProgressIndicator());
+                                                            }
+                                                          },
+                                                        )),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                      );
+                                    },
+                                  )
+                                : null;
                           },
-                        );
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'BUY TICKET ${formatPriceToEuro(state.eventDetails.price!)}',
-                            style: GoogleFonts.actor(
-                              textStyle: const TextStyle(
-                                  color: Colors.white, fontSize: 20),
-                            ),
-                          ),
-                          const Spacer(), // Espaciador para empujar el icono hacia la derecha
-                          Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(40),
-                              color: const Color.fromARGB(40, 0, 0, 0),
-                            ),
-                            padding: const EdgeInsets.all(6),
-                            child: const Icon(
-                              Icons
-                                  .arrow_forward, // Icono a la derecha del texto
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                          child: state.eventDetails.maxCapacity! <=
+                                  state.eventDetails.students!.length
+                              ? Text('SOLD OUT',
+                                  style: GoogleFonts.actor(
+                                    textStyle: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                    ),
+                                  ))
+                              : Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'BUY TICKET ${formatPriceToEuro(state.eventDetails.price!)}',
+                                      style: GoogleFonts.actor(
+                                        textStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                    const Spacer(),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(40),
+                                        color:
+                                            const Color.fromARGB(40, 0, 0, 0),
+                                      ),
+                                      padding: const EdgeInsets.all(6),
+                                      child: const Icon(
+                                        Icons.arrow_forward,
+                                        color: Colors.white,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ],
+                                ))),
                 ),
               );
             } else if (state is EventDetailsLoading ||

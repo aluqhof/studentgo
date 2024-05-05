@@ -1,6 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:student_go/models/response/event_overview_response/event_overview_response.dart';
+import 'package:student_go/models/response/purchase_overview_response/purchase_overview_response.dart';
 import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
 

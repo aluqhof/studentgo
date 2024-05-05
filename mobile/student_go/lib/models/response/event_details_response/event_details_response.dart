@@ -18,6 +18,7 @@ class EventDetailsResponse {
   List<dynamic>? eventType;
   List<Student>? students;
   List<dynamic>? urlPhotos;
+  int? maxCapacity;
 
   EventDetailsResponse(
       {this.uuid,
@@ -32,28 +33,29 @@ class EventDetailsResponse {
       this.organizer,
       this.eventType,
       this.students,
-      this.urlPhotos});
+      this.urlPhotos,
+      this.maxCapacity});
 
   factory EventDetailsResponse.fromMap(Map<String, dynamic> data) =>
       EventDetailsResponse(
-        uuid: data['uuid'] as String?,
-        name: data['name'] as String?,
-        latitude: (data['latitude'] as num?)?.toDouble(),
-        longitude: (data['longitude'] as num?)?.toDouble(),
-        description: data['description'] as String?,
-        cityId: data['cityId'] as String?,
-        price: (data['price'] as num?)?.toDouble(),
-        place: data['place'] as String?,
-        dateTime: data['dateTime'] as String?,
-        organizer: data['organizer'] == null
-            ? null
-            : Organizer.fromMap(data['organizer'] as Map<String, dynamic>),
-        eventType: data['eventType'] as List<dynamic>?,
-        students: (data['students'] as List<dynamic>?)
-            ?.map((e) => Student.fromMap(e as Map<String, dynamic>))
-            .toList(),
-        urlPhotos: data['urlPhotos'] as List<dynamic>?,
-      );
+          uuid: data['uuid'] as String?,
+          name: data['name'] as String?,
+          latitude: (data['latitude'] as num?)?.toDouble(),
+          longitude: (data['longitude'] as num?)?.toDouble(),
+          description: data['description'] as String?,
+          cityId: data['cityId'] as String?,
+          price: (data['price'] as num?)?.toDouble(),
+          place: data['place'] as String?,
+          dateTime: data['dateTime'] as String?,
+          organizer: data['organizer'] == null
+              ? null
+              : Organizer.fromMap(data['organizer'] as Map<String, dynamic>),
+          eventType: data['eventType'] as List<dynamic>?,
+          students: (data['students'] as List<dynamic>?)
+              ?.map((e) => Student.fromMap(e as Map<String, dynamic>))
+              .toList(),
+          urlPhotos: data['urlPhotos'] as List<dynamic>?,
+          maxCapacity: data['maxCapacity'] as int?);
 
   Map<String, dynamic> toMap() => {
         'uuid': uuid,

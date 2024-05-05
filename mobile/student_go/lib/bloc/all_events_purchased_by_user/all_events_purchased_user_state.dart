@@ -8,8 +8,8 @@ final class AllEventsPurchasedUserInitial extends AllEventsPurchasedUserState {}
 final class AllEventsPurchasedUserLoading extends AllEventsPurchasedUserState {}
 
 final class AllEventsPurchasedUserSuccess extends AllEventsPurchasedUserState {
-  final List<EventOverviewResponse> events;
-  AllEventsPurchasedUserSuccess(this.events);
+  final List<PurchaseOverviewResponse> purchases;
+  AllEventsPurchasedUserSuccess(this.purchases);
 }
 
 final class AllEventsPurchasedUserError extends AllEventsPurchasedUserState {

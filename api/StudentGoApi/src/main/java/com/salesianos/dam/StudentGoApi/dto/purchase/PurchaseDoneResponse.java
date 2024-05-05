@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 public record PurchaseDoneResponse (
         String id,
         LocalDateTime dateTime,
-        int numberOfTickets,
         double totalPrice,
         String eventId,
         String author
@@ -16,7 +15,6 @@ public record PurchaseDoneResponse (
         return new PurchaseDoneResponse(
                 purchase.getUuid().toString(),
                 purchase.getDateTime(),
-                purchase.getNumberOfTickets(),
                 purchase.getTotalPrice(),
                 purchase.getEvent().getId().toString(),
                 purchase.getAuthor()

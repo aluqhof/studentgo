@@ -1,6 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:student_go/models/dto/purchase_dto.dart';
 import 'package:student_go/models/response/general_exception.dart';
 import 'package:student_go/models/response/purchase_response.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
@@ -17,9 +16,7 @@ class PurchaseBloc extends Bloc<PurchaseEvent, PurchaseState> {
   void _fetchPurchase(FetchPurchase event, Emitter<PurchaseState> emit) async {
     emit(PurchaseLoading());
     try {
-      final PurchaseDto purchaseDto = PurchaseDto(
-          eventId: event.eventId, numberOfTickets: event.numberOfTickets);
-      final response = await purchaseRepository.doEventPurchase(purchaseDto);
+      final response = await purchaseRepository.doEventPurchase(event.eventId);
       emit(PurchaseSuccess(response));
     } catch (e) {
       if (e is GeneralException) {

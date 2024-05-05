@@ -26,7 +26,8 @@ public record EventDetailsResponse (
         List<String> eventType,
         List<StudentListResponse> students,
 
-        List<String> urlPhotos
+        List<String> urlPhotos,
+        int maxCapacity
 ){
     public static EventDetailsResponse of(Event e, List<Student> students, Organizer organizer){
         return new EventDetailsResponse(
@@ -42,7 +43,8 @@ public record EventDetailsResponse (
                 OrganizerShortResponse.of(organizer),
                 e.getEventTypes().stream().map(EventType::getName).toList(),
                 students.stream().map(StudentListResponse::of).toList(),
-                e.getUrlPhotos()
+                e.getUrlPhotos(),
+                e.getMaxCapacity()
         );
     }
 }
