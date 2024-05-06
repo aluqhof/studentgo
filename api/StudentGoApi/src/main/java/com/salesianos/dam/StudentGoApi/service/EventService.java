@@ -121,7 +121,7 @@ public class EventService {
             throw new DateRangeFilterException("The start date cannot be higher or equal than the end date");
         }
 
-        if(startDate.isBefore(LocalDateTime.now()) || endDate.isAfter(LocalDateTime.now().plusYears(1))){
+        if(startDate.isBefore(LocalDateTime.now().minusHours(5)) || endDate.isAfter(LocalDateTime.now().plusYears(1).plusDays(1))){
             throw new DateRangeFilterException("The date selected is out of range");
         }
 

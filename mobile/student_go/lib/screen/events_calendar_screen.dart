@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:student_go/bloc/all_events_calendar/all_events_calendar_bloc.dart';
+import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
@@ -111,7 +112,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
 
   Widget _buildCalendar() {
     return Padding(
-      padding: const EdgeInsets.only(top: 20.0),
+      padding: const EdgeInsets.only(top: 30.0, left: 10, right: 10),
       child: Column(
         children: [
           TableCalendar(
@@ -210,115 +211,163 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
               builder: (context, events, _) {
                 return events.isEmpty
                     ? Text(
-                        'No hay ningún evento para este día',
+                        'There is no event for this day',
                         style: GoogleFonts.actor(),
                       )
                     : ListView.builder(
                         itemCount: events.length,
                         itemBuilder: (context, index) {
                           final event = events[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                top: 8.0, left: 60, right: 10),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => EventDetailsScreen(
-                                            eventId: event.uuid!,
-                                          )),
-                                );
-                              },
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  color: Color(int.parse(
-                                      event.eventType![0].colorCode!)),
-                                  child: SizedBox(
-                                    width: double.infinity,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        children: [
-                                          Expanded(
-                                            flex: 1,
-                                            child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(50),
-                                              child: Container(
-                                                width: 65,
-                                                height: 65,
-                                                decoration: const BoxDecoration(
-                                                  image: DecorationImage(
-                                                    image: AssetImage(
-                                                        'assets/img/card_background.jpg'),
-                                                    fit: BoxFit.cover,
-                                                  ),
+                          final eventImageBloc =
+                              EventImageBloc(eventRepository);
+                          eventImageBloc.add(FetchEventImage(event.uuid!, 0));
+                          return BlocProvider(
+                            create: (context) => eventImageBloc,
+                            key: UniqueKey(),
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 8.0, left: 60, right: 10),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            EventDetailsScreen(
+                                              eventId: event.uuid!,
+                                            )),
+                                  );
+                                },
+                                child: SizedBox(
+                                  width: double.infinity,
+                                  child: Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    color: Color(int.parse(
+                                        event.eventType![0].colorCode!)),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Row(
+                                          children: [
+                                            Expanded(
+                                              flex: 1,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                                child: BlocBuilder<
+                                                    EventImageBloc,
+                                                    EventImageState>(
+                                                  builder:
+                                                      (context, stateImage) {
+                                                    if (stateImage
+                                                            is EventImageInitial ||
+                                                        stateImage
+                                                            is EventImageLoading) {
+                                                      return Container(
+                                                        width: 65,
+                                                        height: 65,
+                                                        child: const Center(
+                                                            child:
+                                                                CircularProgressIndicator()),
+                                                      );
+                                                    } else if (stateImage
+                                                        is EventImageSuccess) {
+                                                      return Container(
+                                                        width: 65,
+                                                        height: 65,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          image:
+                                                              DecorationImage(
+                                                            image: MemoryImage(
+                                                                stateImage
+                                                                    .image),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return Container(
+                                                        width: 65,
+                                                        height: 65,
+                                                        decoration:
+                                                            const BoxDecoration(
+                                                          image:
+                                                              DecorationImage(
+                                                            image: AssetImage(
+                                                                'assets/img/card_background.jpg'),
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          Expanded(
-                                            flex: 4,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 6.0,
-                                                horizontal: 12,
-                                              ),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        formatHour(
-                                                            event.dateTime!),
-                                                        style:
-                                                            GoogleFonts.actor(
-                                                          textStyle:
-                                                              const TextStyle(
-                                                            color:
-                                                                Color.fromRGBO(
-                                                                    255,
-                                                                    255,
-                                                                    255,
-                                                                    1),
+                                            Expanded(
+                                              flex: 4,
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  vertical: 6.0,
+                                                  horizontal: 12,
+                                                ),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          formatHour(
+                                                              event.dateTime!),
+                                                          style:
+                                                              GoogleFonts.actor(
+                                                            textStyle:
+                                                                const TextStyle(
+                                                              color: Color
+                                                                  .fromRGBO(
+                                                                      255,
+                                                                      255,
+                                                                      255,
+                                                                      1),
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Text(
-                                                        event.name!,
-                                                        style:
-                                                            GoogleFonts.actor(
-                                                          textStyle:
-                                                              const TextStyle(
-                                                                  fontSize: 18,
-                                                                  height: 1.1,
-                                                                  color: Colors
-                                                                      .white),
+                                                        Text(
+                                                          event.name!,
+                                                          style:
+                                                              GoogleFonts.actor(
+                                                            textStyle:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        18,
+                                                                    height: 1.1,
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
