@@ -215,7 +215,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Align(
                         alignment: Alignment.topLeft,
                         child: Text(
-                          state.studentInfoResponse.description!,
+                          state.studentInfoResponse.description != null
+                              ? state.studentInfoResponse.description!
+                              : 'Let other users know something about you...',
                           style: GoogleFonts.actor(
                               textStyle: const TextStyle(fontSize: 15)),
                         )),

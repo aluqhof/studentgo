@@ -20,16 +20,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder<bool>(
       future: _isTokenPresent(),
-      builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+      builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
+          return const CircularProgressIndicator();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
         } else {
           return MaterialApp(
             debugShowCheckedModeBanner: false,
