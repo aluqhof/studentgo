@@ -35,7 +35,6 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
       Completer<GoogleMapController>();
   Content? _selectedEvent;
   Set<Marker> _markers = {};
-  bool _showEventCard = false;
   String name = '';
   late FocusNode focusNode;
   late TextEditingController _searchController;
@@ -189,7 +188,7 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
               return Stack(
                 children: [
                   _buildMap(state.listEventsResponse),
-                  if (_showEventCard) _buildEventCard(),
+                  if (_selectedEvent != null) _buildEventCard(),
                   Positioned(
                     top: 40,
                     left: 0,
@@ -219,18 +218,6 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
                                               0,
                                               1000000));
                                     },
-                                    /*onChanged: (value) {
-                                      _eventListBloc.add(
-                                          FetchUpcomingListSearchableEvent(
-                                              _currentCity,
-                                              value,
-                                              List.empty(),
-                                              DateTime.now(),
-                                              DateTime.now().add(
-                                                  const Duration(days: 365)),
-                                              0,
-                                              1000000));
-                                    },*/
                                     decoration: InputDecoration(
                                       hintText:
                                           'Find for Music, Food, Sports...',
@@ -337,6 +324,8 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
                 );
               });
               return const Center(child: CircularProgressIndicator());
+            } else if (state is UpcomingListsearchableEntityException) {
+              return Center(child: Text(state.generalException.detail!));
             } else {
               return const Center(child: CircularProgressIndicator());
             }
@@ -392,7 +381,6 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
         icon: BitmapDescriptor.fromBytes(markerIcon),
         onTap: () {
           setState(() {
-            _showEventCard = true;
             _selectedEvent = result;
           });
         },

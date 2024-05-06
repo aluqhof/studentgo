@@ -8,12 +8,15 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_details/event_details_bloc.dart';
 import 'package:student_go/bloc/event_image/event_image_bloc.dart';
+import 'package:student_go/bloc/events_saved/events_saved_bloc.dart';
 import 'package:student_go/bloc/purchase/purchase_bloc.dart';
 import 'package:student_go/models/response/event_details_response/event_details_response.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
 import 'package:student_go/repository/purchase/purchase_repository.dart';
 import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
+import 'package:student_go/repository/student/student_repository.dart';
+import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/widgets/people_going_list.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -30,6 +33,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late EventRepository eventRepository;
   late EventDetailsBloc _eventDetailsBloc;
   late PurchaseRepository purchaseRepository;
+  late StudentRepository studentRepository;
   late PurchaseBloc _purchaseBloc;
   late SharedPreferences _prefs;
   late String _street = '';
@@ -37,6 +41,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late String _postalCode = '';
   int _counter = 1;
   late EventImageBloc _eventImageBloc;
+  late EventsSavedBloc _eventsSavedBloc;
+  bool isEventSaved = false;
 
   Future<void> _getStreet(double latitude, double longitude) async {
     try {
@@ -58,18 +64,26 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   @override
   void initState() {
     eventRepository = EventRepositoryImpl();
+    studentRepository = StudentRepositoryImp();
     _eventDetailsBloc = EventDetailsBloc(eventRepository)
       ..add(FetchEventDetails(widget.eventId));
     purchaseRepository = PurchaseRepositoryImpl();
     _purchaseBloc = PurchaseBloc(purchaseRepository);
     _eventImageBloc = EventImageBloc(eventRepository);
+    _eventsSavedBloc = EventsSavedBloc(studentRepository)
+      ..add(FetchEventsSaved());
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-        value: _eventDetailsBloc,
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider.value(
+            value: _eventDetailsBloc,
+          ),
+          BlocProvider.value(value: _eventsSavedBloc),
+        ],
         child: BlocBuilder<EventDetailsBloc, EventDetailsState>(
           builder: (context, state) {
             if (state is EventDetailsSuccess) {
@@ -102,17 +116,43 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                           const SizedBox(
                             width: 5,
                           ),
-                          Container(
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                isEventSaved = !isEventSaved;
+                              });
+                              _eventsSavedBloc
+                                  .add(BookmarkEvent(state.eventDetails.uuid!));
+                              _eventsSavedBloc.add(FetchEventsSaved());
+                            },
+                            child: Container(
                               decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      const Color.fromRGBO(255, 255, 255, 0.3)),
+                                borderRadius: BorderRadius.circular(8),
+                                color: const Color.fromRGBO(255, 255, 255, 0.3),
+                              ),
                               padding: const EdgeInsets.all(8),
-                              child: const Icon(
-                                //Bokmark added
-                                Icons.bookmark,
-                                color: Color.fromRGBO(255, 255, 255, 1),
-                              )),
+                              child: BlocBuilder<EventsSavedBloc,
+                                  EventsSavedState>(
+                                builder: (context, stateSave) {
+                                  if (stateSave is EventsSavedSuccess) {
+                                    final eventsSaved = stateSave.eventsSaved;
+                                    isEventSaved = eventsSaved.any((event) =>
+                                        event.uuid == state.eventDetails.uuid);
+                                    return Icon(
+                                      Icons.bookmark,
+                                      color: isEventSaved
+                                          ? Color.fromRGBO(63, 56, 221, 1)
+                                          : Color.fromARGB(255, 255, 255, 255),
+                                    );
+                                  }
+                                  return const Icon(
+                                    Icons.bookmark,
+                                    color: Color.fromRGBO(167, 166, 166, 1),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -392,7 +432,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                   ),
                                   Text(
                                       truncateString(
-                                          '$_street, $_postalCode, $_city', 40),
+                                          '$_street, $_city, $_postalCode', 40),
                                       style: GoogleFonts.actor(
                                           textStyle: const TextStyle(
                                               fontSize: 15,

@@ -68,37 +68,10 @@ class _EventCardState extends State<EventCard> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _eventsSavedBloc),
-      ],
-      child: BlocBuilder<EventsSavedBloc, EventsSavedState>(
-        builder: (context, state) {
-          if (state is EventsSavedInitial || state is EventsSavedLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (state is EventsSavedSuccess) {
-            final eventsSaved = state.eventsSaved;
-            final isSaved =
-                eventsSaved.any((event) => event.uuid == widget.result.uuid);
-            return _buildCard(isSaved);
-          } else if (state is EventsSavedEntityException ||
-              state is EventsSavedError) {
-            return const Card(
-              child: Center(child: Text('Event not found')),
-            );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      ),
-    );
+    return _buildCard();
   }
 
-  Widget _buildCard(bool isSaved) {
-    isEventSaved = isSaved;
+  Widget _buildCard() {
     List<Widget> stackChildren = [];
 
     for (int i = 0; i < widget.result.students!.length && i < 3; i++) {
@@ -178,19 +151,18 @@ class _EventCardState extends State<EventCard> {
         ),
       );
     }
-    return BlocProvider.value(
-      value: _eventImageBloc,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(
+          value: _eventImageBloc,
+        ),
+        BlocProvider.value(value: _eventsSavedBloc)
+      ],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: GestureDetector(
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EventDetailsScreen(
-                        eventId: widget.result.uuid!,
-                      )),
-            );
+            _navigateAndRefreshProfile(context, widget.result.uuid!);
           },
           child: SizedBox(
             height: 300,
@@ -302,13 +274,31 @@ class _EventCardState extends State<EventCard> {
                                         color: Colors.white,
                                       ),
                                       padding: const EdgeInsets.all(8),
-                                      child: Icon(
-                                        Icons.bookmark,
-                                        color: isEventSaved
-                                            ? const Color.fromARGB(
-                                                255, 247, 230, 5)
-                                            : const Color.fromRGBO(
-                                                240, 99, 90, 1),
+                                      child: BlocBuilder<EventsSavedBloc,
+                                          EventsSavedState>(
+                                        builder: (context, state) {
+                                          if (state is EventsSavedSuccess) {
+                                            final eventsSaved =
+                                                state.eventsSaved;
+                                            isEventSaved = eventsSaved.any(
+                                                (event) =>
+                                                    event.uuid ==
+                                                    widget.result.uuid);
+                                            return Icon(
+                                              Icons.bookmark,
+                                              color: isEventSaved
+                                                  ? const Color.fromARGB(
+                                                      255, 247, 230, 5)
+                                                  : const Color.fromRGBO(
+                                                      240, 99, 90, 1),
+                                            );
+                                          }
+                                          return const Icon(
+                                            Icons.bookmark,
+                                            color: Color.fromRGBO(
+                                                167, 166, 166, 1),
+                                          );
+                                        },
                                       ),
                                     ),
                                   ),
@@ -450,261 +440,35 @@ class _EventCardState extends State<EventCard> {
     return dia;
   }
 
-  /*
-  Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EventDetailsScreen(
-                              eventId: widget.result.uuid!,
-                            )),
-                  );
-                },
-                child: SizedBox(
-                  height: 300,
-                  width: 275,
-                  child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      surfaceTintColor: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Stack(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    image: const DecorationImage(
-                                      image: AssetImage(
-                                          'assets/img/card_background.jpg'),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                  width: double.infinity,
-                                  height: 170,
-                                ),
-                                Positioned(
-                                  top: 10,
-                                  left: 10,
-                                  child: SizedBox(
-                                    width: 230,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white),
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 12),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                obtenerDia(
-                                                    widget.result.dateTime!),
-                                                style: GoogleFonts.openSans(
-                                                    textStyle: const TextStyle(
-                                                        color: Color.fromRGBO(
-                                                            240, 99, 90, 1),
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.bold)),
-                                              ),
-                                              Text(
-                                                  obtenerMes(widget
-                                                          .result.dateTime!)
-                                                      .toUpperCase(),
-                                                  style: GoogleFonts.actor(
-                                                      textStyle:
-                                                          const TextStyle(
-                                                              color: Color
-                                                                  .fromRGBO(
-                                                                      240,
-                                                                      99,
-                                                                      90,
-                                                                      1),
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400)))
-                                            ],
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            _eventsSavedBloc.add(BookmarkEvent(
-                                                widget.result.uuid!));
-                                            setState(() {
-                                              isEventSaved = !isEventSaved;
-                                            });
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: Colors.white,
-                                            ),
-                                            padding: const EdgeInsets.all(8),
-                                            child: Icon(
-                                              Icons.bookmark,
-                                              color: isEventSaved
-                                                  ? Colors.red
-                                                  : Color.fromRGBO(
-                                                      240, 99, 90, 1),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: SizedBox(
-                                width: double.infinity,
-                                child: Text(
-                                  truncateString(widget.result.name!, 21),
-                                  style: GoogleFonts.actor(
-                                      textStyle: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.w500)),
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: SizedBox(
-                                width: double.infinity,
-                                height: 30,
-                                child: Stack(
-                                  alignment: Alignment.center,
-                                  children: [
-                                    Positioned(
-                                      left: 40,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            'assets/img/fotoprueba1.jpg',
-                                            width: 30,
-                                            height: 30,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 20,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            'assets/img/fotoprueba2.jpg',
-                                            width: 30,
-                                            height: 30,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 1,
-                                          ),
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.asset(
-                                            'assets/img/fotoprueba3.jpg',
-                                            width: 30,
-                                            height: 30,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 80,
-                                      child: Text(
-                                        '+20 Going',
-                                        style: GoogleFonts.actor(
-                                            textStyle: const TextStyle(
-                                          color: Color.fromRGBO(63, 56, 221, 1),
-                                          fontSize: 12,
-                                        )),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(
-                              height: 5,
-                            ),
-                            SizedBox(
-                              width: double.infinity,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6.0),
-                                child: Row(
-                                  children: [
-                                    const Icon(
-                                      Icons.location_on,
-                                      size: 18,
-                                      color: Color.fromRGBO(116, 118, 136, 1),
-                                    ),
-                                    const SizedBox(
-                                      width: 2,
-                                    ),
-                                    Text(
-                                      truncateString(
-                                          '$_street, $_postalCode, $_city', 40),
-                                      style: GoogleFonts.actor(
-                                        textStyle: const TextStyle(
-                                            color: Color.fromRGBO(
-                                                116, 118, 136, 1),
-                                            fontSize: 12),
-                                        fontWeight: FontWeight.w100,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ),
-              ),
-            );
-  */
+  Route _createRoute(String uuid) {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, secondaryAnimation) =>
+          EventDetailsScreen(eventId: uuid),
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        const begin = Offset(1.0, 0.0); // Comienza desde el lado derecho
+        const end = Offset
+            .zero; // Termina en el centro (pantalla completamente visible)
+        const curve =
+            Curves.ease; // Puedes cambiar la curva de animación si deseas
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  void _fetchData() {
+    _eventsSavedBloc.add(FetchEventsSaved());
+  }
+
+  void _navigateAndRefreshProfile(BuildContext context, String uuid) {
+    Navigator.of(context).push(_createRoute(uuid)).then((_) {
+      _fetchData();
+    });
+  }
 }

@@ -10,6 +10,7 @@ import 'package:student_go/repository/event_type/event_type_repository.dart';
 import 'package:student_go/repository/event_type/event_type_repository_impl.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
+import 'package:student_go/screen/event_details_screen.dart';
 import 'package:student_go/screen/login_screen.dart';
 import 'package:student_go/screen/profile_screen.dart';
 import 'package:student_go/screen/search_screen.dart';
