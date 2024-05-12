@@ -54,44 +54,81 @@ class _UpcomingHorizontalListState extends State<UpcomingHorizontalList> {
                       style: GoogleFonts.actor(
                           textStyle: const TextStyle(fontSize: 20)),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => UpcomingListVertical(
-                                    cityName: widget.cityName,
-                                  )),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            'See All',
-                            style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                    color: Color.fromRGBO(116, 118, 136, 1))),
-                          ),
-                          const Icon(Icons.arrow_right,
-                              size: 20,
-                              color: Color.fromRGBO(
-                                  116, 118, 136, 1)), // Agregar el icono aquí
-                        ],
-                      ),
-                    ),
+                    state.listEventsResponse.content!.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => UpcomingListVertical(
+                                          cityName: widget.cityName,
+                                        )),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  'See All',
+                                  style: GoogleFonts.actor(
+                                      textStyle: const TextStyle(
+                                          color: Color.fromRGBO(
+                                              116, 118, 136, 1))),
+                                ),
+                                const Icon(Icons.arrow_right,
+                                    size: 20,
+                                    color: Color.fromRGBO(116, 118, 136,
+                                        1)), // Agregar el icono aquí
+                              ],
+                            ),
+                          )
+                        : const SizedBox(),
                   ],
                 ),
               ),
               SizedBox(
                 height: 300,
                 width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.listEventsResponse.content!.length,
-                    itemBuilder: ((context, index) {
-                      return EventCard(
-                          result: state.listEventsResponse.content![index]);
-                    })),
+                child: state.listEventsResponse.content!.isNotEmpty
+                    ? ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: state.listEventsResponse.content!.length,
+                        itemBuilder: ((context, index) {
+                          return EventCard(
+                              result: state.listEventsResponse.content![index]);
+                        }))
+                    : SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              width: 150.0,
+                              height: 150.0,
+                              decoration: const BoxDecoration(
+                                image: DecorationImage(
+                                  image: AssetImage('assets/img/noevents.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 18.0),
+                              child: Text(
+                                'There are currently no upcoming events in your city',
+                                style: GoogleFonts.actor(
+                                    textStyle: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w200,
+                                        color: Colors.grey)),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               )
             ],
           );
@@ -117,8 +154,18 @@ class _UpcomingHorizontalListState extends State<UpcomingHorizontalList> {
           if (state.generalException.status == 400) {
             return const Text('Unespected error');
           }
-          if (state.generalException.status == 404) {
-            return const Text('No hay eventos en tu ciudad');
+          if ((state.generalException.status == 404)) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
+              child: Center(
+                child: Text(
+                  'We are working on covering more cities. Maybe soon your city will also have events',
+                  style: GoogleFonts.actor(
+                      textStyle: const TextStyle(color: Colors.grey)),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
           }
           return Text('${state.generalException.status!}');
         } else if (state is UpcomingListError) {

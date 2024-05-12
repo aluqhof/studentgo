@@ -26,7 +26,7 @@ class AllEventsPurchasedUserBloc
         if (e.status == 403) {
           emit(TokenNotValidState());
         }
-        emit(AllEventsEntityException(e, e.title!));
+        emit(AllEventsPurchasedUserEntityException(e, e.title!));
       } else {
         emit(AllEventsPurchasedUserError("An unespected error occurred"));
       }

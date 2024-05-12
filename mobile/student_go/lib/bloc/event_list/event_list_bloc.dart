@@ -61,15 +61,15 @@ class EventListBloc extends Bloc<EventListEvent, EventListState> {
     try {
       final response = await eventRepository.getEventsByEventType(
           event.city, event.eventTypeId, event.page, event.size);
-      emit(EventTypeListSuccess(response));
+      emit(UpcomingListSuccess(response));
     } catch (e) {
       if (e is GeneralException) {
         if (e.status == 403) {
           emit(TokenNotValidState());
         }
-        emit(EventTypeListEntityException(e, e.title!));
+        emit(UpcomingListEntityException(e, e.title!));
       } else {
-        emit(EventTypeListError("An unespected error occurred"));
+        emit(UpcomingListError("An unespected error occurred"));
       }
     }
   }

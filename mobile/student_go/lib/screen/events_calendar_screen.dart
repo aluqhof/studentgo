@@ -5,12 +5,14 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/all_events_calendar/all_events_calendar_bloc.dart';
 import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/repository/event/event_repository.dart';
 import 'package:student_go/repository/event/event_repository_impl.dart';
 import 'package:student_go/screen/event_details_screen.dart';
+import 'package:student_go/screen/login_screen.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class EventsCalendarScreen extends StatefulWidget {
@@ -27,6 +29,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
   Map<DateTime, List<Content>> _eventsMap = {};
   late String _currentCity = '';
   bool _isLoading = true;
+  late SharedPreferences _prefs;
 
   Future<void> _getCurrentLocation() async {
     try {
@@ -48,6 +51,10 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
       });
       throw Exception('Error obtaining location: $e');
     }
+  }
+
+  Future<void> initialize() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
   Future<Position> _determinePosition() async {
@@ -78,6 +85,7 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
   void initState() {
     super.initState();
     _getCurrentLocation();
+    initialize();
     eventRepository = EventRepositoryImpl();
     _selectedEvents = ValueNotifier([]);
     _calendarBloc = AllEventsCalendarBloc(eventRepository);
@@ -100,8 +108,60 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
           } else if (state is AllEventsCalendarSuccess) {
             _eventsMap = _getEventsMap(state.events);
             return _buildCalendar();
-          } else if (state is AllEventsCalendarError) {
-            return Center(child: Text(state.errorMessage));
+          } else if (state is AllEventsEntityException) {
+            if (state.generalException.status == 404) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment
+                        .center, // This is already set for vertical alignment
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center, // Aligns the children to the center of the column.
+                    children: [
+                      Container(
+                        width: 200.0, // Sets the width of the container to 200
+                        height:
+                            200.0, // Sets the height of the container to 200
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/img/noevents.png'), // Replace with your image URL
+                            fit: BoxFit
+                                .cover, // Covers the area of the container without stretching the image.
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                          height:
+                              20), // Adds space between the image and the text.
+                      Text(
+                        'There are currently no events in your city', // Replace with your desired text
+                        style: GoogleFonts.actor(
+                            textStyle: const TextStyle(
+                          fontSize: 20, // Sets the font size of the text
+                          fontWeight: FontWeight.bold, // Makes the text bold
+                        )),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+            if (state.generalException.status == 401 ||
+                state.generalException.status == 403) {
+              _prefs.setString('token', '');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+              return const SizedBox();
+            }
+            if (state.generalException.status == 400) {
+              return const Text('Unespected error');
+            }
+            return Center(child: Text(state.generalException.detail!));
           } else {
             return const Center(child: CircularProgressIndicator());
           }

@@ -93,6 +93,10 @@ flutter:
     - assets/img/fotoprueba3.jpg
     - assets/img/card_background.jpg
     - assets/img/nophoto.png
+    - assets/img/noevents.png
+    - assets/img/notickets.png
+    - assets/img/error.png
+    - assets/img/nosaved.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -13,8 +13,7 @@ import 'package:student_go/widgets/vertical_list.dart';
 class UpcomingListVertical extends StatefulWidget {
   final String cityName;
 
-  const UpcomingListVertical({Key? key, required this.cityName})
-      : super(key: key);
+  const UpcomingListVertical({super.key, required this.cityName});
 
   @override
   State<UpcomingListVertical> createState() => _UpcomingListVerticalState();
@@ -35,16 +34,13 @@ class _UpcomingListVerticalState extends State<UpcomingListVertical> {
     super.initState();
     eventRepository = EventRepositoryImpl();
 
-    // Inicializar el bloc y enviar el evento FetchAccordingListEvent
     _eventListBloc = EventListBloc(eventRepository);
-    _eventListBloc.add(FetchAccordingListEvent(widget.cityName, 0, 5));
+    _eventListBloc.add(FetchUpcomingListEvent(widget.cityName, 0, 5));
 
-    // Configurar el listener para las solicitudes de página
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
 
-    // Inicializar otros recursos si es necesario
     initialize();
   }
 

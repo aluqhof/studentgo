@@ -222,6 +222,64 @@ class _SearchScreenState extends State<SearchScreen> {
                     builder: (context, state) {
                       if (state is EventListLoading) {
                         return const Center(child: CircularProgressIndicator());
+                      } else if (state
+                          is UpcomingListsearchableEntityException) {
+                        if (state.generalException.status == 404) {
+                          return Container(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment
+                                  .center, // This is already set for vertical alignment
+                              crossAxisAlignment: CrossAxisAlignment
+                                  .center, // Aligns the children to the center of the column.
+                              children: [
+                                Container(
+                                  width:
+                                      200.0, // Sets the width of the container to 200
+                                  height:
+                                      200.0, // Sets the height of the container to 200
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      image: AssetImage(
+                                          'assets/img/noevents.png'), // Replace with your image URL
+                                      fit: BoxFit
+                                          .cover, // Covers the area of the container without stretching the image.
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                    height:
+                                        20), // Adds space between the image and the text.
+                                Text(
+                                  'There are currently no events in your city', // Replace with your desired text
+                                  style: GoogleFonts.actor(
+                                      textStyle: const TextStyle(
+                                    fontSize:
+                                        20, // Sets the font size of the text
+                                    fontWeight:
+                                        FontWeight.bold, // Makes the text bold
+                                  )),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        if (state.generalException.status == 401 ||
+                            state.generalException.status == 403) {
+                          _prefs.setString('token', '');
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const LoginScreen()),
+                          );
+                          return const SizedBox();
+                        }
+                        if (state.generalException.status == 400) {
+                          return const Text('Unespected error');
+                        }
+                        return Center(
+                            child: Text(state.generalException.detail!));
                       } else if (state is UpcomingListSearchableError) {
                         return Center(child: Text(state.errorMessage));
                       } else if (state is TokenNotValidState) {
@@ -234,20 +292,56 @@ class _SearchScreenState extends State<SearchScreen> {
                         });
                         return const Center(child: CircularProgressIndicator());
                       } else if (state is UpcomingListSearchableSuccess) {
-                        return ListView.builder(
+                        if (state.listEventsResponse.isNotEmpty) {
+                          return ListView.builder(
                             itemCount: state.listEventsResponse.length,
                             itemBuilder: (context, index) {
-                              return state.listEventsResponse.isNotEmpty
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: EventCardVerticalList(
-                                          result:
-                                              state.listEventsResponse[index]),
-                                    )
-                                  : const Center(
-                                      child: Text('Nothing'),
-                                    );
-                            });
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: EventCardVerticalList(
+                                  result: state.listEventsResponse[index],
+                                ),
+                              );
+                            },
+                          );
+                        } else {
+                          return SizedBox(
+                            width: double.infinity,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  width: 150.0,
+                                  height: 150.0,
+                                  decoration: const BoxDecoration(
+                                    image: DecorationImage(
+                                      image:
+                                          AssetImage('assets/img/noevents.png'),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 18.0),
+                                  child: Text(
+                                    'No events found',
+                                    style: GoogleFonts.actor(
+                                      textStyle: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w200,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
                       } else {
                         return const Center(child: CircularProgressIndicator());
                       }

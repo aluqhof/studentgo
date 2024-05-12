@@ -281,9 +281,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                     BlocBuilder<EventTypeBloc, EventTypeState>(
                                   builder: (context, state) {
                                     if (state is EventTypeInitial) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
-                                      );
+                                      return const SizedBox();
                                     } else if (state is EventTypeError) {
                                       return Text(state.errorMessage);
                                     } else if (state is EventTypeSuccess) {
@@ -292,7 +290,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                                         state.eventTypeResponseList,
                                       );
                                     } else {
-                                      return const Text('Not support');
+                                      return const SizedBox();
                                     }
                                   },
                                 ),
