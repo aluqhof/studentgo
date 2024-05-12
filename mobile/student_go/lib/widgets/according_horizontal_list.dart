@@ -11,7 +11,6 @@ import 'package:student_go/widgets/event_card.dart';
 
 class AccordingHorizontalList extends StatefulWidget {
   final String cityName;
-  //final bool isLoading;
   const AccordingHorizontalList({super.key, required this.cityName});
 
   @override
@@ -56,45 +55,83 @@ class _AccordingHorizontalListState extends State<AccordingHorizontalList> {
                       style: GoogleFonts.actor(
                           textStyle: const TextStyle(fontSize: 20)),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => AccordingListVertical(
-                                    cityName: widget.cityName,
-                                  )),
-                        );
-                      },
-                      child: Row(
-                        children: [
-                          Text(
-                            'See All',
-                            style: GoogleFonts.actor(
-                                textStyle: const TextStyle(
-                                    color: Color.fromRGBO(116, 118, 136, 1))),
-                          ),
-                          const Icon(Icons.arrow_right,
-                              size: 20,
-                              color: Color.fromRGBO(
-                                  116, 118, 136, 1)), // Agregar el icono aquí
-                        ],
-                      ),
-                    ),
+                    state.listEventsResponse.content!.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AccordingListVertical(
+                                          cityName: widget.cityName,
+                                        )),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text(
+                                  'See All',
+                                  style: GoogleFonts.actor(
+                                      textStyle: const TextStyle(
+                                          color: Color.fromRGBO(
+                                              116, 118, 136, 1))),
+                                ),
+                                const Icon(Icons.arrow_right,
+                                    size: 20,
+                                    color: Color.fromRGBO(116, 118, 136,
+                                        1)), // Agregar el icono aquí
+                              ],
+                            ),
+                          )
+                        : const SizedBox()
                   ],
                 ),
               ),
               SizedBox(
-                height: 300,
-                width: MediaQuery.of(context).size.width,
-                child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: state.listEventsResponse.content!.length,
-                    itemBuilder: ((context, index) {
-                      return EventCard(
-                          result: state.listEventsResponse.content![index]);
-                    })),
-              )
+                  height: 300,
+                  width: MediaQuery.of(context).size.width,
+                  child: state.listEventsResponse.content!.isNotEmpty
+                      ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: state.listEventsResponse.content!.length,
+                          itemBuilder: ((context, index) {
+                            return EventCard(
+                                result:
+                                    state.listEventsResponse.content![index]);
+                          }))
+                      : SizedBox(
+                          width: double.infinity,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 150.0,
+                                height: 150.0,
+                                decoration: const BoxDecoration(
+                                  image: DecorationImage(
+                                    image:
+                                        AssetImage('assets/img/noevents.png'),
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18.0),
+                                child: Text(
+                                  'There are currently no events according to your interests in your city',
+                                  style: GoogleFonts.actor(
+                                      textStyle: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w200,
+                                          color: Colors.grey)),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ))
             ],
           );
         } else if (state is EventListInitial) {
@@ -115,18 +152,46 @@ class _AccordingHorizontalListState extends State<AccordingHorizontalList> {
               context,
               MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
+            return const SizedBox();
           }
           if (state.generalException.status == 400) {
             return const Text('Unespected error');
           }
           if (state.generalException.status == 404) {
-            return const Text('No hay eventos en tu ciudad');
+            return Column(
+              mainAxisAlignment: MainAxisAlignment
+                  .center, // Aligns the children to the center of the column.
+              children: [
+                Container(
+                  width: 200.0, // Sets the width of the container to 200
+                  height: 200.0, // Sets the height of the container to 200
+                  decoration: const BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(
+                          'assets/img/noevents.png'), // Replace with your image URL
+                      fit: BoxFit
+                          .cover, // Covers the area of the container without stretching the image.
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                    height: 20), // Adds space between the image and the text.
+                Text(
+                  'There are currently no events in your city', // Replace with your desired text
+                  style: GoogleFonts.actor(
+                      textStyle: const TextStyle(
+                    fontSize: 20, // Sets the font size of the text
+                    fontWeight: FontWeight.bold, // Makes the text bold
+                  )),
+                ),
+              ],
+            );
           }
-          return Text('${state.generalException.status!}');
+          return Text(state.generalException.detail!);
         } else if (state is AccordingListError) {
           return Text(state.errorMessage);
         } else {
-          return const Text('Not support');
+          return const Text('Unespected error');
         }
       }),
     );

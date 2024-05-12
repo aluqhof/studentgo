@@ -67,7 +67,7 @@ public class EventService {
         double maxPrice;
 
         City city = cityRepository.findFirstByNameIgnoreCase(cityName)
-                .orElseThrow(() -> new NotFoundException("City not found"));
+                .orElseThrow(() -> new NotFoundException("City"));
 
         if (searchQuery == null || searchQuery.isEmpty()) {
             eventName = "";

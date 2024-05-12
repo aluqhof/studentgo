@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/events_saved/events_saved_bloc.dart';
-import 'package:student_go/models/response/list_events_response/content.dart';
 import 'package:student_go/repository/student/student_repository.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/widgets/drawer_widget.dart';
 import 'package:student_go/widgets/vertical_list_v2.dart';
 
 class EventsSavedScreen extends StatefulWidget {
-  const EventsSavedScreen({Key? key}) : super(key: key);
+  const EventsSavedScreen({super.key});
 
   @override
   State<EventsSavedScreen> createState() => _EventsSavedScreenState();
@@ -26,7 +22,6 @@ class _EventsSavedScreenState extends State<EventsSavedScreen> {
     super.initState();
     studentRepository = StudentRepositoryImp();
 
-    // Inicializar el bloc y enviar el evento FetchAccordingListEvent
     _eventListBloc = EventsSavedBloc(studentRepository);
     _eventListBloc.add(FetchEventsSaved());
   }

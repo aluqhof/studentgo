@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_list/event_list_bloc.dart';
 import 'package:student_go/models/response/event_type_response.dart';
 import 'package:student_go/models/response/list_events_response/content.dart';
@@ -42,11 +44,13 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
   Color colorLocation = const Color.fromARGB(255, 35, 150, 245);
   int? _selectedEventTypeId;
   ValueNotifier<Content?> _selectedEventNotifier = ValueNotifier(null);
+  late SharedPreferences _prefs;
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    initialize();
     focusNode = FocusNode();
     _searchController = TextEditingController();
     eventRepository = EventRepositoryImpl();
@@ -89,6 +93,10 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
     } catch (e) {
       throw Exception('Error obtaining location: $e');
     }
+  }
+
+  Future<void> initialize() async {
+    _prefs = await SharedPreferences.getInstance();
   }
 
   Future<Position> _determinePosition() async {
@@ -183,7 +191,7 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
         body: BlocBuilder<EventListBloc, EventListState>(
           bloc: _eventListBloc,
           builder: (context, state) {
-            if (state is EventListLoading) {
+            if (state is EventListLoading || state is EventListInitial) {
               return const Center(child: CircularProgressIndicator());
             } else if (state is UpcomingListSearchableSuccess) {
               return Stack(
@@ -337,6 +345,56 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
               });
               return const Center(child: CircularProgressIndicator());
             } else if (state is UpcomingListsearchableEntityException) {
+              if (state.generalException.status == 404) {
+                return SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment
+                        .center, // This is already set for vertical alignment
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center, // Aligns the children to the center of the column.
+                    children: [
+                      Container(
+                        width: 200.0, // Sets the width of the container to 200
+                        height:
+                            200.0, // Sets the height of the container to 200
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/img/noevents.png'), // Replace with your image URL
+                            fit: BoxFit
+                                .cover, // Covers the area of the container without stretching the image.
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                          height:
+                              20), // Adds space between the image and the text.
+                      Text(
+                        'There are currently no events in your city', // Replace with your desired text
+                        style: GoogleFonts.actor(
+                            textStyle: const TextStyle(
+                          fontSize: 20, // Sets the font size of the text
+                          fontWeight: FontWeight.bold, // Makes the text bold
+                        )),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                );
+              }
+              if (state.generalException.status == 401 ||
+                  state.generalException.status == 403) {
+                _prefs.setString('token', '');
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+                return const SizedBox();
+              }
+              if (state.generalException.status == 400) {
+                return const Text('Unespected error');
+              }
               return Center(child: Text(state.generalException.detail!));
             } else {
               return const Center(child: CircularProgressIndicator());

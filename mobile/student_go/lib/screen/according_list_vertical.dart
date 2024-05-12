@@ -23,7 +23,6 @@ class AccordingListVertical extends StatefulWidget {
 class _AccordingListVerticalState extends State<AccordingListVertical> {
   late EventRepository eventRepository;
   late EventListBloc _eventListBloc;
-  // ignore: unused_field
   late SharedPreferences _prefs;
   String appBarTitle = '';
 
@@ -36,16 +35,13 @@ class _AccordingListVerticalState extends State<AccordingListVertical> {
     super.initState();
     eventRepository = EventRepositoryImpl();
 
-    // Inicializar el bloc y enviar el evento FetchAccordingListEvent
     _eventListBloc = EventListBloc(eventRepository);
     _eventListBloc.add(FetchAccordingListEvent(widget.cityName, 0, 5));
 
-    // Configurar el listener para las solicitudes de página
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
 
-    // Inicializar otros recursos si es necesario
     initialize();
   }
 

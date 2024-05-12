@@ -59,17 +59,81 @@ class _MyTicketsPageState extends State<MyTicketsPage> {
                   child: CircularProgressIndicator(),
                 );
               } else if (state is AllEventsPurchasedUserSuccess) {
-                return ListView.builder(
-                  itemCount: state.purchases.length,
-                  scrollDirection: Axis.vertical,
-                  itemBuilder: (context, index) {
-                    return TicketCardWidget(
-                        purchaseOverviewResponse: state.purchases[index]);
-                  },
-                );
+                if (state.purchases.isNotEmpty) {
+                  return ListView.builder(
+                    itemCount: state.purchases.length,
+                    scrollDirection: Axis.vertical,
+                    itemBuilder: (context, index) {
+                      return TicketCardWidget(
+                          purchaseOverviewResponse: state.purchases[index]);
+                    },
+                  );
+                } else {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 150.0,
+                          height: 150.0,
+                          decoration: const BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/img/notickets.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                          child: Text(
+                            'At the moment you do not have tickets for any upcoming event.',
+                            style: GoogleFonts.actor(
+                                textStyle: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w200,
+                                    color: Colors.grey)),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
               } else {
-                return const Center(
-                  child: Text('Error'),
+                return SizedBox(
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 150.0,
+                        height: 150.0,
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/img/error.png'),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Text(
+                          'At the moment you do not have tickets for any upcoming event.',
+                          style: GoogleFonts.actor(
+                              textStyle: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w200,
+                                  color: Colors.grey)),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
                 );
               }
             },

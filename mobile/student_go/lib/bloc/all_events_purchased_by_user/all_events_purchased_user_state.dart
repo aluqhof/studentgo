@@ -19,8 +19,10 @@ final class AllEventsPurchasedUserError extends AllEventsPurchasedUserState {
 
 final class TokenNotValidState extends AllEventsPurchasedUserState {}
 
-final class AllEventsEntityException extends AllEventsPurchasedUserError {
+final class AllEventsPurchasedUserEntityException
+    extends AllEventsPurchasedUserError {
   final GeneralException generalException;
-  AllEventsEntityException(this.generalException, String errorMessage)
+  AllEventsPurchasedUserEntityException(
+      this.generalException, String errorMessage)
       : super(errorMessage);
 }

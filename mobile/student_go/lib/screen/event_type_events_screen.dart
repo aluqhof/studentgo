@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,17 +33,12 @@ class _EventTypeEventsScreenState extends State<EventTypeEventsScreen> {
   void initState() {
     super.initState();
     eventRepository = EventRepositoryImpl();
-
-    // Inicializar el bloc y enviar el evento FetchAccordingListEvent
     _eventListBloc = EventListBloc(eventRepository);
     _eventListBloc
         .add(FetchEventTypeListEvent(widget.cityName, widget.id, 0, _pageSize));
-    // Configurar el listener para las solicitudes de página
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
-
-    // Inicializar otros recursos si es necesario
     initialize();
   }
 

@@ -641,6 +641,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             onTap: () {
                                               setState(() {
                                                 interestList.removeAt(index);
+                                                interestsId = interestList
+                                                    .map((e) => e.id!)
+                                                    .toList();
                                               });
                                             },
                                             child: Container(

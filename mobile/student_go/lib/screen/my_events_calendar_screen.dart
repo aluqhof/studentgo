@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:student_go/bloc/all_events_purchased_by_user/all_events_purchased_user_bloc.dart';
@@ -184,7 +182,7 @@ class _MyEventsCalendarScreenState extends State<MyEventsCalendarScreen> {
               builder: (context, events, _) {
                 return events.isEmpty
                     ? Text(
-                        'No hay ningún evento para este día',
+                        'You have no events this day',
                         style: GoogleFonts.actor(),
                       )
                     : ListView.builder(
