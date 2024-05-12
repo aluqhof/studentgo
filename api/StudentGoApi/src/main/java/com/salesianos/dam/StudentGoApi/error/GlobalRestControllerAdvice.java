@@ -147,6 +147,16 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(SoldOutException.class)
+    public ErrorResponse handleSoldOutException(
+            SoldOutException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Event Sold Out")
+                .type(URI.create("https://api.studentgo.com/errors/sold-out"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
     @ExceptionHandler(EventAlreadyPurchasedException.class)
     public ErrorResponse handleEventAlreadyPurchased(
             EventAlreadyPurchasedException exception) {

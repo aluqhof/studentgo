@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:student_go/bloc/event_details/event_details_bloc.dart';
 import 'package:student_go/bloc/event_image/event_image_bloc.dart';
 import 'package:student_go/bloc/events_saved/events_saved_bloc.dart';
+import 'package:student_go/bloc/profile_image/profile_image_bloc.dart';
 import 'package:student_go/bloc/purchase/purchase_bloc.dart';
 import 'package:student_go/models/response/event_details_response/event_details_response.dart';
 import 'package:student_go/repository/event/event_repository.dart';
@@ -18,6 +19,7 @@ import 'package:student_go/repository/purchase/purchase_repository_impl.dart';
 import 'package:student_go/repository/student/student_repository.dart';
 import 'package:student_go/repository/student/student_repository_impl.dart';
 import 'package:student_go/screen/login_screen.dart';
+import 'package:student_go/screen/my_tickets_page.dart';
 import 'package:student_go/widgets/people_going_list.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
@@ -43,6 +45,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   late EventImageBloc _eventImageBloc;
   late EventsSavedBloc _eventsSavedBloc;
   bool isEventSaved = false;
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey();
 
   Future<void> _getStreet(double latitude, double longitude) async {
     try {
@@ -90,6 +93,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
               _getStreet(
                   state.eventDetails.latitude!, state.eventDetails.longitude!);
               return Scaffold(
+                key: scaffoldKey,
                 extendBodyBehindAppBar:
                     true, // Para extender el body detrás del AppBar
                 appBar: AppBar(
@@ -218,123 +222,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                           horizontal: 8.0),
                                       child: Stack(
                                         alignment: Alignment.center,
-                                        children: [
-                                          Positioned(
-                                            left: 50,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: ClipOval(
-                                                child: Image.asset(
-                                                  'assets/img/fotoprueba1.jpg',
-                                                  width: 35,
-                                                  height: 35,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 25,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: ClipOval(
-                                                child: Image.asset(
-                                                  'assets/img/fotoprueba2.jpg',
-                                                  width: 35,
-                                                  height: 35,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 0,
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 1,
-                                                ),
-                                              ),
-                                              child: ClipOval(
-                                                child: Image.asset(
-                                                  'assets/img/fotoprueba3.jpg',
-                                                  width: 35,
-                                                  height: 35,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            left: 100,
-                                            child: Text(
-                                              state.eventDetails.students!
-                                                          .length >=
-                                                      20
-                                                  ? '+20 Going'
-                                                  : state.eventDetails.students!
-                                                          .isNotEmpty
-                                                      ? '${state.eventDetails.students!.length} Going'
-                                                      : 'Be the first',
-                                              style: GoogleFonts.actor(
-                                                  textStyle: const TextStyle(
-                                                color: Color.fromRGBO(
-                                                    63, 56, 221, 1),
-                                                fontSize: 17,
-                                              )),
-                                            ),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: ElevatedButton(
-                                                style: ButtonStyle(
-                                                    padding:
-                                                        MaterialStateProperty.all<EdgeInsets>(
-                                                            const EdgeInsets.symmetric(
-                                                                horizontal: 25,
-                                                                vertical: 0)),
-                                                    shape: MaterialStateProperty.all<
-                                                            RoundedRectangleBorder>(
-                                                        RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                    10.0))),
-                                                    backgroundColor:
-                                                        MaterialStateProperty
-                                                            .all(Colors.blue)),
-                                                onPressed: () {
-                                                  // Lógica para el botón de invitar
-                                                },
-                                                child: Text(
-                                                  'Invite',
-                                                  style: GoogleFonts.actor(
-                                                      textStyle:
-                                                          const TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 15)),
-                                                ),
-                                              ),
-                                            ),
-                                          )
-                                        ],
+                                        children: makeStackChildren(
+                                            state.eventDetails),
                                       ),
                                     ),
                                   ),
@@ -577,22 +466,71 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                           CrossAxisAlignment
                                                               .start,
                                                       children: [
-                                                        Container(
-                                                          height: 100,
-                                                          width: 100,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        10),
-                                                            image:
-                                                                const DecorationImage(
-                                                              image: AssetImage(
-                                                                'assets/img/card_background.jpg',
-                                                              ),
-                                                              fit: BoxFit.cover,
-                                                            ),
+                                                        BlocProvider(
+                                                          create: (context) =>
+                                                              EventImageBloc(
+                                                                  eventRepository)
+                                                                ..add(FetchEventImage(
+                                                                    state
+                                                                        .eventDetails
+                                                                        .uuid!,
+                                                                    0)),
+                                                          child: BlocBuilder<
+                                                              EventImageBloc,
+                                                              EventImageState>(
+                                                            builder: (context,
+                                                                state) {
+                                                              if (state
+                                                                      is EventImageInitial ||
+                                                                  state
+                                                                      is EventImageLoading) {
+                                                                return const SizedBox(
+                                                                  height: 100,
+                                                                  width: 100,
+                                                                  child: Center(
+                                                                      child:
+                                                                          CircularProgressIndicator()),
+                                                                );
+                                                              } else if (state
+                                                                  is EventImageSuccess) {
+                                                                return Container(
+                                                                  height: 100,
+                                                                  width: 100,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    image:
+                                                                        DecorationImage(
+                                                                      image: MemoryImage(
+                                                                          state
+                                                                              .image),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              } else {
+                                                                return Container(
+                                                                  height: 100,
+                                                                  width: 100,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            10),
+                                                                    image:
+                                                                        const DecorationImage(
+                                                                      image: AssetImage(
+                                                                          'assets/img/card_background.jpg'),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                    ),
+                                                                  ),
+                                                                );
+                                                              }
+                                                            },
                                                           ),
                                                         ),
                                                         Padding(
@@ -750,7 +688,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                                   .addPostFrameCallback(
                                                                       (_) {
                                                                 ScaffoldMessenger.of(
-                                                                        context)
+                                                                        scaffoldKey
+                                                                            .currentContext!)
                                                                     .showSnackBar(
                                                                   SnackBar(
                                                                     content:
@@ -781,26 +720,53 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                                         ],
                                                                       ),
                                                                       child:
-                                                                          const Text(
-                                                                        '¡Compra exitosa!',
-                                                                        style: TextStyle(
-                                                                            fontSize:
-                                                                                18.0,
-                                                                            color:
-                                                                                Colors.black),
+                                                                          Row(
+                                                                        mainAxisAlignment:
+                                                                            MainAxisAlignment.spaceBetween,
+                                                                        children: [
+                                                                          Flexible(
+                                                                            child:
+                                                                                Text(
+                                                                              'Congratulations on getting your ticket for: ${state.eventDetails.name!}',
+                                                                              style: const TextStyle(
+                                                                                fontSize: 16.0,
+                                                                                color: Color.fromARGB(255, 117, 117, 117),
+                                                                              ),
+                                                                              maxLines: 3,
+                                                                              overflow: TextOverflow.ellipsis,
+                                                                            ),
+                                                                          ),
+                                                                          TextButton(
+                                                                            onPressed:
+                                                                                () {
+                                                                              ScaffoldMessenger.of(scaffoldKey.currentContext!).hideCurrentSnackBar();
+                                                                              Navigator.of(scaffoldKey.currentContext!).pushReplacement(
+                                                                                MaterialPageRoute(builder: (context) => const MyTicketsPage()),
+                                                                              );
+                                                                            },
+                                                                            child:
+                                                                                const Text(
+                                                                              'My Tickets',
+                                                                              style: TextStyle(
+                                                                                fontSize: 18.0,
+                                                                                color: Colors.blue,
+                                                                              ),
+                                                                            ),
+                                                                          ),
+                                                                        ],
                                                                       ),
                                                                     ),
                                                                     duration: const Duration(
                                                                         seconds:
-                                                                            4), // Ajusta la duración según tus necesidades
+                                                                            4),
                                                                     backgroundColor:
                                                                         Colors
-                                                                            .transparent, // Fondo transparente para eliminar el fondo del SnackBar
+                                                                            .transparent,
                                                                     elevation:
-                                                                        0, // Sin elevación para que la sombra personalizada se aplique
+                                                                        0,
                                                                     behavior:
                                                                         SnackBarBehavior
-                                                                            .floating, // SnackBar flotante
+                                                                            .floating,
                                                                   ),
                                                                 );
                                                               });
@@ -1069,6 +1035,149 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         initialPage: 0,
       ),
     );
+  }
+
+  List<Widget> makeStackChildren(EventDetailsResponse eventDetailsResponse) {
+    List<Widget> stackChildren = [];
+
+    for (int i = 0; i < eventDetailsResponse.students!.length && i < 3; i++) {
+      stackChildren.add(
+        BlocProvider(
+          create: (context) => ProfileImageBloc(studentRepository)
+            ..add(FetchProfileImageById(eventDetailsResponse.students![i].id!)),
+          child: BlocBuilder<ProfileImageBloc, ProfileImageState>(
+            builder: (context, state) {
+              if (state is ProfileImageInitial ||
+                  state is ProfileImageLoading) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is ProfileImageSuccess) {
+                return Positioned(
+                  left: 25 * i.toDouble(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.memory(
+                        state.image,
+                        width: 35,
+                        height: 35,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              } else {
+                return Positioned(
+                  left: 25 * i.toDouble(),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 1,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/img/nophoto.png',
+                        width: 35,
+                        height: 35,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    }
+
+    if (eventDetailsResponse.students!.isEmpty) {
+      stackChildren.add(
+        Positioned(
+          left: 10,
+          child: Text(
+            'Be the first to get a ticket!',
+            style: GoogleFonts.actor(
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(63, 56, 221, 1),
+                fontSize: 17,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (eventDetailsResponse.students!.length <= 3 &&
+        eventDetailsResponse.students!.isNotEmpty) {
+      stackChildren.add(
+        Positioned(
+          left: 100,
+          child: Text(
+            '${eventDetailsResponse.students!.length} going',
+            style: GoogleFonts.actor(
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(63, 56, 221, 1),
+                fontSize: 17,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    if (eventDetailsResponse.students!.length > 3) {
+      stackChildren.add(
+        Positioned(
+          left: 100,
+          child: Text(
+            '+${eventDetailsResponse.students!.length - 3} more',
+            style: GoogleFonts.actor(
+              textStyle: const TextStyle(
+                color: Color.fromRGBO(63, 56, 221, 1),
+                fontSize: 17,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    stackChildren.add(Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ElevatedButton(
+          style: ButtonStyle(
+              padding: MaterialStateProperty.all<EdgeInsets>(
+                  const EdgeInsets.symmetric(horizontal: 25, vertical: 0)),
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0))),
+              backgroundColor: MaterialStateProperty.all(Colors.blue)),
+          onPressed: () {
+            // Lógica para el botón de invitar
+          },
+          child: Text(
+            'Invite',
+            style: GoogleFonts.actor(
+                textStyle: const TextStyle(color: Colors.white, fontSize: 15)),
+          ),
+        ),
+      ),
+    ));
+
+    return stackChildren;
   }
 
   String formatPriceToEuro(double price) {
