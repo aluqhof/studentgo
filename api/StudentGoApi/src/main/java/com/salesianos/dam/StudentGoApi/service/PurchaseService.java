@@ -7,6 +7,7 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseTicket;
 import com.salesianos.dam.StudentGoApi.exception.EventAlreadyPurchasedException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
+import com.salesianos.dam.StudentGoApi.exception.SoldOutException;
 import com.salesianos.dam.StudentGoApi.model.Event;
 import com.salesianos.dam.StudentGoApi.model.Purchase;
 import com.salesianos.dam.StudentGoApi.model.Student;
@@ -34,6 +35,10 @@ public class PurchaseService {
 
     public Purchase buyEventTicket(Student student, String idEvent){
         Event eventSelected = eventRepository.findById(UUID.fromString(idEvent)).orElseThrow(() -> new NotFoundException("Event"));
+        List<Student> students = eventRepository.findStudentsByEventIdNoPageable(UUID.fromString(idEvent));
+        if(eventSelected.getMaxCapacity() >= students.size()){
+            throw new SoldOutException("The event has reached its maximum capacity.");
+        }
 
         List<Event> eventsPurchasedByStudent = purchaseRepository.findEventsPurchasedByStudentId(student.getId().toString());
 

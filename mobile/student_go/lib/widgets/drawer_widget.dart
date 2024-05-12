@@ -265,7 +265,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       leading: Icon(
                         Icons.logout_outlined,
                         size: 26,
-                      ), // Icono a la izquierda
+                      ),
                       title: Text(
                         'Sign out',
                         style: GoogleFonts.actor(
@@ -273,12 +273,8 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                       ),
                       onTap: () async {
                         await clearToken();
-                        /*Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );*/
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => const LoginScreen()));
                       },
                     ),
                   ],
@@ -296,6 +292,6 @@ class _DrawerWidgetState extends State<DrawerWidget> {
 
   Future<void> clearToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
+    await prefs.setString('token', '');
   }
 }

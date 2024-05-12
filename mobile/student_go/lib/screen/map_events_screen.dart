@@ -41,6 +41,7 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
   bool loadingLocation = true;
   Color colorLocation = const Color.fromARGB(255, 35, 150, 245);
   int? _selectedEventTypeId;
+  ValueNotifier<Content?> _selectedEventNotifier = ValueNotifier(null);
 
   @override
   void initState() {
@@ -188,7 +189,18 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
               return Stack(
                 children: [
                   _buildMap(state.listEventsResponse),
-                  if (_selectedEvent != null) _buildEventCard(),
+                  ValueListenableBuilder<Content?>(
+                    valueListenable: _selectedEventNotifier,
+                    builder: (context, value, child) {
+                      if (value != null) {
+                        return _buildEventCard(
+                            value); // Build event card only if there's a selected event
+                      } else {
+                        return const SizedBox
+                            .shrink(); // Return an empty widget if no event is selected
+                      }
+                    },
+                  ),
                   Positioned(
                     top: 40,
                     left: 0,
@@ -380,9 +392,8 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
         position: LatLng(result.latitude!, result.longitude!),
         icon: BitmapDescriptor.fromBytes(markerIcon),
         onTap: () {
-          setState(() {
-            _selectedEvent = result;
-          });
+          _selectedEventNotifier.value =
+              result; // This will only update the notifier
         },
       );
       markers.add(marker);
@@ -457,13 +468,14 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
     return byteData!.buffer.asUint8List();
   }
 
-  Widget _buildEventCard() {
+  Widget _buildEventCard(Content event) {
     return Positioned(
-        bottom: 16,
-        left: 16,
-        right: 16,
-        child: EventCardVerticalList(
-          result: _selectedEvent!,
-        ));
+      bottom: 16,
+      left: 16,
+      right: 16,
+      child: EventCardVerticalList(
+        result: event,
+      ),
+    );
   }
 }

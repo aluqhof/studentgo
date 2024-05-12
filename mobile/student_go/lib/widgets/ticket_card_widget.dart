@@ -70,7 +70,7 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
   @override
   Widget build(BuildContext context) {
     List<String> formats =
-        obtenerFormatos(widget.purchaseOverviewResponse.dateTime!);
+        obtainFormats(widget.purchaseOverviewResponse.dateTime!);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10),
       child: Skeletonizer(
@@ -87,8 +87,8 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                   elevation: 0,
                   backgroundColor: Colors.transparent,
                   child: TicketWidget(
-                    width: 350,
-                    height: 500,
+                    width: 380,
+                    height: 540,
                     isCornerRounded: true,
                     padding: const EdgeInsets.all(20),
                     child: TicketData(
@@ -140,15 +140,13 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                       },
                     ),
                     BackdropFilter(
-                      filter: ImageFilter.blur(
-                          sigmaX: 5.0, sigmaY: 5.0), // Apply blur effect
+                      filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
                       child: Container(
-                        color: Colors.black.withOpacity(
-                            0.5), // This container must be translucent
+                        color: Colors.black.withOpacity(0.5),
                       ),
                     ),
                     Positioned(
-                      top: 15, // Adjust these values as needed for your design
+                      top: 15,
                       left: 12,
                       child: BlocBuilder<EventImageBloc, EventImageState>(
                         builder: (context, state) {
@@ -157,28 +155,25 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                             return SizedBox();
                           } else if (state is EventImageSuccess) {
                             return Container(
-                              width: 80.0, // Set the size of the small image
+                              width: 80.0,
                               height: 60.0,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    10.0), // Rounded corners for the small image
+                                borderRadius: BorderRadius.circular(10.0),
                                 image: DecorationImage(
-                                  image: MemoryImage(state
-                                      .image), // Same image as the background
+                                  image: MemoryImage(state.image),
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             );
                           } else {
                             return Container(
-                              width: 80.0, // Set the size of the small image
+                              width: 80.0,
                               height: 60.0,
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(
-                                    10.0), // Rounded corners for the small image
+                                borderRadius: BorderRadius.circular(10.0),
                                 image: const DecorationImage(
                                   image: AssetImage(
-                                      'assets/img/card_background.jpg'), // Same image as the background
+                                      'assets/img/card_background.jpg'),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -197,8 +192,7 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                                 textStyle: const TextStyle(
                                     fontSize: 14,
                                     color: Color.fromARGB(255, 255, 255, 255))),
-                            textAlign: TextAlign
-                                .left), // Text aligned left within the container
+                            textAlign: TextAlign.left),
                       ),
                     ),
                     Positioned(
@@ -217,15 +211,14 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                                       color:
                                           Color.fromARGB(255, 199, 198, 198))),
                               textAlign: TextAlign.left),
-                        ), // Text aligned left within the container
+                        ),
                       ),
                     ),
                     Positioned(
                       top: 26,
                       right: 4,
                       child: SizedBox(
-                        width:
-                            80, // Forces the container to take all available width
+                        width: 80,
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: Text(formats[0],
@@ -233,7 +226,7 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                                   textStyle: const TextStyle(
                                       fontSize: 34, color: Colors.white)),
                               textAlign: TextAlign.left),
-                        ), // Text aligned left within the container
+                        ),
                       ),
                     ),
                     Positioned(
@@ -270,7 +263,7 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
                                     height: 1)),
                             textAlign: TextAlign.left,
                           ),
-                        ), // Text aligned left within the container
+                        ),
                       ),
                     ),
                     Positioned(
@@ -298,20 +291,15 @@ class _TicketCardWidgetState extends State<TicketCardWidget> {
     );
   }
 
-  List<String> obtenerFormatos(String dateTimeString) {
-    // Parsear la cadena de fecha en un objeto DateTime
+  List<String> obtainFormats(String dateTimeString) {
     DateTime dateTime = DateTime.parse(dateTimeString);
 
-    // Obtener el día del mes
     String dayOfMonth = dateTime.day.toString();
 
-    // Obtener las tres primeras letras del mes en mayúsculas
     String monthAbbreviation = _getMonthAbbreviation(dateTime.month);
 
-    // Obtener el día de la semana y la hora en el formato solicitado
     String dayOfWeekAndTime = _getDayOfWeekAndTime(dateTime);
 
-    // Devolver los formatos en una lista
     return [dayOfMonth, monthAbbreviation, dayOfWeekAndTime];
   }
 
