@@ -36,7 +36,7 @@ public class PurchaseService {
     public Purchase buyEventTicket(Student student, String idEvent){
         Event eventSelected = eventRepository.findById(UUID.fromString(idEvent)).orElseThrow(() -> new NotFoundException("Event"));
         List<Student> students = eventRepository.findStudentsByEventIdNoPageable(UUID.fromString(idEvent));
-        if(eventSelected.getMaxCapacity() >= students.size()){
+        if(eventSelected.getMaxCapacity() <= students.size()){
             throw new SoldOutException("The event has reached its maximum capacity.");
         }
 

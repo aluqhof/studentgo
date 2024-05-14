@@ -21,14 +21,15 @@ export class LoginPageComponent {
 
   constructor(private authService: AuthService, private tokenStorage: TokenStorageService, private router: Router) { }
 
-  ngOnInit(): void {
+  /*ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
-      this.isLoggedIn = true;
+      //this.isLoggedIn = true;
     }
-  }
+  }*/
 
   onSubmit(): void {
     const { username, password } = this.form;
+    console.log(username + " " + password)
 
     this.authService.login(username, password).subscribe({
       next: data => {
@@ -44,7 +45,7 @@ export class LoginPageComponent {
         this.router.navigate(['/home']);
       },
       error: err => {
-        this.errorMessage = err.error.message;
+        this.errorMessage = err.error.detail;
         this.isLoginFailed = true;
         console.log(err);
       }

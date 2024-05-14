@@ -1,0 +1,108 @@
+<section class="vh-100" style="background: linear-gradient(to right, #6a11cb, #2575fc);">
+    <div class="container-fluid h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="card p-3 p-md-5 rounded col-10 col-sm-8 col-md-6 col-lg-4 col-xl-3 m-auto bg-light">
+                <form *ngIf="!isSuccessful" class="form-right my-auto" (ngSubmit)="f.form.valid && onSubmit()"
+                    #f="ngForm" novalidate>
+                    <div class="d-flex justify-content-center mb-4">
+                        <img src="../../../assets/logo.png" class="img-fluid w-25" alt="Logo">
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="name" class="form-label small fw-normal">Name</label>
+                        <input [(ngModel)]="form.name" type="text" id="name" name="name"
+                            class="input-field form-control" required minlength="3" maxlength="30" #name="ngModel">
+                        <div *ngIf="name.errors && f.submitted" class="error">
+                            <div *ngIf="name.errors['required']">Name is required</div>
+                            <div *ngIf="name.errors['minlength']">First Name must be at least 3 characters</div>
+                            <div *ngIf="name.errors['maxlength']">Name must be at most 30 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="email" class="form-label small fw-normal">Email</label>
+                        <input [(ngModel)]="form.email" type="email" id="email" name="email"
+                            class="input-field form-control" required email #email="ngModel">
+                        <div *ngIf="email.errors && f.submitted" class="error">
+                            <div *ngIf="email.errors['required']">Email is required</div>
+                            <div *ngIf="email.errors['email']">Email must be a valid email address</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-2">
+                        <label for="username" class="form-label small fw-normal">Username</label>
+                        <input [(ngModel)]="form.username" type="text" id="username" name="username"
+                            class="input-field form-control" required minlength="3" maxlength="20" #username="ngModel">
+                        <div *ngIf="username.errors && f.submitted" class="error">
+                            <div *ngIf="username.errors['required']">Username is required</div>
+                            <div *ngIf="username.errors['minlength']">Username must be at least 3 characters</div>
+                            <div *ngIf="username.errors['maxlength']">Username must be at most 20 characters</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 mb-2">
+                            <label for="password" class="form-label small fw-normal">Password</label>
+                            <input [(ngModel)]="form.password" type="password" id="password" name="password"
+                                class="input-field form-control" required minlength="6" #password="ngModel">
+                            <div *ngIf="password.errors && f.submitted" class="error">
+                                <div *ngIf="password.errors['required']">Password is required</div>
+                                <div *ngIf="password.errors['minlength']">Password must be at least 6 characters</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <label for="verifyPassword" class="form-label small fw-normal">Repeat Password</label>
+                            <input [(ngModel)]="form.verifyPassword" type="password" id="verifyPassword"
+                                name="verifyPassword" class="input-field form-control" required minlength="6"
+                                #verifyPassword="ngModel">
+                            <div *ngIf="f.submitted && password !== verifyPassword" class="error">
+                                <div>Passwords do not match</div>
+                            </div>
+                            <div *ngIf="verifyPassword.errors && f.submitted" class="error">
+                                <div *ngIf="verifyPassword.errors['required']">Verify Password is required</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Otros campos de formulario aquí -->
+
+                        <!-- Campo Select para seleccionar intereses -->
+                        <div class="col-sm-12 mb-2">
+                            <label for="interest" class="form-label small fw-normal">Interest</label>
+                            <select id="interest" name="interest" class="input-field form-control"
+                                (change)="addInterest($event)">
+                                <option value="">Select interest</option>
+                                <option *ngFor="let interest of interestList" [value]="interest | json">{{ interest.name
+                                    }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <!-- Intereses seleccionados -->
+                        <div *ngIf="selectedInterests.length > 0" class="col-sm-12 mb-2">
+                            <label class="form-label small fw-normal">Selected Interests</label>
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <div *ngFor="let selectedInterest of selectedInterests"
+                                    (click)="removeInterest(selectedInterest)"
+                                    class="interest-container text-black small cursor-pointer">
+                                    {{ selectedInterest.name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="d-flex justify-content-center">
+                        <input type="submit" value="Register" class="btn btn-primary btn-lg mt-4 mb-3">
+                    </div>
+
+                    <div class="text-center">
+                        <p>Already have an account? <a href="/login" class="link-primary">Sign In</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

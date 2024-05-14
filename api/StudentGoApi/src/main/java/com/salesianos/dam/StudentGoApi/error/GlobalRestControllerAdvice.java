@@ -59,15 +59,6 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
-    /*@ExceptionHandler({ InUseException.class })
-    public ErrorResponse handleAlreadyInUseException(InUseException exception) {
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Already in use")
-                .type(URI.create("https://api.bikeapp.com/errors/user-bike-in-use"))
-                .property("timestamp", Instant.now())
-                .build();
-    }*/
-
     @ExceptionHandler(InvalidCredentialsException.class)
     public ErrorResponse handleInvalidCredentialsException(
             InvalidCredentialsException exception) {
@@ -213,66 +204,5 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .property("timestamp", Instant.now())
                 .build();
     }
-
-    /*
-    @ExceptionHandler({InvalidPinExcepcion.class})
-    public ErrorResponse handleInvalidPin(InvalidPinExcepcion exception) {
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Invalid Pin")
-                .type(URI.create("https://api.bikeapp.com/errors/invalid-pin"))
-                .property("timestamp", Instant.now())
-                .build();
-    }
-
-    @ExceptionHandler({NotEnoughBalanceException.class})
-    public ErrorResponse handleInvalidPin(NotEnoughBalanceException exception) {
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Not enough balance")
-                .type(URI.create("https://api.bikeapp.com/errors/not-enough-balance"))
-                .property("timestamp", Instant.now())
-                .build();
-    }
-
-    @ExceptionHandler(BikesInThatStationException.class)
-    public ErrorResponse handleBikesInThatStationException(BikesInThatStationException exception) {
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("The station can't be deleted")
-                .type(URI.create("https://api.bikeapp.com/errors/bikes-in-station"))
-                .property("timestamp", Instant.now())
-                .build();
-    }
-
-    @ExceptionHandler({ BadRequestForBikeAddException.class })
-    private static ErrorResponse handleBadRequestBikeAdd(BadRequestForBikeAddException exception) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Bad request from user")
-                .type(URI.create("https://api.bikeapp.com/errors/not-valid"))
-                .property("date", LocalDateTime.now().format(formatter))
-                .build();
-    }
-
-    @ExceptionHandler({ BikeWithSameNameException.class })
-    private static ErrorResponse handleBikeWithSameNameException(BikeWithSameNameException exception) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Already exists a bike with that name")
-                .type(URI.create("https://api.bikeapp.com/errors/not-valid"))
-                .property("date", LocalDateTime.now().format(formatter))
-                .build();
-    }
-
-    @ExceptionHandler({ StationWithoutCapacityException.class })
-    private static ErrorResponse handleStationWithoutCapacityException(StationWithoutCapacityException exception) {
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
-        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("That station is full of bikes")
-                .type(URI.create("https://api.bikeapp.com/errors/not-valid"))
-                .property("date", LocalDateTime.now().format(formatter))
-                .build();
-    }
-    */
 
 }

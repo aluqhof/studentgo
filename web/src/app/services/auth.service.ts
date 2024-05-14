@@ -20,7 +20,7 @@ export class AuthService {
     tokenStorageService!: TokenStorageService;
 
     registerUser(form: RegisterForm): Observable<UserResponse> {
-        return this.http.post<UserResponse>(`${environment.authUrl}register`,
+        return this.http.post<UserResponse>(`http://localhost:8080/auth/register-student`,
             {
                 "username": form.username,
                 "password": form.password,
@@ -32,7 +32,7 @@ export class AuthService {
     }
 
     login(username: string, password: string): Observable<UserResponse> {
-        return this.http.post<UserResponse>(`${environment.authUrl}login`, {
+        return this.http.post<UserResponse>(`http://localhost:8080/auth/login`, {
             username,
             password
         });
