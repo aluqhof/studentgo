@@ -7,7 +7,13 @@ import { UserResponse } from "../models/user-response.interface";
 import { environment } from "../../environments/environment";
 
 const httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+    headers: new HttpHeaders(
+        {
+            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept"
+        }
+    )
 }
 
 @Injectable({
@@ -15,9 +21,8 @@ const httpOptions = {
 })
 export class AuthService {
 
-    constructor(private http: HttpClient) { }
+    constructor(private http: HttpClient, private tokenStorageService: TokenStorageService) { }
     userRole!: string;
-    tokenStorageService!: TokenStorageService;
 
     registerUser(form: RegisterForm): Observable<UserResponse> {
         return this.http.post<UserResponse>(`http://localhost:8080/auth/register-student`,
@@ -38,16 +43,31 @@ export class AuthService {
         });
     }
 
+    logout(): void {
+        this.tokenStorageService.signOut();
+    }
+
 
     isAdmin(): boolean {
-        if (inject(TokenStorageService).getUser().role === 'ROLE_ADMIN') return true;
+        if (this.tokenStorageService.getUser().role === 'ROLE_ADMIN') return true;
 
         return false;
     }
 
     isOrganizer(): boolean {
-        if (inject(TokenStorageService).getUser().role === 'ROLE_ORGANIZER') return true;
+        if (this.tokenStorageService.getUser().role === 'ROLE_ORGANIZER') return true;
 
         return false;
+    }
+
+    isStudent(): boolean {
+        if (this.tokenStorageService.getUser().role === 'ROLE_USER') return true;
+
+        return false;
+    }
+
+    isLoggedIn(): boolean {
+        const token = this.tokenStorageService.getToken();
+        return token !== null;
     }
 }

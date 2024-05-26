@@ -1,0 +1,14 @@
+.nav-item {
+    cursor: pointer;
+}
+
+aside {
+    /* border: 1px yellow solid; */
+    position: fixed;
+    overflow: auto;
+    height: calc(100vh - 68px);
+    justify-content: flex-start;
+    align-self: flex-start;
+    background-color: #0E1550;
+
+}

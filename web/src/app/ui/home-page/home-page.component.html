@@ -1,1 +1,28 @@
 <app-nav-bar></app-nav-bar>
+<div class="row w-100 curved-container m-0">
+    <div class="col-md-6 d-flex align-items-center justify-content-center mt-3 mt-md-0 p-md-5 text-center">
+        <img class="image-banner w-75 " src="../../../assets/image-banner.jpeg" alt="Chica de Fever"
+            fetchpriority="high" crossorigin="anonymous">
+    </div>
+    <div class="col-md-6 my-2 my-md-auto px-5 mx-auto">
+        <h1 class="banner-title">Discover the best experiences for students in <span role="button" (click)="openModal()"
+                class="text-white">your
+                city <i class="bi bi-chevron-down" style="font-size: 25px;"></i></span></h1>
+        <h2 class="fw-light banner-title">Parties, get-togethers, sports, championships, competitions...</h2>
+    </div>
+</div>
+<div class="container my-4">
+    <h2 class="m-3">Top Cities</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col" *ngFor="let city of cities">
+            <div class="card rounded-3 overflow-hidden position-relative">
+                <img [src]="'http://localhost:8080/city/download-photo/'+city.id" class="card-img-top" [alt]="city.name"
+                    style="object-fit: cover;">
+                <div class="overlay"></div>
+                <div class="card-img-overlay d-flex align-items-center justify-content-center text-center">
+                    <h3 class="card-title text-white">{{city.name}}</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

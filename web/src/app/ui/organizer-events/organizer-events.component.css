@@ -1,0 +1,88 @@
+main {
+    position: relative;
+    overflow: auto;
+    margin-left: auto;
+    justify-content: flex-end;
+    align-self: flex-end;
+}
+
+.custom-pagination .page-link {
+    color: #007bff;
+    border: none;
+    margin: 0 5px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.custom-pagination .page-link:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.custom-pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: #fff;
+}
+
+.custom-pagination .page-item.disabled .page-link {
+    color: #6c757d;
+}
+
+.custom-pagination .page-link {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-modal .modal-dialog {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-modal .modal-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: none;
+    border: none;
+    box-shadow: none;
+}
+
+.upload-placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: #f8f9fa;
+    border: 2px dashed #ced4da;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.upload-placeholder:hover {
+    background-color: #e2e6ea;
+}
+
+.upload-placeholder .card-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.card-img-top {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.card-img-top:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+    .upload-placeholder .card-body i {
+        font-size: 20px !important;
+    }
+}

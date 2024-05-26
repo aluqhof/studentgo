@@ -1,0 +1,13 @@
+<div class="modal-header text-black">
+    <h5 class="modal-title">Select Your City</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+</div>
+<div class="modal-body">
+    <input type="text" class="form-control mb-3" placeholder="Search city..." (input)="handleInput($event)">
+    <ul class="list-group">
+        <li role="button" *ngFor="let city of filteredCities"
+            class="list-group-item list-group-item-action cursor-pointer" (click)=" selectCity(city)">
+            {{ city }}
+        </li>
+    </ul>
+</div>
