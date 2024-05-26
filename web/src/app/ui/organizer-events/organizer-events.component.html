@@ -140,6 +140,12 @@
                                     <input type="text" class="form-control" id="username" name="username"
                                         [value]="eventDetails.latitude" readonly>
                                 </div>
+                                <mat-form-field>
+                                    <mat-label>Address << using the directive>></mat-label>
+                                    <input matInput matGoogleMapsAutocomplete [country]="de"
+                                        (onAutocompleteSelected)="onAutocompleteSelected($event)"
+                                        (onLocationSelected)="onLocationSelected($event)">
+                                </mat-form-field>
                                 <button type="submit"
                                     class="btn btn-gray btn-transparent d-flex justify-content-center align-items-center"
                                     style="width: 100%; margin-top: 10px;">
