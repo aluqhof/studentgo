@@ -1,4 +1,4 @@
-INSERT INTO user_default (id, username, password, email, url_photo, name, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('c62db400-22e3-4e92-94db-1447f5688f2c', 'admin', '{bcrypt}$2a$10$4zcpWiElBDO8KELG3JE37ukgcCVfrdYeDd2i.F3MEioTkHFIfcqfK', 'admin@admin.com', 'nophoto.png', 'admin',  true, true, true, true, current_timestamp, current_timestamp);--admin
+INSERT INTO user_default (id, username, password, email, url_photo, name, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('c62db400-22e3-4e92-94db-1447f5688f2c', 'admin', '{bcrypt}$2a$10$4zcpWiElBDO8KELG3JE37ukgcCVfrdYeDd2i.F3MEioTkHFIfcqfK', 'admin@admin.com', 'nophoto.png', 'admin',  true, true, true, true, current_timestamp, current_timestamp);--admin1
 INSERT INTO user_default (id, username, password, email, url_photo, name, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', 'student1', '{bcrypt}$2a$10$pWJK9KslilCl0HcW5eVKOOdRd8AHuwymd0kze.WvLXM/kQVdKNRi.', 'student1@student.com', 'nophoto.png', 'Student 1', true, true, true, true, current_timestamp, current_timestamp);--user1234
 INSERT INTO user_default (id, username, password, email, url_photo, name, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 'student2', '{bcrypt}$2a$10$pWJK9KslilCl0HcW5eVKOOdRd8AHuwymd0kze.WvLXM/kQVdKNRi.', 'student2@student.com', 'nophoto.png', 'Student 2', true, true, true, true, current_timestamp, current_timestamp);
 INSERT INTO user_default (id, username, password, email, url_photo, name, account_non_expired, account_non_locked, credentials_non_expired, enabled, created_at, last_password_change_at) VALUES ('f3d074a8-d100-4b2f-ad93-ab0da39617c5', 'student3', '{bcrypt}$2a$10$pWJK9KslilCl0HcW5eVKOOdRd8AHuwymd0kze.WvLXM/kQVdKNRi.', 'student3@student.com', 'nophoto.png', 'Student 3', true, true, true, true, current_timestamp, current_timestamp);
@@ -43,9 +43,9 @@ INSERT INTO student_event_type (student_id, event_type_id) VALUES ('04d0595e-45d
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 1);
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 4);
 
-INSERT INTO city (id, name) VALUES (1, 'Sevilla');
-INSERT INTO city (id, name) VALUES (2, 'Köln');
-INSERT INTO city (id, name) VALUES (3, 'Madrid');
+INSERT INTO city (id, name, photo_url) VALUES (1, 'Sevilla', 'sevilla.jpg');
+INSERT INTO city (id, name, photo_url) VALUES (2, 'Köln', 'koeln.jpg');
+INSERT INTO city (id, name, photo_url) VALUES (3, 'Madrid', 'madrid.jpg');
 
 INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'Torneo de Fútbol 7', 37.38283, -5.97317, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 0);
 INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'Degustación en grupo', 37.3824023, -5.99631554987113, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-19 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 200);
@@ -96,3 +96,22 @@ INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f23e4567-e89b-12d3-a456-426614174017', 10.0, current_timestamp, '9d782609-1b54-4cee-ad3d-5ce678be376d', 'ad7242d7-11db-4e72-ac96-f668eb1147bb');
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f23e4567-e89b-12d3-a456-426614174018', 40.0, current_timestamp, 'f13a8a04-afe2-4b12-a279-91b3e365073b', 'dc98d909-98fd-44da-8944-f2e84ecb1695');
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f23e4567-e89b-12d3-a456-426614174019', 30.0, current_timestamp, 'ae56ec32-98bf-4eb6-821d-741a0816b3bf', '23b9773b-b123-4f48-8a6d-ef732806d1f5');
+
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'nophoto.png');
+
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'nophoto.png');

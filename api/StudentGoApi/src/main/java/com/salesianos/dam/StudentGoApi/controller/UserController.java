@@ -10,6 +10,7 @@ import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
 import com.salesianos.dam.StudentGoApi.exception.FileTypeException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
+import com.salesianos.dam.StudentGoApi.exception.NotLoggedInException;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
@@ -64,7 +65,7 @@ public class UserController {
 
     @Operation(summary = "Register student")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201 Created", description = "Register was succesful", content = {
+            @ApiResponse(responseCode = "201 Created", description = "Register was successful", content = {
                     @Content(mediaType = "application/json", schema = @Schema(implementation = JwtUserResponse.class), examples = {
                             @ExampleObject(value = """
                                     {

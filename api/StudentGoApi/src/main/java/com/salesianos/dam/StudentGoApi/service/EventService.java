@@ -7,6 +7,7 @@ import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
 import com.salesianos.dam.StudentGoApi.exception.DateRangeFilterException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
+import com.salesianos.dam.StudentGoApi.exception.PermissionException;
 import com.salesianos.dam.StudentGoApi.exception.PriceRangeFilterException;
 import com.salesianos.dam.StudentGoApi.model.*;
 import com.salesianos.dam.StudentGoApi.repository.CityRepository;
@@ -54,6 +55,24 @@ public class EventService {
                 .build();
 
         return eventRepository.save(event);
+    }
+
+    public MyPage<EventViewResponse> getEventsByOrganizer(Organizer organizer, Pageable pageable) {
+        if(organizer == null){
+            throw new PermissionException("You don't have permission to access to this resource");
+        }
+        Page<Event> events = eventRepository.getAllByOrganizer(organizer.getId().toString(), pageable);
+        return MyPage.of(events
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Organizer Events");
+    }
+
+    public MyPage<EventViewResponse> getPastEventsByOrganizer(Organizer organizer, Pageable pageable)  {
+        if(organizer == null){
+            throw new PermissionException("You don't have permission to access to this resource");
+        }
+        Page<Event> events = eventRepository.getAllByOrganizerPast(organizer.getId().toString(), pageable);
+        return MyPage.of(events
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Organizer Events");
     }
 
     public List<Event> getAllUpcomingEventsInCity(String cityName, String searchQuery,
@@ -138,6 +157,9 @@ public class EventService {
     }
 
     public MyPage<EventViewResponse> getFutureEventsInCityAccordingToUser(String cityName, Student student, Pageable pageable) {
+        if(student == null){
+            throw new PermissionException("You don't have permission to access to this resource");
+        }
         Page<Event> events =  eventRepository.findAllFutureEventsByCityIdWithAccordingToUser(cityRepository.findFirstByNameIgnoreCase(cityName)
                 .orElseThrow(() -> new NotFoundException("city")).getId(), userRepository.findById(student.getId()).orElseThrow(() -> new NotFoundException("User")).getId(), pageable);
         return MyPage.of(events

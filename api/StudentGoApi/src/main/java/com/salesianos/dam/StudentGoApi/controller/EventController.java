@@ -38,6 +38,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -149,6 +150,118 @@ public class EventController {
                                                                    @RequestParam(value = "max", required = false) Double maxPrice
                                                                    ){
         return ResponseEntity.ok(eventService.getAllUpcomingEventsInCity(cityName, eventName, eventTypeIds, startDate, endDate, minPrice, maxPrice).stream().map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))).toList());
+    }
+
+    @Operation(summary = "Get all by organizer")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    [
+                                        {
+                                            "uuid": "9d782609-1b54-4cee-ad3d-5ce678be376d",
+                                            "name": "Torneo de Fútbol 7",
+                                            "latitude": -5.97317,
+                                            "longitude": 37.38283,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.830396",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Sports"
+                                            ]
+                                        },
+                                        {
+                                            "uuid": "f13a8a04-afe2-4b12-a279-91b3e365073b",
+                                            "name": "Degustación en grupo",
+                                            "latitude": -5.99631554987113,
+                                            "longitude": 37.3824023,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.832156",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Food",
+                                                "Music"
+                                            ]
+                                        },
+                                        {
+                                            "uuid": "62feb988-886b-44ad-ac0b-43acd928a7c3",
+                                            "name": "Torneo de fifa por parejas",
+                                            "latitude": -5.99255572619863,
+                                            "longitude": 37.386207,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.833622",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Gaming"
+                                            ]
+                                        }
+                                    ]
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/organizer")
+    public MyPage<EventViewResponse> getEventsByOrganizer(@AuthenticationPrincipal Organizer organizer,  @PageableDefault(size = 10, page = 0) Pageable pageable
+    ) {
+        return eventService.getEventsByOrganizer(organizer, pageable);
+    }
+
+    @Operation(summary = "Get all by organizer past")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    [
+                                        {
+                                            "uuid": "9d782609-1b54-4cee-ad3d-5ce678be376d",
+                                            "name": "Torneo de Fútbol 7",
+                                            "latitude": -5.97317,
+                                            "longitude": 37.38283,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.830396",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Sports"
+                                            ]
+                                        },
+                                        {
+                                            "uuid": "f13a8a04-afe2-4b12-a279-91b3e365073b",
+                                            "name": "Degustación en grupo",
+                                            "latitude": -5.99631554987113,
+                                            "longitude": 37.3824023,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.832156",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Food",
+                                                "Music"
+                                            ]
+                                        },
+                                        {
+                                            "uuid": "62feb988-886b-44ad-ac0b-43acd928a7c3",
+                                            "name": "Torneo de fifa por parejas",
+                                            "latitude": -5.99255572619863,
+                                            "longitude": 37.386207,
+                                            "cityId": "Sevilla",
+                                            "description": "Algo guapo",
+                                            "dateTime": "2024-02-22T15:18:47.833622",
+                                            "organizer": "5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2",
+                                            "eventTypes": [
+                                                "Gaming"
+                                            ]
+                                        }
+                                    ]
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
+    })
+    @GetMapping("/past/organizer")
+    public MyPage<EventViewResponse> getEventsByOrganizerPast(@AuthenticationPrincipal Organizer organizer, @PageableDefault(size = 10, page = 0) Pageable pageable
+    )  {
+        return eventService.getPastEventsByOrganizer(organizer, pageable);
     }
 
     @Operation(summary = "Get Pageable results from upcoming events in a city limited")

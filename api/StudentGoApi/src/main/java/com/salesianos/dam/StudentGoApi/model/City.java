@@ -21,4 +21,6 @@ public class City {
 
     @NaturalId
     private String name;
+
+    private String photoUrl;
 }

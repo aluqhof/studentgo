@@ -109,6 +109,16 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
 
     }
 
+    @ExceptionHandler({ PermissionException.class })
+    public ErrorResponse handlePermissionException(PermissionException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.FORBIDDEN, exception.getMessage())
+                .title("NO PERMISSION")
+                .type(URI.create("https://api.studentgo.com/errors/no-permission"))
+                .property("timestamp", Instant.now())
+                .build();
+
+    }
+
 
     @ExceptionHandler({JwtTokenException.class})
     public ErrorResponse handleTokenException(JwtTokenException exception) {
@@ -195,6 +205,17 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .property("timestamp", Instant.now())
                 .build();
     }
+
+
+    @ExceptionHandler(NotLoggedInException.class)
+    public ErrorResponse handleUserNotLoggedIn(NotLoggedInException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.UNAUTHORIZED, exception.getMessage())
+                .title("User not logged in")
+                .type(URI.create("https://api.studentgo.com/errors/not-logged-in"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
 
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ErrorResponse handleUsernameExistsException(UsernameAlreadyExistsException exception) {

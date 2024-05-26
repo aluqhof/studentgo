@@ -94,7 +94,9 @@ public class SecurityConfig {
                                 antMatcher("/admin/**"))
                         .hasRole("ADMIN")
                         .requestMatchers(
-                                antMatcher(HttpMethod.GET, "/event-type/**")
+                                antMatcher(HttpMethod.GET, "/event-type/**"),
+                                antMatcher(HttpMethod.GET, "/city/**"),
+                                antMatcher(HttpMethod.GET, "/event/**")
                         ).permitAll()
                         .anyRequest().authenticated());
 

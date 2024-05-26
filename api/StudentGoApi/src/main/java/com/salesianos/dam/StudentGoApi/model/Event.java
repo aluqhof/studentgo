@@ -39,6 +39,9 @@ public class Event {
 
     private LocalDateTime dateTime;
 
+    @ElementCollection
+    @CollectionTable(name = "event_photos", joinColumns = @JoinColumn(name = "event_id"))
+    @Column(name = "url_photo")
     private List<String> urlPhotos;
 
     private int maxCapacity;

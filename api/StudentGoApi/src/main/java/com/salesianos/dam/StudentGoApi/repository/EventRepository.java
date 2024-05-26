@@ -61,4 +61,12 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
 
     @Query("SELECT DISTINCT s FROM Student s JOIN Purchase p ON s.id = CAST(p.author AS java.util.UUID) JOIN p.event e WHERE e.id = :eventId")
     List<Student> findStudentsByEventIdNoPageable(@Param("eventId") UUID eventId);
+
+    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
+    Page<Event> getAllByOrganizer(@Param("author") String author,
+                                  Pageable pageable);
+
+    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime < CURRENT_TIMESTAMP ORDER BY e.dateTime DESC")
+    Page<Event> getAllByOrganizerPast(@Param("author") String author,
+                                      Pageable pageable);
 }

@@ -1,2 +1,7 @@
-package com.salesianos.dam.StudentGoApi.exception;public class PermissionException {
+package com.salesianos.dam.StudentGoApi.exception;
+
+public class PermissionException extends RuntimeException{
+    public PermissionException(String message) {
+        super(message);
+    }
 }

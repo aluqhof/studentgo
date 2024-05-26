@@ -4,6 +4,7 @@ import com.salesianos.dam.StudentGoApi.dto.user.ChangeUsernameRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.UpdateProfileRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
+import com.salesianos.dam.StudentGoApi.exception.PermissionException;
 import com.salesianos.dam.StudentGoApi.exception.UsernameAlreadyExistsException;
 import com.salesianos.dam.StudentGoApi.exception.TextLengthException;
 import com.salesianos.dam.StudentGoApi.model.EventType;
@@ -43,7 +44,9 @@ public class UserService {
 
         String username = changeUsernameRequest.username();
 
-        findById(user.getId()).orElseThrow(() -> new NotFoundException("User"));
+        if(user == null){
+            throw new PermissionException("You don't have permission to access to this resource");
+        }
 
         if(userExistsByUsername(username)){
             throw new UsernameAlreadyExistsException();
@@ -58,7 +61,9 @@ public class UserService {
         String description = updateProfileRequest.description();
         List<Long> interestIds = updateProfileRequest.interests();
 
-        findById(user.getId()).orElseThrow(() -> new NotFoundException("User"));
+        if(user == null){
+            throw new PermissionException("You don't have permission to access to this resource");
+        }
 
         List<EventType> interests = interestIds.stream()
                 .map(i-> eventTypeRepository.findById(i).orElseThrow(() ->  new NotFoundException("Event Type")))

@@ -18,6 +18,7 @@ public record EventViewResponse(
 
         String cityId,
         LocalDateTime dateTime,
+        int maxCapacity,
         List<EventTypeResponse> eventType,
         List<StudentListResponse> students
 ) {
@@ -30,6 +31,7 @@ public record EventViewResponse(
                 e.getLongitude(),
                 e.getCity().getName(),
                 e.getDateTime(),
+                e.getMaxCapacity(),
                 e.getEventTypes().stream().map(EventTypeResponse::of).toList(),
                 students.stream().map(StudentListResponse::of).toList()
         );
