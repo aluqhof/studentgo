@@ -4,6 +4,7 @@ import { EventService } from '../../services/events.service';
 import { EventTypeResponse } from '../../models/event-type-response.inteface';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailsResponse } from '../../models/event-details.interface';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-organizer-events',
@@ -39,8 +40,10 @@ export class OrganizerEventsComponent {
   selectedImage: string | null = null;
   imageWidth: number | null = null;
   imageHeight: number | null = null;
+  loading: boolean = false;
 
-  constructor(private eventService: EventService, private modalService: NgbModal) { }
+
+  constructor(private eventService: EventService, private modalService: NgbModal, private httpClient: HttpClient) { }
 
   ngOnInit() {
     this.loadNewPageFuture();
@@ -194,6 +197,7 @@ export class OrganizerEventsComponent {
       }
     });
   }
+
 
   onSubmit() {
     /*this.useService.editUse(this.selectedUse.id, this.useDetails).subscribe({

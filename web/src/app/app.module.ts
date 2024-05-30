@@ -15,6 +15,10 @@ import { OrganizerDashboardComponent } from './ui/organizer-dashboard/organizer-
 import { authInterceptorProviders } from './helpers/auth.interceptor';
 import { OrganizerNavBarComponent } from './comps/organizer-nav-bar/organizer-nav-bar.component';
 import { OrganizerEventsComponent } from './ui/organizer-events/organizer-events.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MaterialImportModule } from '../material-import/material-import.module';
+
+
 //import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
 
 @NgModule({
@@ -40,6 +44,8 @@ import { OrganizerEventsComponent } from './ui/organizer-events/organizer-events
     NgbModalModule,
     NgbCollapse,
     NgbPagination,
+    MatFormFieldModule,
+    MaterialImportModule,
     //MatGoogleMapsAutocompleteModule.forRoot('AIzaSyAlKtaZlLjfVcE6fktFj9SB1wqRpFjQtFE')
   ],
   providers: [authInterceptorProviders, provideHttpClient(withFetch()), DatePipe],
