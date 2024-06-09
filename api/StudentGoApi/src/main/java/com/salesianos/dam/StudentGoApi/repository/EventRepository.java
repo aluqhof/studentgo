@@ -42,6 +42,9 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
     Page<Event> findFutureEventsByCityPaged(@Param("cityId") Long cityId, Pageable pageable);
     //Esto deberia ir en orden de popularidad del organizador (reviews, eventos realizados...)
 
+    @Query("SELECT e FROM Event e ORDER BY e.dateTime ASC")
+    Page<Event> findFutureEventsPaged(Pageable pageable);
+
     @Query("SELECT e FROM Event e " +
             "JOIN e.eventTypes et " +
             "JOIN Student s ON et MEMBER OF s.interests " +

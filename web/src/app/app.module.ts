@@ -17,6 +17,9 @@ import { OrganizerNavBarComponent } from './comps/organizer-nav-bar/organizer-na
 import { OrganizerEventsComponent } from './ui/organizer-events/organizer-events.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MaterialImportModule } from '../material-import/material-import.module';
+import { AdminDashboardComponent } from './ui/admin-dashboard/admin-dashboard.component';
+import { SidebarAdminPanelComponent } from './comps/sidebar-admin-panel/sidebar-admin-panel.component';
+import { SidebarPanelComponent } from './components/sidebar-panel/sidebar-panel.component';
 
 
 //import { MatGoogleMapsAutocompleteModule } from '@angular-material-extensions/google-maps-autocomplete';
@@ -30,7 +33,10 @@ import { MaterialImportModule } from '../material-import/material-import.module'
     NavBarComponent,
     OrganizerDashboardComponent,
     OrganizerNavBarComponent,
-    OrganizerEventsComponent],
+    OrganizerEventsComponent,
+    AdminDashboardComponent,
+    SidebarAdminPanelComponent,
+    SidebarPanelComponent],
   bootstrap: [AppComponent],
   imports: [
     BrowserModule,

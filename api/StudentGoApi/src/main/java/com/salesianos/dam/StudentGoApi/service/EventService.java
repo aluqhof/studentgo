@@ -2,6 +2,7 @@ package com.salesianos.dam.StudentGoApi.service;
 
 import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
+import com.salesianos.dam.StudentGoApi.dto.event.EditEventAdminRequest;
 import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
@@ -21,11 +22,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +161,11 @@ public class EventService {
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
     }
 
+    public MyPage<EventViewResponse> getAllUpcomingEventsPaged(Pageable pageable){
+        return MyPage.of(eventRepository.findFutureEventsPaged(pageable)
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
+    }
+
     public MyPage<EventViewResponse> getFutureEventsInCityAccordingToUser(String cityName, Student student, Pageable pageable) {
         if(student == null){
             throw new PermissionException("You don't have permission to access to this resource");
@@ -186,5 +196,50 @@ public class EventService {
         List<Student> students = eventRepository.findStudentsByEventIdNoPageable(event.getId());
         Organizer organizer= organizerRepository.findById(UUID.fromString(event.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
         return EventDetailsResponse.of(event, students, organizer);
+    }
+
+    public EventDetailsResponse editEventAdmin(String id, EditEventAdminRequest edit){
+        Event eventSelected = eventRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("Event"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        if (edit.name() != null) {
+            eventSelected.setName(edit.name());
+        }
+        if (edit.dateTime() != null) {
+            eventSelected.setDateTime(LocalDateTime.parse(edit.dateTime(), formatter));
+        }
+        if (edit.description() != null) {
+            eventSelected.setDescription(edit.description());
+        }
+        if (edit.price() != null) {
+            eventSelected.setPrice(edit.price());
+        }
+        if (edit.maxCapacity() != null) {
+            eventSelected.setMaxCapacity(edit.maxCapacity());
+        }
+        if (edit.cityId() != null) {
+            eventSelected.setCity(cityRepository.findFirstByNameIgnoreCase(edit.cityId()).orElseThrow(() -> new NotFoundException("City")));
+        }
+        if (edit.latitude() != null) {
+            eventSelected.setLatitude(edit.latitude());
+        }
+        if (edit.longitude() != null) {
+            eventSelected.setLongitude(edit.longitude());
+        }
+        if (edit.eventTypes() != null) {
+            eventSelected.setEventTypes(
+                    edit.eventTypes()
+                            .stream()
+                            .map(et -> eventTypeRepository.findFirstByNameIgnoreCase(et)
+                                    .orElseThrow(() -> new NotFoundException("Event Type")))
+                            .collect(Collectors.toList())
+            );
+        }
+        eventRepository.save(eventSelected);
+        List<Student> students = eventRepository.findStudentsByEventIdNoPageable(eventSelected.getId());
+        Organizer organizer= organizerRepository.findById(UUID.fromString(eventSelected.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
+
+        return EventDetailsResponse.of(eventSelected, students, organizer);
     }
 }

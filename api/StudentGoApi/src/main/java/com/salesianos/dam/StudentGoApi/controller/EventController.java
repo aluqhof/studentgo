@@ -2,6 +2,7 @@ package com.salesianos.dam.StudentGoApi.controller;
 
 import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
+import com.salesianos.dam.StudentGoApi.dto.event.EditEventAdminRequest;
 import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
@@ -39,10 +40,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.nio.file.AccessDeniedException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequiredArgsConstructor
@@ -348,6 +348,89 @@ public class EventController {
         return eventService.getAllUpcomingEventsInCityPaged(cityName, pageable);
     }
 
+    @Operation(summary = "Get Pageable results for all upcoming events")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventViewResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "name": "Upcoming Events",
+                                        "content": [
+                                            {
+                                                "uuid": "d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2",
+                                                "name": "Exposición de arte contemporáneo",
+                                                "latitude": 50.934741,
+                                                "longitude": 6.97958,
+                                                "cityId": "Köln",
+                                                "dateTime": "2024-04-14T12:00:00",
+                                                "eventType": [
+                                                    {
+                                                        "id": 3,
+                                                        "name": "Food",
+                                                        "iconRef": "0xe533",
+                                                        "colorCode": "0xff29d697"
+                                                    }
+                                                ],
+                                                "students": [
+                                                    {
+                                                        "id": "7f40a32b-344f-4928-9995-8f6d12c34694",
+                                                        "username": "student10",
+                                                        "name": "Student 10"
+                                                    },
+                                                    {
+                                                        "id": "e010f144-b376-4dbb-933d-b3ec8332ed0d",
+                                                        "username": "student2",
+                                                        "name": "Student 2"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "uuid": "ae56ec32-98bf-4eb6-821d-741a0816b3bf",
+                                                "name": "Concierto de la niña pastori",
+                                                "latitude": 37.386207,
+                                                "longitude": -5.99255572619863,
+                                                "cityId": "Köln",
+                                                "dateTime": "2024-04-26T08:00:00",
+                                                "eventType": [
+                                                    {
+                                                        "id": 4,
+                                                        "name": "Gaming",
+                                                        "iconRef": "0xe5e8",
+                                                        "colorCode": "0xff46cdfb"
+                                                    }
+                                                ],
+                                                "students": [
+                                                    {
+                                                        "id": "04d0595e-45d5-4f63-8b53-1d79e9d84a5d",
+                                                        "username": "student1",
+                                                        "name": "Student 1"
+                                                    },
+                                                    {
+                                                        "id": "23b9773b-b123-4f48-8a6d-ef732806d1f5",
+                                                        "username": "student8",
+                                                        "name": "Student 8"
+                                                    },
+                                                    {
+                                                        "id": "dc98d909-98fd-44da-8944-f2e84ecb1695",
+                                                        "username": "student7",
+                                                        "name": "Student 7"
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "size": 5,
+                                        "totalElements": 2,
+                                        "pageNumber": 0,
+                                        "first": true,
+                                        "last": true
+                                    }
+                                                                        """) }) })
+    })
+    @GetMapping("/upcoming")
+    public MyPage<EventViewResponse> getUpcomingEvents(@PageableDefault(size = 5, page = 0) Pageable pageable){
+        return eventService.getAllUpcomingEventsPaged(pageable);
+    }
+
     @Operation(summary = "Get Pageable results from recommendended events in a city limited based on user interests")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
@@ -512,8 +595,34 @@ public class EventController {
         return ResponseEntity.ok(eventService.getEventById(eventId));
     }
 
-    //SOLO ORGANIZADOR O ADMIN
+    @GetMapping("/delete-photo/{id}/number/{index}")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
+    public ResponseEntity<?> deletePhoto(@PathVariable("id") String eventId, @PathVariable("index") int index) {
+
+        Event event = eventRepository.findById(UUID.fromString(eventId))
+                .orElseThrow(() -> new NotFoundException("Event"));
+
+        List<String> eventPhotos = new ArrayList<>(event.getUrlPhotos());
+
+        if (index >= 0 && index < eventPhotos.size()) {
+            eventPhotos.remove(index);
+
+            if (eventPhotos.isEmpty()) {
+                event.setUrlPhotos(new ArrayList<>(Collections.singletonList("nophoto.png")));
+            } else {
+                event.setUrlPhotos(new ArrayList<>(eventPhotos));
+            }
+
+            eventRepository.save(event);
+
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping("/upload/event-photos/{idEvent}")
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
     public ResponseEntity<?> upload(@RequestPart("files") MultipartFile[] files, @PathVariable("idEvent") String idEvent) {
 
         List<FileResponse> result = Arrays.stream(files)
@@ -581,5 +690,11 @@ public class EventController {
         return ResponseEntity.status(HttpStatus.OK)
                 .header("Content-Type", resource.getType())
                 .body(resource);
+    }
+
+    @PutMapping("/edit-admin/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventDetailsResponse editEvent(@PathVariable("id") String id, @RequestBody @Valid EditEventAdminRequest edit){
+        return eventService.editEventAdmin(id, edit);
     }
 }
