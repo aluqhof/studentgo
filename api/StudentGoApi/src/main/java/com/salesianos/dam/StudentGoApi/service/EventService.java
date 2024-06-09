@@ -1,9 +1,13 @@
 package com.salesianos.dam.StudentGoApi.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
+import com.salesianos.dam.StudentGoApi.dto.event.EditEventAdminRequest;
 import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
+import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
 import com.salesianos.dam.StudentGoApi.exception.DateRangeFilterException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
@@ -19,13 +23,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -36,25 +43,53 @@ public class EventService {
     private final CityRepository cityRepository;
     private final UserRepository userRepository;
     private final OrganizerRepository organizerRepository;
+    private final StorageService storageService;
+    private final ObjectMapper objectMapper;
 
-    public Event createEvent(AddEventRequest addEventRequest, Organizer organizer){
+    public Event createEvent(EditEventAdminRequest addEventRequest, MultipartFile[] files,UserDefault user){
+        List<FileResponse> result = Arrays.stream(files)
+                .map(this::uploadFile)
+                .toList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        List<String> eventPhotos = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            String filename = file.getOriginalFilename();
+            if (filename != null && !filename.isBlank()) {
+                eventPhotos.add(filename);
+            }
+        }
+
         Event event = Event.builder()
                 .name(addEventRequest.name())
                 .description(addEventRequest.description())
                 .latitude(addEventRequest.latitude())
                 .longitude(addEventRequest.longitude())
-                .author(organizer.getId().toString())
-                .city(cityRepository.findById(addEventRequest.cityId()).orElseThrow(()-> new NotFoundException("city")))
-                .dateTime(addEventRequest.dateTime())
-                .eventTypes(addEventRequest.eventTypesIds()
+                .author(user.getId().toString())
+                .city(cityRepository.findFirstByNameIgnoreCase(addEventRequest.cityId()).orElseThrow(()-> new NotFoundException("city")))
+                .dateTime(LocalDateTime.parse(addEventRequest.dateTime(), formatter))
+                .eventTypes(addEventRequest.eventTypes()
                         .stream()
-                        .map(e -> eventTypeRepository.findById(e)
+                        .map(e -> eventTypeRepository.findFirstByNameIgnoreCase(e)
                                 .orElseThrow(() -> new NotFoundException("event type")))
                         .toList())
                 .maxCapacity(addEventRequest.maxCapacity())
+                .urlPhotos(eventPhotos)
                 .build();
 
         return eventRepository.save(event);
+    }
+
+    public Event createEvent(String addEventRequest, MultipartFile[] files, UserDefault user){
+        EditEventAdminRequest addEventDto = null;
+        try {
+            addEventDto = objectMapper.readValue(addEventRequest, EditEventAdminRequest.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return createEvent(addEventDto, files, user);
     }
 
     public MyPage<EventViewResponse> getEventsByOrganizer(Organizer organizer, Pageable pageable) {
@@ -64,6 +99,21 @@ public class EventService {
         Page<Event> events = eventRepository.getAllByOrganizer(organizer.getId().toString(), pageable);
         return MyPage.of(events
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Organizer Events");
+    }
+
+    private FileResponse uploadFile(MultipartFile file) {
+        String name = storageService.store(file);
+        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/download/")
+                .path(name)
+                .toUriString();
+
+        return FileResponse.builder()
+                .name(name)
+                .size(file.getSize())
+                .type(file.getContentType())
+                .uri(uri)
+                .build();
     }
 
     public MyPage<EventViewResponse> getPastEventsByOrganizer(Organizer organizer, Pageable pageable)  {
@@ -156,6 +206,11 @@ public class EventService {
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
     }
 
+    public MyPage<EventViewResponse> getAllUpcomingEventsPaged(Pageable pageable){
+        return MyPage.of(eventRepository.findFutureEventsPaged(pageable)
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
+    }
+
     public MyPage<EventViewResponse> getFutureEventsInCityAccordingToUser(String cityName, Student student, Pageable pageable) {
         if(student == null){
             throw new PermissionException("You don't have permission to access to this resource");
@@ -186,5 +241,50 @@ public class EventService {
         List<Student> students = eventRepository.findStudentsByEventIdNoPageable(event.getId());
         Organizer organizer= organizerRepository.findById(UUID.fromString(event.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
         return EventDetailsResponse.of(event, students, organizer);
+    }
+
+    public EventDetailsResponse editEventAdmin(String id, EditEventAdminRequest edit){
+        Event eventSelected = eventRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("Event"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        if (edit.name() != null) {
+            eventSelected.setName(edit.name());
+        }
+        if (edit.dateTime() != null) {
+            eventSelected.setDateTime(LocalDateTime.parse(edit.dateTime(), formatter));
+        }
+        if (edit.description() != null) {
+            eventSelected.setDescription(edit.description());
+        }
+        if (edit.price() != null) {
+            eventSelected.setPrice(edit.price());
+        }
+        if (edit.maxCapacity() != null) {
+            eventSelected.setMaxCapacity(edit.maxCapacity());
+        }
+        if (edit.cityId() != null) {
+            eventSelected.setCity(cityRepository.findFirstByNameIgnoreCase(edit.cityId()).orElseThrow(() -> new NotFoundException("City")));
+        }
+        if (edit.latitude() != null) {
+            eventSelected.setLatitude(edit.latitude());
+        }
+        if (edit.longitude() != null) {
+            eventSelected.setLongitude(edit.longitude());
+        }
+        if (edit.eventTypes() != null) {
+            eventSelected.setEventTypes(
+                    edit.eventTypes()
+                            .stream()
+                            .map(et -> eventTypeRepository.findFirstByNameIgnoreCase(et)
+                                    .orElseThrow(() -> new NotFoundException("Event Type")))
+                            .collect(Collectors.toList())
+            );
+        }
+        eventRepository.save(eventSelected);
+        List<Student> students = eventRepository.findStudentsByEventIdNoPageable(eventSelected.getId());
+        Organizer organizer= organizerRepository.findById(UUID.fromString(eventSelected.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
+
+        return EventDetailsResponse.of(eventSelected, students, organizer);
     }
 }

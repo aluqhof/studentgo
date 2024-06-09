@@ -17,9 +17,11 @@
 							"script": {
 								"exec": [
 									"var json = pm.response.json();\r",
-									"pm.collectionVariables.set(\"token\", json.token);"
+									"pm.collectionVariables.set(\"token\", json.token);\r",
+									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -28,7 +30,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"username\": \"estudiante\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdakl@gmail.com\",\r\n    \"name\": \"alex\"\r\n}",
+							"raw": "{\r\n    \"username\": \"estudiante2\",\r\n    \"password\": \"123456\",\r\n    \"verifyPassword\": \"123456\",\r\n    \"email\": \"jfdakcxl@gmail.com\",\r\n    \"name\": \"alex\",\r\n    \"interests\": [1]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -81,7 +83,8 @@
 									"pm.collectionVariables.set(\"token\", json.token);\r",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
@@ -112,13 +115,70 @@
 									"pm.collectionVariables.set(\"token\", json.token);\r",
 									""
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {}
 							}
 						}
 					],
 					"request": {
 						"method": "POST",
-						"header": []
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"organizer1\",\r\n    \"password\": \"user1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "Login admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var json = pm.response.json();\r",
+									"pm.collectionVariables.set(\"token\", json.token);"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"admin1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}auth/login"
+					},
+					"response": []
+				},
+				{
+					"name": "User Data",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}user/data"
 					},
 					"response": []
 				}
@@ -152,21 +212,6 @@
 					"response": []
 				},
 				{
-					"name": "Get Events in a City",
-					"request": {
-						"auth": {
-							"type": "bearer",
-							"bearer": {
-								"token": "{{token}}"
-							}
-						},
-						"method": "GET",
-						"header": [],
-						"url": "{{BASE_URL}}event/1"
-					},
-					"response": []
-				},
-				{
 					"name": "Get All Upcoming Events in a City",
 					"request": {
 						"auth": {
@@ -177,7 +222,46 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{BASE_URL}}event/upcoming/2"
+						"url": {
+							"raw": "{{BASE_URL}}event/upcoming/Köln?&eventName=&eventTypes=&start=2024-04-14T12:39:01&end=&min=0.0&max=1000000.0",
+							"host": [
+								"{{BASE_URL}}event"
+							],
+							"path": [
+								"upcoming",
+								"Köln"
+							],
+							"query": [
+								{
+									"key": null,
+									"value": null
+								},
+								{
+									"key": "eventName",
+									"value": ""
+								},
+								{
+									"key": "eventTypes",
+									"value": ""
+								},
+								{
+									"key": "start",
+									"value": "2024-04-14T12:39:01"
+								},
+								{
+									"key": "end",
+									"value": ""
+								},
+								{
+									"key": "min",
+									"value": "0.0"
+								},
+								{
+									"key": "max",
+									"value": "1000000.0"
+								}
+							]
+						}
 					},
 					"response": []
 				},
@@ -192,7 +276,209 @@
 						},
 						"method": "GET",
 						"header": [],
-						"url": "{{BASE_URL}}event/upcoming-limit/Köln"
+						"url": {
+							"raw": "{{BASE_URL}}event/upcoming-limit/Köln?page=0&size=5&eventName=p",
+							"host": [
+								"{{BASE_URL}}event"
+							],
+							"path": [
+								"upcoming-limit",
+								"Köln"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "5"
+								},
+								{
+									"key": "eventName",
+									"value": "p"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Events According To User Limited",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}event/according-limit/Sevilla?size=5&page=0",
+							"host": [
+								"{{BASE_URL}}event"
+							],
+							"path": [
+								"according-limit",
+								"Sevilla"
+							],
+							"query": [
+								{
+									"key": "size",
+									"value": "5"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Events By Event Type",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/by-event-type/Köln/3"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Student List by Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2/students"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Event Details",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/details/d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Photos",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "files",
+									"type": "file",
+									"src": "/C:/Users/alexl/Downloads/Captura de pantalla 2024-03-05 121147.png"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}event/upload/event-photos/9d782609-1b54-4cee-ad3d-5ce678be376d"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/download-event-photo/9d782609-1b54-4cee-ad3d-5ce678be376d/number/0"
+					},
+					"response": []
+				},
+				{
+					"name": "Future Events By Organizer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/organizer"
+					},
+					"response": []
+				},
+				{
+					"name": "Past Events By Organizer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/past/organizer"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Upcoming Events",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/upcoming"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Photo event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}event/delete-photo/9d782609-1b54-4cee-ad3d-5ce678be376d/number/0"
 					},
 					"response": []
 				}
@@ -207,6 +493,398 @@
 						"method": "GET",
 						"header": [],
 						"url": "{{BASE_URL}}event-type/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "student",
+			"item": [
+				{
+					"name": "Get Student Info",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}student/"
+					},
+					"response": []
+				},
+				{
+					"name": "Save/Unsave Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"url": "{{BASE_URL}}student/save-unsave-event/9b3ee893-9181-47b8-91fc-63dd16c74f50"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Events Saved",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}student/saved-events"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"dfd\",\r\n    \"description\": \"Soy una persona a la que le encanta hacer deporte y salir con sus amigos\",\r\n    \"interests\": [1]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}user/student/update"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Purchase",
+			"item": [
+				{
+					"name": "Buy Ticket",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"url": "{{BASE_URL}}purchase/f13a8a04-afe2-4b12-a279-91b3e365073b"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Purchase By User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}purchase/all-by-student"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Purchase",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}purchase/purchase-details/b90a2e37-09d7-4eeb-aae2-2c6e179e9b17"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Change username",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"username\": \"alexluque9\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}user/change-username"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Profile Photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}download-profile-photo"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Profile Image",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/alexl/Downloads/WhatsApp Image 2024-02-17 at 17.52.42.jpeg"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}upload-profile-image"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Profile Photo",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}delete-photo"
+					},
+					"response": []
+				},
+				{
+					"name": "Download Profile Photo By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}download-profile-photo/04d0595e-45d5-4f63-8b53-1d79e9d84a5d"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "files",
+			"item": [
+				{
+					"name": "Post File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"contentType": "",
+									"type": "file",
+									"src": "/C:/Users/alexl/Downloads/WG R1 contract_Alex.pdf"
+								},
+								{
+									"key": "post",
+									"value": "{\n    \"title\": \"Título del post\"\n}",
+									"contentType": "application/json",
+									"type": "text"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}post/"
+					},
+					"response": []
+				},
+				{
+					"name": "Download File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}download/WhatsApp%20Image%202023-11-21%20at%2018.55.45.jpg"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload File",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/alexl/Downloads/Captura de pantalla 2024-02-28 114403.png"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}upload"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}post/"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "City",
+			"item": [
+				{
+					"name": "Download Photo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}city/download-photo/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Cities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{BASE_URL}}city/all"
+					},
+					"response": []
+				},
+				{
+					"name": "Create City",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/Users/alexl/Downloads/malaga.jpg"
+								}
+							]
+						},
+						"url": "{{BASE_URL}}city/Málaga"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "Edit Event",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": {
+								"token": "{{token}}"
+							}
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": null,\r\n    \"dateTime\": \"2024-07-21 21:00\",\r\n    \"description\": null,\r\n    \"price\": null,\r\n    \"maxCapacity\": null,\r\n    \"cityId\": null,\r\n    \"latitude\": null,\r\n    \"longitude\": null,\r\n    \"eventTypes\": [\"Sports\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{BASE_URL}}event/edit-admin/f13a8a04-afe2-4b12-a279-91b3e365073b"
 					},
 					"response": []
 				}

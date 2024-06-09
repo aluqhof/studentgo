@@ -1,0 +1,39 @@
+<app-nav-bar></app-nav-bar>
+<div class="flex flex-wrap w-full bg-teal-400 min-h-[500px] text-gray-800">
+    <div class="w-full md:w-1/2 flex items-center justify-center mt-3 md:mt-0 p-5 text-center">
+        <img class="rounded-xl w-3/4" src="../../../assets/image-banner.jpeg" alt="Chica de Fever" fetchpriority="high"
+            crossorigin="anonymous">
+    </div>
+    <div class="w-full md:w-1/2 my-2 md:my-auto px-5 mx-auto">
+        <p class="text-4xl font-bold text-blue-900">
+            Discover the best experiences for students in
+            <span class="inline-flex items-center space-x-1 cursor-pointer text-white" role="button"
+                (click)="openModal()">
+                <span>your city</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                    stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+            </span>
+        </p>
+        <h2 class="font-light text-4xl text-blue-900">Parties, get-togethers, sports, championships, competitions...
+        </h2>
+    </div>
+</div>
+<div class="container mx-auto my-4">
+    <p class="text-3xl text-blue-900 font-semibold mx-3 text-center">Top Cities</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 m-3">
+        <div class="col" *ngFor="let city of cities">
+            <div class="relative rounded-3xl overflow-hidden h-64">
+                <img [src]="'http://localhost:8080/city/download-photo/'+city.id" class="w-full h-full object-cover"
+                    [alt]="city.name">
+                <div class="absolute top-0 left-0 w-full h-full bg-black opacity-50 z-10"></div>
+                <div class="absolute top-0 left-0 w-full h-full flex items-center justify-center text-center z-20">
+                    <p class="text-white fw-bold text-3xl">{{city.name}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<app-modal-cities [isModalOpen]="isModalOpen" (modalClosed)="closeModal()"></app-modal-cities>
