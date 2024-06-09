@@ -4,7 +4,6 @@ import { EventDetailsResponse } from '../../models/event-details.interface';
 import { EventService } from '../../services/events.service';
 import { HttpClient } from '@angular/common/http';
 import { EventTypeResponse } from '../../models/event-type-response.inteface';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CityService } from '../../services/city.service';
 import { CityResponse } from '../../models/city-response.interface';
 import { EventTypeService } from '../../services/event-type.service';
@@ -12,7 +11,7 @@ import { EventTypeService } from '../../services/event-type.service';
 @Component({
   selector: 'app-admin-events',
   templateUrl: './admin-events.component.html',
-  styleUrl: './admin-events.component.css'
+  styleUrls: ['./admin-events.component.css']
 })
 export class AdminEventsComponent {
 
@@ -28,7 +27,7 @@ export class AdminEventsComponent {
   currentPagePastEvents = 0;
   pageSizePast = 10; // Define el tamaño de la página para eventos pasados
   totalPagesPast = 0;
-  selectedEvent!: EventDetailsResponse;
+  selectedEvent!: EventDetailsResponse | undefined;
   eventDetails = {
     id: '',
     date: '',
@@ -52,7 +51,9 @@ export class AdminEventsComponent {
   eventTypes: EventTypeResponse[] = [];
   selectedEt: EventTypeResponse[] = [];
   citySelected!: string;
-  citiesUnselected: string[] = []
+  citiesUnselected: string[] = [];
+  openCreateModal: boolean = false;
+  files: File[] = [];  // Aquí almacenamos los archivos seleccionados
 
   constructor(private cityService: CityService, private eventTypeService: EventTypeService, private eventService: EventService, private httpClient: HttpClient) { }
 
@@ -82,7 +83,7 @@ export class AdminEventsComponent {
       error: (error) => {
         console.error('Error getting event types:', error);
       }
-    })
+    });
   }
 
   loadNewPageFuture(page: number = 0) {
@@ -111,7 +112,7 @@ export class AdminEventsComponent {
   addCity(event: string | any) {
     const selectedCity: string = event.target.value;
     if (selectedCity) {
-      this.citiesUnselected = this.cities.map(c => c.name)
+      this.citiesUnselected = this.cities.map(c => c.name);
       this.citiesUnselected = this.citiesUnselected.filter(c => selectedCity.substring(3) !== c);
       this.citySelected = selectedCity.substring(3);
     }
@@ -124,28 +125,9 @@ export class AdminEventsComponent {
     }
   }
 
-  /*loadNewPagePast(page: number = 0) {
-    this.eventService.getPastEventsByOrganizer(page).subscribe({
-      next: (data) => {
-        this.eventListPast = data.content;
-        this.countPastEvents = data.totalElements;
-        this.currentPagePastEvents = data.pageNumber;
-        this.pageSizePast = data.size; // Assuming 'size' is part of the response
-        this.totalPagesPast = Math.ceil(this.countPastEvents / this.pageSizePast);
-      },
-      error: (error) => {
-        console.error('Error getting events:', error);
-      }
-    });
-  }*/
-
   changePageFuture(page: number): void {
     this.loadNewPageFuture(page);
   }
-
-  /*changePagePast(page: number): void {
-    this.loadNewPagePast(page);
-  }*/
 
   getArrayFromNumber(length: number): number[] {
     return new Array(length).fill(0).map((_, index) => index);
@@ -186,6 +168,13 @@ export class AdminEventsComponent {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
   }
 
+  openModalCreate() {
+    console.log(this.selectedEvent)
+    this.citiesUnselected = this.cities.map(c => c.name);
+    this.openModal = true;
+    this.f.resetForm(this.eventDetails);
+  }
+
   openEditModal(event: EventResponse) {
     this.eventService.getEventDetails(event.uuid).subscribe({
       next: async (data) => {
@@ -207,20 +196,20 @@ export class AdminEventsComponent {
             this.selectedEt.push(et);
             this.eventTypes = this.eventTypes.filter(item => item.id !== et.id);
           }
-        })
+        });
         this.cities.forEach(city => {
           if (city.name === this.eventDetails.city) {
             this.citySelected = city.name;
             this.citiesUnselected = this.cities.map(c => c.name).filter(c => c !== city.name);
           }
-        })
+        });
         try {
           const photoUrls = await Promise.all(data.urlPhotos.map((_, i) => this.loadPhoto(data.uuid, i)));
           this.imagePreviews = photoUrls;
         } catch (error) {
           console.error('Error loading photos:', error);
         }
-        this.openModal = true
+        this.openModal = true;
       },
       error: (error) => {
         console.error('Error getting event:', error);
@@ -232,12 +221,28 @@ export class AdminEventsComponent {
 
   closeModal() {
     this.openModal = false;
+    this.selectedEvent = undefined;
+    this.imagePreviews = [];
+    this.files = [];
+    this.eventDetails = {
+      id: '',
+      date: '',
+      name: '',
+      description: '',
+      price: 0,
+      eventTypes: [''],
+      maxCapacity: 0,
+      latitude: 0,
+      longitude: 0,
+      city: ''
+    };
   }
 
   onFileChange(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length) {
       Array.from(input.files).forEach((file: File) => {
+        this.files.push(file); // Almacena el archivo en la lista de archivos
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
           reader.onload = (e: any) => {
@@ -253,15 +258,17 @@ export class AdminEventsComponent {
                 const imageDataUrl = canvas.toDataURL(file.type);
                 this.imagePreviews.push(imageDataUrl);
                 // Llama al servicio para cargar la imagen
-                this.eventService.uploadEventPhotos([file], this.eventDetails.id)
-                  .subscribe({
-                    next: (data) => {
-                      console.log('Imagen cargada exitosamente:', data);
-                    },
-                    error: (error) => {
-                      console.error('Error al cargar la imagen:', error);
-                    }
-                  });
+                if (this.selectedEvent) {
+                  this.eventService.uploadEventPhotos([file], this.eventDetails.id)
+                    .subscribe({
+                      next: (data) => {
+                        console.log('Imagen cargada exitosamente:', data);
+                      },
+                      error: (error) => {
+                        console.error('Error al cargar la imagen:', error);
+                      }
+                    });
+                }
               }
             };
           };
@@ -272,15 +279,21 @@ export class AdminEventsComponent {
   }
 
   removeImage(index: number) {
-    this.eventService.deleteEventPhoto(this.eventDetails.id, index)
-      .subscribe({
-        next: (data) => {
-          this.imagePreviews.splice(index, 1);
-        },
-        error: (error) => {
-          console.error("Error al borrar la imagen")
-        }
-      })
+    if (this.selectedEvent) {
+      this.eventService.deleteEventPhoto(this.eventDetails.id, index)
+        .subscribe({
+          next: (data) => {
+            this.files.splice(index, 1)
+            this.imagePreviews.splice(index, 1);
+          },
+          error: (error) => {
+            console.error("Error al borrar la imagen");
+          }
+        });
+    } else {
+      this.files.splice(index, 1)
+      this.imagePreviews.splice(index, 1);
+    }
   }
 
   openModalImage(image: string, modalContent: any) {
@@ -323,28 +336,52 @@ export class AdminEventsComponent {
     });
   }
 
-
   onSubmit() {
-    this.eventService.editEventAdmin(this.eventDetails.id, {
-      name: this.eventDetails.name,
-      dateTime: this.formatDateString(this.eventDetails.date),
-      description: this.eventDetails.description,
-      price: this.eventDetails.price,
-      maxCapacity: this.eventDetails.maxCapacity,
-      cityId: this.citySelected,
-      latitude: this.eventDetails.latitude,
-      longitude: this.eventDetails.longitude,
-      eventTypes: this.selectedEt.map(et => et.name)
-    }).subscribe({
-      next: data => {
-        this.closeModal()
-        window.location.reload();
-      },
-      error: err => {
-        console.error('Hubo un error al editar el evento:', err);
-      }
+    if (this.selectedEvent) {
+      this.eventService.editEventAdmin(this.eventDetails.id, {
+        name: this.eventDetails.name,
+        dateTime: this.formatDateString(this.eventDetails.date),
+        description: this.eventDetails.description,
+        price: this.eventDetails.price,
+        maxCapacity: this.eventDetails.maxCapacity,
+        cityId: this.citySelected,
+        latitude: this.eventDetails.latitude,
+        longitude: this.eventDetails.longitude,
+        eventTypes: this.selectedEt.map(et => et.name)
+      }).subscribe({
+        next: data => {
+          this.closeModal();
+          window.location.reload();
+        },
+        error: err => {
+          console.error('Hubo un error al editar el evento:', err);
+        }
+      });
+      return true;
+    } else {
+      this.eventService.createEvent(
+        {
+          name: this.eventDetails.name,
+          dateTime: this.formatDateString(this.eventDetails.date),
+          description: this.eventDetails.description,
+          price: this.eventDetails.price,
+          maxCapacity: this.eventDetails.maxCapacity,
+          cityId: this.citySelected,
+          latitude: this.eventDetails.latitude,
+          longitude: this.eventDetails.longitude,
+          eventTypes: this.selectedEt.map(et => et.name)
+        },
+        this.files // Pasa los archivos directamente
+      ).subscribe({
+        next: data => {
+          this.closeModal();
+          window.location.reload();
+        },
+        error: err => {
+          console.error('Hubo un error al crear el evento:', err);
+        }
+      });
+      return true;
     }
-    );
-    return true;
   }
 }

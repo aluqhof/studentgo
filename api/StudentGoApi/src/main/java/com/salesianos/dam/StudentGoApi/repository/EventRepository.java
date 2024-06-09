@@ -37,7 +37,6 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
             @Param("maxPrice") double maxPrice
     );
 
-
     @Query("SELECT e FROM Event e WHERE e.city.id = :cityId AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
     Page<Event> findFutureEventsByCityPaged(@Param("cityId") Long cityId, Pageable pageable);
     //Esto deberia ir en orden de popularidad del organizador (reviews, eventos realizados...)

@@ -3,45 +3,20 @@
     <div class="p-4 dark:border-gray-700">
         <p class="text-4xl font-bold">Events</p>
         <div class="relative overflow-x-auto p-2">
+            <p class="text-2xl">Upcoming</p>
             <div
                 class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white">
                 <div>
-                    <button id="dropdownActionButton" data-dropdown-toggle="dropdownAction"
+                    <button (click)="openModalCreate()"
                         class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                         type="button">
-                        <span class="sr-only">Action button</span>
-                        Action
-                        <svg class="w-2.5 h-2.5 ms-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="m1 1 4 4 4-4" />
+                        <span class="sr-only">Create button</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                         </svg>
+                        New Event
                     </button>
-                    <!-- Dropdown menu -->
-                    <div id="dropdownAction"
-                        class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600">
-                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200"
-                            aria-labelledby="dropdownActionButton">
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Reward</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Promote</a>
-                            </li>
-                            <li>
-                                <a href="#"
-                                    class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Activate
-                                    account</a>
-                            </li>
-                        </ul>
-                        <div class="py-1">
-                            <a href="#"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Delete
-                                User</a>
-                        </div>
-                    </div>
                 </div>
                 <label for="table-search" class="sr-only">Search</label>
                 <div class="relative">
@@ -123,9 +98,10 @@
                                 [ngStyle]="{'background-color': convertColorCode(item.colorCode), 'color': '#fff', 'font-size': '10px'}">{{item.name}}</span>
                         </td>
                         <td class="px-6 py-4">
-                            <a (click)="openEditModal(event)"
-                                class="cursor-pointer font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit
-                                event</a>
+                            <div class="inline-flex">
+                                <a (click)="openEditModal(event)"
+                                    class="cursor-pointer font-medium text-red-600 dark:text-blue-500 hover:underline">Edit</a>
+                            </div>
                         </td>
                     </tr>
                     <tr *ngIf="eventList.length == 0">
@@ -166,21 +142,14 @@
     <div class="relative p-4 w-full max-w-md max-h-full items-center">
         <div class="modal bg-white rounded-lg shadow dark:bg-gray-700">
             <div class="flex items-center justify-between p-2 md:p-3 border-b rounded-t dark:border-gray-600">
-                <p class="text-2xl font-semibold text-gray-900 dark:text-white">Edit the event</p>
+                <p *ngIf="selectedEvent" class="text-2xl font-semibold text-gray-900 dark:text-white">Edit event</p>
+                <p *ngIf="!selectedEvent" class="text-2xl font-semibold text-gray-900 dark:text-white">Create event</p>
                 <button type="button" (click)="closeModal()" class="close transparent-close" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body overflow-auto">
                 <form (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
-                    <div class="m-2">
-                        <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
-                            for="id">Id</label>
-                        <input type="text"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                            id="id" name="id" [value]="eventDetails.id" readonly>
-                    </div>
-
                     <div class="flex flex-wrap mt-3 mx-3 gap-2">
                         <div class="w-1/4 mb-2">
                             <div class="relative cursor-pointer" (click)="fileInput.click()">

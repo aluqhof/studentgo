@@ -77,9 +77,13 @@ public class EventController {
             @ApiResponse(responseCode = "404 Not Found", description = "The entity provided does not exist", content = @Content),
     })
     @PostMapping("/")
-    @PreAuthorize("hasRole('ORGANIZER')")
-    public ResponseEntity<EventViewResponse> createEvent(@RequestBody @Valid AddEventRequest addEventRequest, @AuthenticationPrincipal Organizer organizer){
-        Event newEvent = eventService.createEvent(addEventRequest, organizer);
+    @PreAuthorize("hasAnyRole('ORGANIZER', 'ADMIN')")
+    public ResponseEntity<EventViewResponse> createEvent(
+            @RequestPart("addEventRequest") String addEventRequest,
+            @RequestPart("files") MultipartFile[] files,
+            @AuthenticationPrincipal UserDefault user) {
+
+        Event newEvent = eventService.createEvent(addEventRequest, files, user);
 
         URI createdURI = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -90,7 +94,6 @@ public class EventController {
                 .created(createdURI)
                 .body(EventViewResponse.of(newEvent, eventRepository.findStudentsByEventIdNoPageable(newEvent.getId())));
     }
-
     @Operation(summary = "Get all events in a city")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {

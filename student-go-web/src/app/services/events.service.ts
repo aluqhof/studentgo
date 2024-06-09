@@ -6,6 +6,7 @@ import { EventDetailsResponse } from "../models/event-details.interface";
 import { MyPage } from "../models/my-page.interface";
 import { EditEventRequest } from "../models/edit-event-request.interface";
 import { UploadResponse } from "../models/upload-response.interface";
+import { EventViewResponse } from "../models/event-view-response.interface";
 
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -60,5 +61,20 @@ export class EventService {
         return this.http.get(`http://localhost:8080/event/delete-photo/${id}/number/${index}`)
     }
 
+    createEvent(add: EditEventRequest, files: File[]): Observable<EventViewResponse> {
+        const formData = new FormData();
+        //const addEventRequestBlob = new Blob([JSON.stringify(add)], { type: 'application/json' });
+        formData.append('addEventRequest', JSON.stringify(add));
+
+        files.forEach(file => {
+            formData.append('files', file);
+        });
+
+        const headers = new HttpHeaders();
+        headers.set('Content-Type', 'multipart/form-data');
+
+
+        return this.http.post<EventViewResponse>("http://localhost:8080/event/", formData, { headers: headers });
+    }
 
 }

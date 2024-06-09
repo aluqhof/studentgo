@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-//Repasarrrrrrr hay que agregarle más cosas
 public record AddEventRequest(
         @NotBlank(message = "{addEventRequest.name.notblank}")
         String name,
@@ -18,17 +17,21 @@ public record AddEventRequest(
         @NotBlank(message = "{addEventRequest.description.notblank}")
         String description,
 
-        @Future(message = "{addEventRequest.dateTime.future}")
-        LocalDateTime dateTime,
+        @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}$", message = "{editEventRequest.dateTime.pattern}")
+        String dateTime,
 
         @NotNull(message = "{addEventRequest.cityId.notnull}")
-        Long cityId,
+        String cityId,
 
         @NotEmpty(message = "{addEventRequest.eventTypeIds.notempty}")
-        List<Long> eventTypesIds,
+        List<String> eventTypesIds,
 
         @NotNull(message = "{addEventRequest.maxCapacity.notnull}")
         @Min(value = 0, message = "{addEventRequest.maxCapacity.min}")
-        int maxCapacity
+        int maxCapacity,
+
+        @DecimalMin(value = "0.0", inclusive = true, message = "{editEventRequest.price.min}")
+        @DecimalMax(value = "1000.0", inclusive = true, message = "{editEventRequest.price.max}")
+        Double price
 ) {
 }
