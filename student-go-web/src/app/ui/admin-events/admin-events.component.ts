@@ -52,10 +52,9 @@ export class AdminEventsComponent {
   selectedEt: EventTypeResponse[] = [];
   citySelected!: string;
   citiesUnselected: string[] = [];
-  openCreateModal: boolean = false;
   files: File[] = [];  // Aquí almacenamos los archivos seleccionados
 
-  constructor(private cityService: CityService, private eventTypeService: EventTypeService, private eventService: EventService, private httpClient: HttpClient) { }
+  constructor(private cityService: CityService, private eventTypeService: EventTypeService, private eventService: EventService) { }
 
   ngOnInit() {
     this.loadNewPageFuture();
@@ -169,7 +168,6 @@ export class AdminEventsComponent {
   }
 
   openModalCreate() {
-    console.log(this.selectedEvent)
     this.citiesUnselected = this.cities.map(c => c.name);
     this.openModal = true;
     this.f.resetForm(this.eventDetails);

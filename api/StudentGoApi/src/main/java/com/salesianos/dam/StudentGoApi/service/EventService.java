@@ -3,10 +3,7 @@ package com.salesianos.dam.StudentGoApi.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.salesianos.dam.StudentGoApi.MyPage;
-import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
-import com.salesianos.dam.StudentGoApi.dto.event.EditEventAdminRequest;
-import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
-import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
+import com.salesianos.dam.StudentGoApi.dto.event.*;
 import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
 import com.salesianos.dam.StudentGoApi.exception.DateRangeFilterException;
@@ -286,5 +283,10 @@ public class EventService {
         Organizer organizer= organizerRepository.findById(UUID.fromString(eventSelected.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
 
         return EventDetailsResponse.of(eventSelected, students, organizer);
+    }
+
+    public MyPage<EventShortResponse> getEventByIdOrName(String term, Pageable pageable) {
+        Page<Event> events = eventRepository.findByIdOrNameContainingIgnoreCase(term, pageable);
+        return MyPage.of(events.map(EventShortResponse::of), "Events");
     }
 }

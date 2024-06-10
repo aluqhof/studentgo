@@ -3,6 +3,7 @@ package com.salesianos.dam.StudentGoApi.service.user;
 import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
+import com.salesianos.dam.StudentGoApi.dto.user.student.StudentShortResponse;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.model.Event;
 import com.salesianos.dam.StudentGoApi.model.EventType;
@@ -12,6 +13,7 @@ import com.salesianos.dam.StudentGoApi.repository.EventTypeRepository;
 import com.salesianos.dam.StudentGoApi.repository.user.StudentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -72,5 +74,9 @@ public class StudentService {
                 .map(event -> EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(student.getId())))
                 .toList();
     }
-    
+
+    public MyPage<StudentShortResponse> findByUsername(String username, Pageable pageable){
+        Page<Student> students = studentRepository.findByUsernameIgnoreCaseContaining(username, pageable);
+        return MyPage.of(students.map(StudentShortResponse::of), "Students");
+    }
 }

@@ -1,10 +1,7 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
 import com.salesianos.dam.StudentGoApi.MyPage;
-import com.salesianos.dam.StudentGoApi.dto.event.AddEventRequest;
-import com.salesianos.dam.StudentGoApi.dto.event.EditEventAdminRequest;
-import com.salesianos.dam.StudentGoApi.dto.event.EventDetailsResponse;
-import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
+import com.salesianos.dam.StudentGoApi.dto.event.*;
 import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
 import com.salesianos.dam.StudentGoApi.exception.ImageNotFoundException;
@@ -699,5 +696,10 @@ public class EventController {
     @PreAuthorize("hasRole('ADMIN')")
     public EventDetailsResponse editEvent(@PathVariable("id") String id, @RequestBody @Valid EditEventAdminRequest edit){
         return eventService.editEventAdmin(id, edit);
+    }
+
+    @GetMapping("/search")
+    public MyPage<EventShortResponse> searchByIdOrName(@RequestParam(value = "term", required = false) String term, @PageableDefault(size = 5, page = 0) Pageable pageable){
+        return eventService.getEventByIdOrName(term, pageable);
     }
 }

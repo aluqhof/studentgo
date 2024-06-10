@@ -7,6 +7,8 @@ import { MyPage } from "../models/my-page.interface";
 import { EditEventRequest } from "../models/edit-event-request.interface";
 import { UploadResponse } from "../models/upload-response.interface";
 import { EventViewResponse } from "../models/event-view-response.interface";
+import { Event } from "../models/purchase-details.interface";
+import { EventShortListResponse } from "../models/event-short-list-response.interface";
 
 const httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -75,6 +77,10 @@ export class EventService {
 
 
         return this.http.post<EventViewResponse>("http://localhost:8080/event/", formData, { headers: headers });
+    }
+
+    searchForEvent(searchTerm: string): Observable<EventShortListResponse> {
+        return this.http.get<EventShortListResponse>("http://localhost:8080/event/search?term=" + searchTerm)
     }
 
 }
