@@ -220,7 +220,16 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UsernameAlreadyExistsException.class)
     public ErrorResponse handleUsernameExistsException(UsernameAlreadyExistsException exception) {
         return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
-                .title("Username exists error")
+                .title("Username exist error")
+                .type(URI.create("https://api.studentgo.com/errors/username-exists-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
+    @ExceptionHandler(EmailAlreadyExistException.class)
+    public ErrorResponse handleEmailExistsException(EmailAlreadyExistException exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Email exist error")
                 .type(URI.create("https://api.studentgo.com/errors/username-exists-error"))
                 .property("timestamp", Instant.now())
                 .build();

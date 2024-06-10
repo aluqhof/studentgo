@@ -1,0 +1,251 @@
+<app-sidebar-panel></app-sidebar-panel>
+<div class="p-4 sm:ml-64">
+    <div class="p-4 dark:border-gray-700">
+        <p class="text-4xl font-bold">Students</p>
+        <div class="relative overflow-x-auto p-2">
+            <div
+                class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white">
+                <label for="table-search" class="sr-only">Search</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="table-search-users"
+                        class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Search for students">
+                </div>
+            </div>
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            Name and Id
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Created at
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Username
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Interests
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let student of studentList"
+                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <th scope="row"
+                            class="flex items-center px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            <img class="w-10 h-10 rounded"
+                                [src]="'http://localhost:8080/download-profile-photo/'+student.id" [alt]="student.name">
+                            <div class="ps-3">
+                                <div class="text-base font-semibold">{{student.name}}</div>
+                                <div class="font-normal text-gray-500">{{student.id}}
+                                </div>
+                            </div>
+                        </th>
+                        <td class="px-6 py-4">
+                            {{formatDateString(student.created.toString())}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{student.username}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{student.email}}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span *ngFor="let item of student.interests"
+                                class="rounded-full text-sm px-2 mx-1 inline-flex"
+                                [ngStyle]="{'background-color': convertColorCode(item.colorCode), 'color': '#fff', 'font-size': '10px'}">{{item.name}}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="inline-flex">
+                                <a (click)="openEditModal(student)"
+                                    class="cursor-pointer font-medium text-red-600 dark:text-blue-500 hover:underline">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="studentList.length == 0">
+                        <td colspan="7"
+                            class="px-6 py-4 text-2xl text-center dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            No students
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="pagination flex justify-center mt-4">
+            <button (click)="changePageFuture(currentPage - 1)" [disabled]="currentPage === 0"
+                class="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50">
+                Previous
+            </button>
+            <span *ngFor="let page of getArrayFromNumber(totalPages); let i = index" class="px-2">
+                <button (click)="changePageFuture(i)"
+                    [ngClass]="{'bg-blue-500 text-white': i === currentPage, 'bg-gray-200': i !== currentPage}"
+                    class="px-4 py-2 mx-1 rounded">
+                    {{ i + 1 }}
+                </button>
+            </span>
+            <button (click)="changePageFuture(currentPage + 1)" [disabled]="currentPage >= totalPages - 1"
+                class="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50">
+                Next
+            </button>
+        </div>
+    </div>
+</div>
+<div *ngIf="openModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+    <div class="relative p-4 w-full max-w-md max-h-full items-center">
+        <div class="modal bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="flex items-center justify-between p-2 md:p-3 border-b rounded-t dark:border-gray-600">
+                <p class="text-2xl font-semibold text-gray-900 dark:text-white">Edit student</p>
+                <button type="button" (click)="closeModal()" class="close transparent-close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body overflow-auto">
+                <form (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+                    <div class="flex flex-wrap mt-3 mx-3 gap-2">
+                        <div class="w-1/4 mb-2">
+                            <div class="relative cursor-pointer" (click)="fileInput.click()">
+                                <div
+                                    class="flex justify-center items-center bg-gray-100 border border-dashed border-gray-400 rounded-lg w-full h-24">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                        stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </div>
+                                <input type="file" #fileInput class="hidden" (change)="onFileChange($event)"
+                                    accept="image/*">
+                            </div>
+                        </div>
+                        <div class="w-1/4 mb-2" *ngIf="imagePreview">
+                            <div class="relative rounded-lg border border-gray-200 w-full h-24">
+                                <img [src]="imagePreview" class="rounded-lg w-full h-full object-cover"
+                                    alt="Uploaded image preview">
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="m-2">
+                        <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                            for="id">Id</label>
+                        <input [value]="selectedStudent?.id"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            type="text" disabled="">
+                    </div>
+                    <div class="m-2">
+                        <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                            for="start">Created at</label>
+                        <input [value]="formatDate(selectedStudent!.created)"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            type="datetime-local" id="start" name="start" disabled>
+                    </div>
+
+                    <div class="m-2">
+                        <label for="studentName"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                        <input type="text" [(ngModel)]="studentDetails.name" #studentName="ngModel"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            id="studentName" minlength="3" maxlength="50" name="studentName" required>
+                        <div class="alert-danger mt-1" *ngIf="studentName.errors && f.submitted">
+                            <div class="error" *ngIf="studentName.errors['required']">Name is required</div>
+                            <div class="error" *ngIf="studentName.errors['minlength']">Name must be at least 3
+                                characters</div>
+                            <div class="error" *ngIf="studentName.errors['maxlength']">Name must be less than 50
+                                characters</div>
+                        </div>
+                        <div *ngIf="fieldErrors['name']" class="error">{{ fieldErrors['name'] }}</div>
+                    </div>
+                    <div class="m-2">
+                        <label for="username"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+                        <input type="text" [(ngModel)]="studentDetails.username" #username="ngModel"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            id="username" minlength="3" maxlength="50" name="username" required>
+                        <div class="alert-danger mt-1" *ngIf="username.errors && f.submitted">
+                            <div class="error" *ngIf="username.errors['required']">Username is required</div>
+                            <div class="error" *ngIf="username.errors['minlength']">Username must be at least 3
+                                characters</div>
+                            <div class="error" *ngIf="username.errors['maxlength']">Username must be less than 50
+                                characters</div>
+                        </div>
+                        <div *ngIf="fieldErrors['username']" class="error">{{ fieldErrors['username'] }}</div>
+                    </div>
+                    <div class="m-2">
+                        <label for="email"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+                        <input type="email" [(ngModel)]="studentDetails.email" #email="ngModel"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            id="email" name="email" required email>
+                        <div class="alert-danger mt-1" *ngIf="email.errors && email.touched">
+                            <div class="error" *ngIf="email.errors['required']">Email is required</div>
+                            <div class="error" *ngIf="email.errors['email']">Invalid email format</div>
+                        </div>
+                        <div *ngIf="fieldErrors['email']" class="error">{{ fieldErrors['email'] }}</div>
+                    </div>
+                    <div class="m-2">
+                        <label for="description"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                        <textarea [(ngModel)]="studentDetails.description" #description="ngModel"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            name="description" minlength="10" maxlength="250" id="description" required></textarea>
+                        <div class="alert-danger mt-1" *ngIf="description.errors && f.submitted">
+                            <div class="error" *ngIf="description.errors['required']">Description is required</div>
+                            <div class="error" *ngIf="description.errors['minlength']">Description must be at least 10
+                                characters</div>
+                            <div class="error" *ngIf="description.errors['maxlength']">Description must be less than 250
+                                characters</div>
+                        </div>
+                        <div *ngIf="fieldErrors['description']" class="error">{{ fieldErrors['description'] }}</div>
+                    </div>
+                    <div class="m-2">
+                        <label for="eventTypes"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Event
+                            Types</label>
+                        <select id="interest" name="interest"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            (change)="addInterest($event)">
+                            <option value="">Choose a Event Type</option>
+                            <option *ngFor="let et of eventTypes" [value]="et | json">{{ et.name
+                                }}
+                            </option>
+                        </select>
+                        <div *ngIf="f.submitted && selectedEt.length === 0" class="error">
+                            At least one event type must be selected.
+                        </div>
+                        <div *ngIf="fieldErrors['eventTypes']" class="error">{{ fieldErrors['eventTypes'] }}</div>
+
+                        <div *ngIf="selectedEt.length > 0" class="mb-0.5 mt-1.5">
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <div *ngFor="let selectedInterest of selectedEt"
+                                    (click)="removeInterest(selectedInterest)"
+                                    class="interest-container text-black text-sm cursor-pointer">
+                                    {{ selectedInterest.name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full flex justify-end">
+                        <button type="submit"
+                            class="m-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Save</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

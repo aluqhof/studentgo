@@ -222,6 +222,9 @@ export class AdminEventsComponent {
     this.selectedEvent = undefined;
     this.imagePreviews = [];
     this.files = [];
+    this.selectedEt = [];
+    this.eventTypes = [];
+    this.getAllEventTypes();
     this.eventDetails = {
       id: '',
       date: '',
