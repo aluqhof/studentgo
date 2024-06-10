@@ -14,8 +14,8 @@ import { AdminEventsComponent } from './ui/admin-events/admin-events.component';
 import { ModalCitiesComponent } from './components/modal-cities/modal-cities.component';
 import { ModalLoginComponent } from './components/modal-login/modal-login.component';
 import { FormsModule } from '@angular/forms';
-import { NgxMaterialTimepickerModule } from 'ngx-material-timepicker';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.component';
 
 @NgModule({
   declarations: [
@@ -26,13 +26,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SidebarPanelComponent,
     AdminEventsComponent,
     ModalCitiesComponent,
-    ModalLoginComponent
+    ModalLoginComponent,
+    AdminPurchasesComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    NgxMaterialTimepickerModule,
     BrowserAnimationsModule,
     HttpClientModule
   ],

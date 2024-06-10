@@ -1,0 +1,232 @@
+<app-sidebar-panel></app-sidebar-panel>
+<div class="p-4 sm:ml-64">
+    <div class="p-4 dark:border-gray-700">
+        <p class="text-4xl font-bold">Purchases</p>
+        <div class="relative overflow-x-auto p-2">
+            <div
+                class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white">
+                <div>
+                    <button (click)="openModalCreate()"
+                        class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
+                        type="button">
+                        <span class="sr-only">Create button</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                        New Purchase
+                    </button>
+                </div>
+                <label for="table-search" class="sr-only">Search</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 rtl:inset-r-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="table-search-users"
+                        class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="Search for purchases">
+                </div>
+            </div>
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="p-4">
+                            <div class="flex items-center">
+                                <input id="checkbox-all-search" type="checkbox"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="checkbox-all-search" class="sr-only">checkbox</label>
+                            </div>
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Id
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Date
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Event
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            City
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Student
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Action
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let purchase of purchaseList"
+                        class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="w-4 p-4">
+                            <div class="flex items-center">
+                                <input id="checkbox-table-search-1" type="checkbox"
+                                    class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                <label for="checkbox-table-search-1" class="sr-only">checkbox</label>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {{purchase.purchaseId}}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{formatDateString(purchase.dateTime.toString())}}
+                        </td>
+                        <td class="flex px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            <div>
+                                <div class="text-base">{{purchase.eventName}}</div>
+                                <div class="font-normal text-gray-500">
+                                    {{purchase.eventId}}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {{purchase.city}}
+                        </td>
+                        <td class="flex px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white">
+                            <div>
+                                <div class="text-base">{{purchase.student.username}}</div>
+                                <div class="font-normal text-gray-500">
+                                    {{purchase.student.id}}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="inline-flex">
+                                <a (click)="openEditModal(purchase)"
+                                    class="cursor-pointer font-medium text-red-600 dark:text-blue-500 hover:underline">Edit</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr *ngIf="purchaseList.length == 0">
+                        <td colspan="7"
+                            class="px-6 py-4 text-2xl text-center dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            No purchases
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination flex justify-center mt-4">
+            <button (click)="changePageFuture(currentPage - 1)" [disabled]="currentPage === 0"
+                class="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50">
+                Previous
+            </button>
+            <span *ngFor="let page of getArrayFromNumber(totalPages); let i = index" class="px-2">
+                <button (click)="changePageFuture(i)"
+                    [ngClass]="{'bg-blue-500 text-white': i === currentPage, 'bg-gray-200': i !== currentPage}"
+                    class="px-4 py-2 mx-1 rounded">
+                    {{ i + 1 }}
+                </button>
+            </span>
+            <button (click)="changePageFuture(currentPage + 1)" [disabled]="currentPage >= totalPages - 1"
+                class="px-4 py-2 mx-1 bg-gray-200 rounded disabled:opacity-50">
+                Next
+            </button>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="openModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+    <div class="relative p-4 w-full max-w-md max-h-full items-center">
+        <div class="modal bg-white rounded-lg shadow dark:bg-gray-700">
+            <div class="flex items-center justify-between p-2 md:p-3 border-b rounded-t dark:border-gray-600">
+                <p *ngIf="purchaseSelected" class="text-2xl font-semibold text-gray-900 dark:text-white">Edit purchase
+                </p>
+                <p *ngIf="!purchaseSelected" class="text-2xl font-semibold text-gray-900 dark:text-white">Create
+                    purchase</p>
+                <button type="button" (click)="closeModal()" class="close transparent-close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body overflow-auto">
+                <form (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm" novalidate>
+                    <div *ngIf="purchaseSelected" class="m-2">
+                        <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                            for="id">Id</label>
+                        <input [value]="purchaseDetails.id"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            type="text" disabled="">
+                    </div>
+
+                    <div *ngIf="purchaseSelected" class="m-2">
+                        <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                            for="start">Date</label>
+                        <input [value]="purchaseDetails.date"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            type="datetime-local" id="start" name="start" disabled>
+                    </div>
+
+                    <div class="m-2 relative">
+                        <label for="eventName"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Event</label>
+                        <input type="text" [(ngModel)]="searchTerm" #eventName="ngModel"
+                            (input)="filterEvents(searchTerm)"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            id="eventName" minlength="3" maxlength="50" name="eventName">
+                        <div class="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg"
+                            *ngIf="filteredEvents.length > 0">
+                            <ul class="py-1">
+                                <li *ngFor="let event of filteredEvents"
+                                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer" (click)="selectEvent(event)">
+                                    {{ event.name }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="m-2 relative">
+                        <label for="studentName"
+                            class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white">Student</label>
+                        <input type="text" [(ngModel)]="searchStudent" #studentName="ngModel"
+                            (input)="filterStudents(searchStudent)"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            id="studentName" minlength="3" maxlength="50" name="studentName">
+                        <div class="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg"
+                            *ngIf="filteredStudents.length > 0">
+                            <ul class="py-1">
+                                <li *ngFor="let student of filteredStudents"
+                                    class="px-3 py-2 hover:bg-gray-100 cursor-pointer" (click)="selectStudent(student)">
+                                    {{ student.username }}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <div class="m-2 flex-1">
+                            <label class="block mb-2 ml-2 text-sm font-medium text-gray-900 dark:text-white"
+                                for="cost">Cost</label>
+                            <div class="relative mt-2 rounded-md shadow-sm">
+                                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <span class="text-gray-500 sm:text-sm">€</span>
+                                </div>
+                                <input [(ngModel)]="purchaseDetails.price" type="number" min="0" max="1000" name="cost"
+                                    id="cost" #cost="ngModel"
+                                    class="p-2.5 pl-7 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                                    placeholder="0.00" required step="0.01">
+                            </div>
+                            <div class="alert-danger mt-1" *ngIf="cost.errors && f.submitted">
+                                <div class="error" *ngIf="cost.errors['required']">Cost is required</div>
+                                <div class="error" *ngIf="cost.errors['min']">The minimum cost is 0€</div>
+                                <div class="error" *ngIf="cost.errors['max']">The maximum cost is 1000€</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full flex justify-end">
+                        <button [disabled]="!selectedEvent || !selectedStudent" type="submit"
+                            class="m-2 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Save</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

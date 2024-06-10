@@ -1,9 +1,9 @@
 package com.salesianos.dam.StudentGoApi.service;
 
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.salesianos.dam.StudentGoApi.MyPage;
+import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseDetailResponse;
+import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseItemResponse;
+import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseRequest;
 import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseTicket;
 import com.salesianos.dam.StudentGoApi.exception.EventAlreadyPurchasedException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
@@ -15,12 +15,11 @@ import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 import com.salesianos.dam.StudentGoApi.repository.PurchaseRepository;
 import com.salesianos.dam.StudentGoApi.repository.user.StudentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,4 +73,47 @@ public class PurchaseService {
         return PurchaseTicket.of(purchase, student);
     }
 
+    public MyPage<PurchaseItemResponse> findAllPurchases(Pageable pageable){
+        Page<Purchase> purchases = purchaseRepository.findAllPurchases(pageable);
+        return MyPage.of(purchases.map(p -> PurchaseItemResponse.of(p, studentRepository.findById(UUID.fromString(p.getAuthor())).orElseThrow(() -> new NotFoundException("Student")))), "Purchases");
+    }
+
+    public PurchaseDetailResponse getPurchaseById(String id){
+        Purchase p = purchaseRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("Purchase"));
+        Student s = studentRepository.findById(UUID.fromString(p.getAuthor())).orElseThrow(() -> new NotFoundException("Student"));
+        return PurchaseDetailResponse.of(p, s);
+    }
+
+    public Purchase makePurchase(PurchaseRequest purchaseRequest){
+        List<Event> eventsPurchasedByStudent = purchaseRepository.findEventsPurchasedByStudentId(purchaseRequest.studentId());
+
+        for (Event event : eventsPurchasedByStudent){
+            if(event.getId() == UUID.fromString(purchaseRequest.eventId())){
+                throw new EventAlreadyPurchasedException("This user has already a ticket for this event");
+            }
+        }
+
+        Purchase p = Purchase.builder()
+                .event(eventRepository.findById(UUID.fromString(purchaseRequest.eventId())).orElseThrow(() -> new NotFoundException("Event")))
+                .author(studentRepository.findById(UUID.fromString(purchaseRequest.studentId())).orElseThrow(() -> new NotFoundException("Student")).getId().toString())
+                .dateTime(LocalDateTime.now())
+                .totalPrice(purchaseRequest.price())
+                .build();
+
+        p = purchaseRepository.save(p);
+
+        String qrCode = qrService.generateQRCode(p.getUuid().toString());
+
+        System.out.println("Qr Code: "+qrCode);
+        p.setQrCode(qrCode);
+        return purchaseRepository.save(p);
+    }
+
+    public Purchase editPurchase(String purchaseId, PurchaseRequest purchaseRequest){
+        Purchase p = purchaseRepository.findById(UUID.fromString(purchaseId)).orElseThrow(() -> new NotFoundException("Purchase"));
+        p.setTotalPrice(purchaseRequest.price());
+        p.setEvent(eventRepository.findById(UUID.fromString(purchaseRequest.eventId())).orElseThrow(() -> new NotFoundException("Event")));
+        p.setAuthor(studentRepository.findById(UUID.fromString(purchaseRequest.studentId())).orElseThrow(() -> new NotFoundException("Student")).getId().toString());
+        return purchaseRepository.save(p);
+    }
 }

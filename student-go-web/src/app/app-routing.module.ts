@@ -4,6 +4,7 @@ import { HomePageComponent } from './ui/home-page/home-page.component';
 import { AdminDashboardComponent } from './ui/admin-dashboard/admin-dashboard.component';
 import { AdminGuard } from './auth.guard';
 import { AdminEventsComponent } from './ui/admin-events/admin-events.component';
+import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.component';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent },
@@ -12,8 +13,8 @@ const routes: Routes = [
     path: 'admin',
     children: [
       { path: '', component: AdminDashboardComponent, canActivate: [AdminGuard] },
-      { path: 'events', component: AdminEventsComponent, canActivate: [AdminGuard] }
-      //{ path: 'stations', component: AdminStationsPageComponent, canActivate: [AuthGuard] },
+      { path: 'events', component: AdminEventsComponent, canActivate: [AdminGuard] },
+      { path: 'purchases', component: AdminPurchasesComponent, canActivate: [AdminGuard] },
       //{ path: 'issues', component: AdminIssuesPageComponent, canActivate: [AuthGuard] },
       //{ path: 'travels', component: PageAdminTravelsComponent, canActivate: [AuthGuard] }
     ]
