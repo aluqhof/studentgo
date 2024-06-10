@@ -39,7 +39,6 @@ public abstract class UserDefault implements UserDetails {
 
     private String password;
 
-    @NaturalId
     @Column(unique = true)
     private String email;
 

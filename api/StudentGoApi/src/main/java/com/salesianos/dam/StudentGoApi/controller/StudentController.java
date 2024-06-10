@@ -4,11 +4,14 @@ import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.event.EventsSavedResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
+import com.salesianos.dam.StudentGoApi.dto.user.student.StudentItemResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentShortResponse;
+import com.salesianos.dam.StudentGoApi.dto.user.student.UpdateStudentRequest;
 import com.salesianos.dam.StudentGoApi.model.Event;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.service.user.StudentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.connector.Response;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +54,24 @@ public class StudentController {
     @GetMapping("/search")
     public MyPage<StudentShortResponse> searchByUsername(@RequestParam(value = "term", required = false) String term, @PageableDefault(size = 5, page = 0) Pageable pageable){
         return studentService.findByUsername(term, pageable);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public MyPage<StudentItemResponse> getAllStudents(@PageableDefault(size = 10, page = 0) Pageable pageable){
+        return studentService.findAllStudents(pageable);
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<StudentItemResponse> getStudent(@PathVariable("id") String id){
+        return ResponseEntity.ok(StudentItemResponse.of(studentService.findStudent(id)));
+    }
+
+    @PutMapping("{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public StudentItemResponse editStudent(@PathVariable("id") String id, @RequestBody @Valid UpdateStudentRequest updateStudentRequest){
+        return StudentItemResponse.of(studentService.editStudent(id, updateStudentRequest));
     }
 
 }

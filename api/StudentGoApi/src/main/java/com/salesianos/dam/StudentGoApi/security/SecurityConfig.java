@@ -96,7 +96,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 antMatcher(HttpMethod.GET, "/event-type/**"),
                                 antMatcher(HttpMethod.GET, "/city/**"),
-                                antMatcher(HttpMethod.GET, "/event/**")
+                                antMatcher(HttpMethod.GET, "/event/**"),
+                                antMatcher(HttpMethod.GET, "/download-profile-photo/**")
                         ).permitAll()
                         .anyRequest().authenticated());
 

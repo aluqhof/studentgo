@@ -206,6 +206,20 @@ public class UserController {
         return ResponseEntity.created(URI.create(response.getUri())).body(response);
     }
 
+    @PostMapping("/upload-profile-image/{id}")
+    public ResponseEntity<?> uploadPhotoByUserId(@RequestPart("file") MultipartFile file, @PathVariable("id") String id) {
+
+        FileResponse response = uploadFile(file);
+        UserDefault user = userRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("User"));
+        user.setUrlPhoto(file.getOriginalFilename());
+        userRepository.save(user);
+        //if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
+        //  throw new FileTypeException("The file must be of type image");
+        //}
+
+        return ResponseEntity.created(URI.create(response.getUri())).body(response);
+    }
+
     @GetMapping("/delete-photo")
     public ResponseEntity<?> deletePhoto(@AuthenticationPrincipal UserDefault user) {
 

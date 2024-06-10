@@ -16,6 +16,7 @@ import { ModalLoginComponent } from './components/modal-login/modal-login.compon
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.component';
+import { AdminUsersComponent } from './ui/admin-users/admin-users.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.co
     AdminEventsComponent,
     ModalCitiesComponent,
     ModalLoginComponent,
-    AdminPurchasesComponent
+    AdminPurchasesComponent,
+    AdminUsersComponent
   ],
   imports: [
     BrowserModule,
