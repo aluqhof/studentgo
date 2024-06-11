@@ -213,7 +213,6 @@ export class AdminEventsComponent {
         console.error('Error getting event:', error);
       }
     });
-    //this.modalService.open(content, { ariaLabelledBy: 'modal-title' });
     this.f.resetForm(this.eventDetails);
   }
 

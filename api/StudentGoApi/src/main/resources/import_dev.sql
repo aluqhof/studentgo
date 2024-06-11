@@ -43,9 +43,9 @@ INSERT INTO student_event_type (student_id, event_type_id) VALUES ('04d0595e-45d
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 1);
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 4);
 
-INSERT INTO city (id, name, photo_url) VALUES (1, 'Sevilla', 'sevilla.jpg');
-INSERT INTO city (id, name, photo_url) VALUES (2, 'Köln', 'koeln.jpg');
-INSERT INTO city (id, name, photo_url) VALUES (3, 'Madrid', 'madrid.jpg');
+INSERT INTO city (name, photo_url) VALUES ('Sevilla', 'sevilla.jpg');
+INSERT INTO city (name, photo_url) VALUES ('Köln', 'koeln.jpg');
+INSERT INTO city (name, photo_url) VALUES ('Madrid', 'madrid.jpg');
 
 INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'Torneo de Fútbol 7', 37.38283, -5.97317, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 0);
 INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'Degustación en grupo', 37.3824023, -5.99631554987113, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-19 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 200);
