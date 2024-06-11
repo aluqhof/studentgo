@@ -6,6 +6,9 @@ import { AdminGuard } from './auth.guard';
 import { AdminEventsComponent } from './ui/admin-events/admin-events.component';
 import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.component';
 import { AdminUsersComponent } from './ui/admin-users/admin-users.component';
+import { AdminOrganizersComponent } from './ui/admin-organizers/admin-organizers.component';
+import { AdminCitiesComponent } from './ui/admin-cities/admin-cities.component';
+import { AdminEventTypesComponent } from './ui/admin-event-types/admin-event-types.component';
 
 const routes: Routes = [
   { path: 'home', component: HomePageComponent },
@@ -16,9 +19,10 @@ const routes: Routes = [
       { path: '', component: AdminDashboardComponent, canActivate: [AdminGuard] },
       { path: 'events', component: AdminEventsComponent, canActivate: [AdminGuard] },
       { path: 'purchases', component: AdminPurchasesComponent, canActivate: [AdminGuard] },
-      { path: 'students', component: AdminUsersComponent, canActivate: [AdminGuard] }
-      //{ path: 'issues', component: AdminIssuesPageComponent, canActivate: [AuthGuard] },
-      //{ path: 'travels', component: PageAdminTravelsComponent, canActivate: [AuthGuard] }
+      { path: 'students', component: AdminUsersComponent, canActivate: [AdminGuard] },
+      { path: 'organizers', component: AdminOrganizersComponent, canActivate: [AdminGuard] },
+      { path: 'cities', component: AdminCitiesComponent, canActivate: [AdminGuard] },
+      { path: 'event-types', component: AdminEventTypesComponent, canActivate: [AdminGuard] }
     ]
   },
 ];

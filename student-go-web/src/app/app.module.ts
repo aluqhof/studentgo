@@ -17,6 +17,9 @@ import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminPurchasesComponent } from './ui/admin-purchases/admin-purchases.component';
 import { AdminUsersComponent } from './ui/admin-users/admin-users.component';
+import { AdminOrganizersComponent } from './ui/admin-organizers/admin-organizers.component';
+import { AdminCitiesComponent } from './ui/admin-cities/admin-cities.component';
+import { AdminEventTypesComponent } from './ui/admin-event-types/admin-event-types.component';
 
 @NgModule({
   declarations: [
@@ -29,7 +32,10 @@ import { AdminUsersComponent } from './ui/admin-users/admin-users.component';
     ModalCitiesComponent,
     ModalLoginComponent,
     AdminPurchasesComponent,
-    AdminUsersComponent
+    AdminUsersComponent,
+    AdminOrganizersComponent,
+    AdminCitiesComponent,
+    AdminEventTypesComponent
   ],
   imports: [
     BrowserModule,

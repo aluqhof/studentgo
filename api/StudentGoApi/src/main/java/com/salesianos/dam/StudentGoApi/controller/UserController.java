@@ -5,12 +5,11 @@ import com.salesianos.dam.StudentGoApi.dto.user.ChangeUsernameRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.ChangeUsernameResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.LoginUser;
 import com.salesianos.dam.StudentGoApi.dto.user.UpdateProfileRequest;
-import com.salesianos.dam.StudentGoApi.dto.user.organizer.AddOrganizerRequest;
+import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerDetailsResponse;
+import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.AddStudentRequest;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentInfoResponse;
-import com.salesianos.dam.StudentGoApi.exception.FileTypeException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
-import com.salesianos.dam.StudentGoApi.exception.NotLoggedInException;
 import com.salesianos.dam.StudentGoApi.model.Organizer;
 import com.salesianos.dam.StudentGoApi.model.Student;
 import com.salesianos.dam.StudentGoApi.model.UserDefault;
@@ -44,9 +43,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.io.File;
 import java.net.URI;
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -109,12 +106,9 @@ public class UserController {
             @ApiResponse(responseCode = "403 Forbidden", content = @Content)
     })
     @PostMapping("/auth/register-organizer")
-    public ResponseEntity<JwtUserResponse> registerOrganizer(@Valid @RequestBody AddOrganizerRequest addOrganizerRequest) {
+    public ResponseEntity<OrganizerDetailsResponse> registerOrganizer(@Valid @RequestBody OrganizerRequest addOrganizerRequest) {
         Organizer organizer = organizerService.createOrganizer(addOrganizerRequest);
-        Authentication authentication = authManager.authenticate(new UsernamePasswordAuthenticationToken(addOrganizerRequest.username(),addOrganizerRequest.password()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtProvider.generateToken(authentication);
-        return ResponseEntity.status(HttpStatus.CREATED).body(JwtUserResponse.of(organizer, token));
+        return ResponseEntity.status(HttpStatus.CREATED).body(OrganizerDetailsResponse.of(organizer));
     }
 
 
