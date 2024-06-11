@@ -1,0 +1,9 @@
+.modal {
+    max-height: 800px;
+    overflow: auto;
+}
+
+.error {
+    font-size: 0.8rem;
+    color: red;
+}
