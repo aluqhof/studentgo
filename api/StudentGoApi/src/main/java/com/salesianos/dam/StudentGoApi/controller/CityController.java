@@ -8,6 +8,7 @@ import com.salesianos.dam.StudentGoApi.repository.CityRepository;
 import com.salesianos.dam.StudentGoApi.service.StorageService;
 import com.salesianos.dam.StudentGoApi.utils.MediaTypeUrlResource;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +39,7 @@ public class CityController {
         city.setName(name);
         city.setPhotoUrl(file.getOriginalFilename());
         City saved = cityRepository.save(city);
-        //if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
-        //  throw new FileTypeException("The file must be of type image");
-        //}
+
         URI createdURI = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -49,14 +48,13 @@ public class CityController {
         return ResponseEntity.created(createdURI).body(city);
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<?> upload(@RequestPart("file") MultipartFile file) {
+    @PostMapping("/upload/{id}")
+    public ResponseEntity<?> upload(@RequestPart("file") MultipartFile file, @PathVariable("id") Long cityId) {
 
         FileResponse response = uploadFile(file);
-
-        if (!Objects.requireNonNull(file.getContentType()).startsWith("image/")) {
-            throw new FileTypeException("The file must be of type image");
-        }
+        City city = cityRepository.findById(cityId).orElseThrow(() -> new NotFoundException("City"));
+        city.setPhotoUrl(file.getOriginalFilename());
+        cityRepository.save(city);
 
         return ResponseEntity.created(URI.create(response.getUri())).body(response);
     }
@@ -99,5 +97,28 @@ public class CityController {
     @GetMapping("/{id}")
     public ResponseEntity<City> getCity(@PathVariable("id") Long id){
         return ResponseEntity.ok(cityRepository.findById(id).orElseThrow(() -> new NotFoundException("City")));
+    }
+
+    @PutMapping("/{id}/name/{name}")
+    public ResponseEntity<City> editCity(@PathVariable("id") Long id, @PathVariable("name") String name, @RequestPart(value = "file", required = false) MultipartFile file) throws BadRequestException {
+        FileResponse response;
+        City city = cityRepository.findById(id).orElseThrow(() -> new NotFoundException("City"));
+        city.setName(name);
+        if(file != null){
+            response = uploadFile(file);
+            city.setPhotoUrl(file.getOriginalFilename());
+        } else{
+            if(city.getPhotoUrl() == null){
+                throw new BadRequestException("'file' is not present");
+            }
+        }
+        City saved = cityRepository.save(city);
+
+        URI createdURI = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId()).toUri();
+
+        return ResponseEntity.created(createdURI).body(city);
     }
 }
