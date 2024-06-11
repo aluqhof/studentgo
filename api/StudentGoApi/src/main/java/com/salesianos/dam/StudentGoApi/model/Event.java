@@ -61,4 +61,10 @@ public class Event {
     @CreatedBy
     private String author;
 
+    public void removeEventType(EventType eventType) {
+        if (eventTypes != null) {
+            eventTypes.remove(eventType);
+        }
+    }
+
 }

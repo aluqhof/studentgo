@@ -73,4 +73,6 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
                                       Pageable pageable);
     @Query("SELECT e FROM Event e WHERE LOWER(CAST(e.id AS string)) LIKE %:term% OR LOWER(e.name) LIKE %:term%")
     Page<Event> findByIdOrNameContainingIgnoreCase(@Param("term") String term, Pageable pageable);
+    @Query("SELECT e FROM Event e JOIN e.eventTypes et WHERE et.id = :eventTypeId")
+    List<Event> findByEventTypeId(@Param("eventTypeId") Long eventTypeId);
 }

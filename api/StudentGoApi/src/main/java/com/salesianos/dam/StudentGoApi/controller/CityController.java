@@ -100,7 +100,7 @@ public class CityController {
     }
 
     @PutMapping("/{id}/name/{name}")
-    public ResponseEntity<City> editCity(@PathVariable("id") Long id, @PathVariable("name") String name, @RequestPart(value = "file", required = false) MultipartFile file) throws BadRequestException {
+    public City editCity(@PathVariable("id") Long id, @PathVariable("name") String name, @RequestPart(value = "file", required = false) MultipartFile file) throws BadRequestException {
         FileResponse response;
         City city = cityRepository.findById(id).orElseThrow(() -> new NotFoundException("City"));
         city.setName(name);
@@ -112,13 +112,8 @@ public class CityController {
                 throw new BadRequestException("'file' is not present");
             }
         }
-        City saved = cityRepository.save(city);
 
-        URI createdURI = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(saved.getId()).toUri();
 
-        return ResponseEntity.created(createdURI).body(city);
+        return cityRepository.save(city);
     }
 }

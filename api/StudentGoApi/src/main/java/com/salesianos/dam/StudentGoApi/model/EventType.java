@@ -1,9 +1,6 @@
 package com.salesianos.dam.StudentGoApi.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
@@ -16,10 +13,10 @@ import org.hibernate.annotations.NaturalId;
 public class EventType {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NaturalId
+    @Column(unique = true)
     private String name;
 
     private String iconRef;
