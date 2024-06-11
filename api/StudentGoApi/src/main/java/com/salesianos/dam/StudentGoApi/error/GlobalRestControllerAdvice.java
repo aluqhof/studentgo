@@ -235,4 +235,13 @@ public class GlobalRestControllerAdvice extends ResponseEntityExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(InvalidEventTypeName.class)
+    public ErrorResponse handleInvalidEventTypeNameException(InvalidEventTypeName exception) {
+        return ErrorResponse.builder(exception, HttpStatus.BAD_REQUEST, exception.getMessage())
+                .title("Invalid name error")
+                .type(URI.create("https://api.studentgo.com/errors/invalid-name-error"))
+                .property("timestamp", Instant.now())
+                .build();
+    }
+
 }

@@ -1,6 +1,10 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
+import com.salesianos.dam.StudentGoApi.dto.eventType.EventTypeRequest;
 import com.salesianos.dam.StudentGoApi.dto.eventType.EventTypeResponse;
+import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
+import com.salesianos.dam.StudentGoApi.model.EventType;
+import com.salesianos.dam.StudentGoApi.repository.EventTypeRepository;
 import com.salesianos.dam.StudentGoApi.service.EventTypeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -10,12 +14,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -26,6 +32,7 @@ import java.util.List;
 public class EventTypeController {
 
     private final EventTypeService eventTypeService;
+    private final EventTypeRepository eventTypeRepository;
 
 
     @Operation(summary = "Get all event types")
@@ -66,4 +73,35 @@ public class EventTypeController {
         return ResponseEntity.ok(eventTypeService.getAllEventTypes().stream().map(EventTypeResponse::of).toList());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<EventTypeResponse> getEventType(@PathVariable("id") Long id){
+        return ResponseEntity.ok(EventTypeResponse.of(eventTypeService.getEventTypeById(id)));
+    }
+
+    @PostMapping("/")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<EventTypeResponse> createEventType(@RequestBody @Valid EventTypeRequest add){
+
+        EventType eventType = eventTypeService.createEventType(add);
+
+        URI createdURI = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(eventType.getId()).toUri();
+
+        return ResponseEntity.created(createdURI).body(EventTypeResponse.of(eventType));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public EventTypeResponse editEventType(@PathVariable("id") Long id, @RequestBody @Valid EventTypeRequest eventTypeRequest){
+        return EventTypeResponse.of(eventTypeService.editEventType(id, eventTypeRequest));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteEventType(@PathVariable("id") Long id){
+        eventTypeService.deleteEventType(id);
+        return ResponseEntity.noContent().build();
+    }
 }

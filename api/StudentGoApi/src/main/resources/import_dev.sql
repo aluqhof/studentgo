@@ -32,10 +32,10 @@ INSERT INTO student (id, description) VALUES ('5cf8b808-3b6e-4d9d-90d5-65c83b0e7
 
 INSERT INTO organizer (id, description, business) VALUES ('5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 'Soy un empresario exitoso', 'Nike');
 
-INSERT INTO event_type (id, name, icon_ref, color_code) VALUES (1, 'Sports', '0xe5e6', '0xfff0635a');
-INSERT INTO event_type (id, name, icon_ref, color_code) VALUES (2, 'Music', '0xe415', '0xfff59762');
-INSERT INTO event_type (id, name, icon_ref, color_code) VALUES (3, 'Food', '0xe533', '0xff29d697');
-INSERT INTO event_type (id, name, icon_ref, color_code) VALUES (4, 'Gaming', '0xe5e8', '0xff46cdfb');
+INSERT INTO event_type (name, icon_ref, color_code) VALUES ('Sports', '0xe5e6', '0xfff0635a');
+INSERT INTO event_type (name, icon_ref, color_code) VALUES ('Music', '0xe415', '0xfff59762');
+INSERT INTO event_type (name, icon_ref, color_code) VALUES ('Food', '0xe533', '0xff29d697');
+INSERT INTO event_type (name, icon_ref, color_code) VALUES ('Gaming', '0xe5e8', '0xff46cdfb');
 
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', 1);
 INSERT INTO student_event_type (student_id, event_type_id) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', 2);

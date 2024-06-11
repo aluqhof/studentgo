@@ -46,4 +46,10 @@ public class Student extends UserDefault {
         this.description = description;
 
     }
+
+    public void removeEventType(EventType eventType) {
+        if (interests != null) {
+            interests.remove(eventType);
+        }
+    }
 }
