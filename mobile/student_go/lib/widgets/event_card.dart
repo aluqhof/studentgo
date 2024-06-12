@@ -348,14 +348,17 @@ class _EventCardState extends State<EventCard> {
                               const SizedBox(
                                 width: 2,
                               ),
-                              Text(
-                                truncateString(
-                                    '$_street, $_postalCode, $_city', 40),
-                                style: GoogleFonts.actor(
-                                  textStyle: const TextStyle(
+                              Expanded(
+                                child: Text(  
+                                  '$_street, $_postalCode, $_city',
+                                  style: GoogleFonts.actor(
+                                    textStyle: const TextStyle(
                                       color: Color.fromRGBO(116, 118, 136, 1),
-                                      fontSize: 12),
-                                  fontWeight: FontWeight.w100,
+                                      fontSize: 12,
+                                    ),
+                                    fontWeight: FontWeight.w100,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],

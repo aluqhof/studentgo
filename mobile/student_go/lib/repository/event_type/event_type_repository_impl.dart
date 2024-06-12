@@ -10,8 +10,8 @@ class EventTypeRepositoryImpl extends EventTypeRepository {
   @override
   Future<List<EventTypeResponse>> getAllEventTypes() async {
     final response = await _httpClient.get(
-      Uri.parse('http://10.0.2.2:8080/event-type/'),
-      //Uri.parse('http://localhost:8080/auth/login'),
+      Uri.parse('http://192.168.1.153:8080/event-type/'),
+      //Uri.parse('http://192.168.1.153:8080/auth/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },

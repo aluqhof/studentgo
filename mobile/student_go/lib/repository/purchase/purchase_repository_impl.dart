@@ -17,7 +17,7 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   Future<PurchaseResponse> doEventPurchase(String eventId) async {
     try {
       final response = await _httpClient
-          .post(Uri.parse('http://10.0.2.2:8080/purchase/$eventId'));
+          .post(Uri.parse('http://192.168.1.153:8080/purchase/$eventId'));
       if (response.statusCode == 201) {
         return PurchaseResponse.fromJson(response.body);
       } else if (response.statusCode == 404 ||
@@ -41,8 +41,8 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   Future<List<PurchaseOverviewResponse>> getAllEventsPurchasedByUser() async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://10.0.2.2:8080/purchase/all-by-student'),
-        //Uri.parse('http://localhost:8080/auth/login'),
+        Uri.parse('http://192.168.1.153:8080/purchase/all-by-student'),
+        //Uri.parse('http://192.168.1.153:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -70,7 +70,7 @@ class PurchaseRepositoryImpl extends PurchaseRepository {
   Future<PurchaseTicketResponse> getPurchase(String purchaseId) async {
     try {
       final response = await _httpClient.get(Uri.parse(
-          'http://10.0.2.2:8080/purchase/purchase-details/$purchaseId'));
+          'http://192.168.1.153:8080/purchase/purchase-details/$purchaseId'));
 
       if (response.statusCode == 200) {
         return PurchaseTicketResponse.fromJson(response.body);

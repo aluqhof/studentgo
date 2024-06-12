@@ -321,13 +321,14 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                             const TextStyle(fontSize: 20)),
                                   ),
                                   Text(
-                                      truncateString(
-                                          '$_street, $_city, $_postalCode', 40),
+                                      '$_street, $_city, $_postalCode',
                                       style: GoogleFonts.actor(
                                           textStyle: const TextStyle(
                                               fontSize: 15,
                                               color: Color.fromRGBO(
-                                                  112, 110, 143, 1))))
+                                                  112, 110, 143, 1))),
+                                  overflow: TextOverflow.ellipsis,
+                                  )
                                 ],
                               ),
                             ),
