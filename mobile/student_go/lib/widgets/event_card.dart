@@ -313,7 +313,7 @@ class _EventCardState extends State<EventCard> {
                         child: SizedBox(
                           width: double.infinity,
                           child: Text(
-                            truncateString(widget.result.name!, 21),
+                            truncateString(widget.result.name!, 20),
                             style: GoogleFonts.actor(
                                 textStyle: const TextStyle(
                                     fontSize: 22, fontWeight: FontWeight.w500)),
