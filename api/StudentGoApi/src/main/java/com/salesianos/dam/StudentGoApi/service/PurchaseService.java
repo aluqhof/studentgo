@@ -8,9 +8,7 @@ import com.salesianos.dam.StudentGoApi.dto.purchase.PurchaseTicket;
 import com.salesianos.dam.StudentGoApi.exception.EventAlreadyPurchasedException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.exception.SoldOutException;
-import com.salesianos.dam.StudentGoApi.model.Event;
-import com.salesianos.dam.StudentGoApi.model.Purchase;
-import com.salesianos.dam.StudentGoApi.model.Student;
+import com.salesianos.dam.StudentGoApi.model.*;
 import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 import com.salesianos.dam.StudentGoApi.repository.PurchaseRepository;
 import com.salesianos.dam.StudentGoApi.repository.user.StudentRepository;
@@ -73,9 +71,14 @@ public class PurchaseService {
         return PurchaseTicket.of(purchase, student);
     }
 
-    public MyPage<PurchaseItemResponse> findAllPurchases(Pageable pageable){
-        Page<Purchase> purchases = purchaseRepository.findAllPurchases(pageable);
-        return MyPage.of(purchases.map(p -> PurchaseItemResponse.of(p, studentRepository.findById(UUID.fromString(p.getAuthor())).orElseThrow(() -> new NotFoundException("Student")))), "Purchases");
+    public MyPage<PurchaseItemResponse> findAllPurchases(Pageable pageable, UserDefault user, String term){
+        if(user instanceof Organizer){
+            Page<Purchase> purchases = purchaseRepository.findPurchasesFromEventByOrganizerId(user.getId().toString(), pageable, term);
+            return MyPage.of(purchases.map(p -> PurchaseItemResponse.of(p, studentRepository.findById(UUID.fromString(p.getAuthor())).orElseThrow(() -> new NotFoundException("Student")))), "Purchases");
+        } else{
+            Page<Purchase> purchases = purchaseRepository.findAllPurchases(pageable, term);
+            return MyPage.of(purchases.map(p -> PurchaseItemResponse.of(p, studentRepository.findById(UUID.fromString(p.getAuthor())).orElseThrow(() -> new NotFoundException("Student")))), "Purchases");
+        }
     }
 
     public PurchaseDetailResponse getPurchaseById(String id){

@@ -1,8 +1,8 @@
 <app-nav-bar></app-nav-bar>
-<div class="flex flex-wrap w-full bg-teal-400 min-h-[500px] text-gray-800">
+<div class="flex flex-wrap w-full bg-teal-400 min-h-[500px] text-gray-800 px-5">
     <div class="w-full md:w-1/2 flex items-center justify-center mt-3 md:mt-0 p-5 text-center">
-        <img class="rounded-xl w-3/4" src="../../../assets/image-banner.jpeg" alt="Chica de Fever" fetchpriority="high"
-            crossorigin="anonymous">
+        <img class="rounded-xl w-3/4 md:w-2/3" src="../../../assets/image-banner.jpeg" alt="Chica de Fever"
+            fetchpriority="high" crossorigin="anonymous">
     </div>
     <div class="w-full md:w-1/2 my-2 md:my-auto px-5 mx-auto">
         <p class="text-4xl font-bold text-blue-900">
@@ -20,10 +20,10 @@
         </h2>
     </div>
 </div>
-<div class="container mx-auto my-4">
-    <p class="text-3xl text-blue-900 font-semibold mx-3 text-center">Top Cities</p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 m-3">
-        <div class="col" *ngFor="let city of cities">
+<div class="container mx-auto my-5">
+    <p class="text-3xl text-blue-900 font-semibold mx-3 mt-3 text-center">Top Cities</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mx-3 my-4">
+        <div (click)="selectCity(city.name)" class="col cursor-pointer" *ngFor="let city of cities">
             <div class="relative rounded-3xl overflow-hidden h-64">
                 <img [src]="'http://localhost:8080/city/download-photo/'+city.id" class="w-full h-full object-cover"
                     [alt]="city.name">

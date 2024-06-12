@@ -5,7 +5,7 @@
         <div class="relative overflow-x-auto p-2">
             <div
                 class="flex items-center justify-between flex-column flex-wrap md:flex-row space-y-4 md:space-y-0 pb-4 bg-white">
-                <div>
+                <div *ngIf="authService.isAdmin()">
                     <button (click)="openModalCreate()"
                         class="inline-flex items-center text-gray-500 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-1.5 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
                         type="button">
@@ -26,7 +26,8 @@
                                 d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
                         </svg>
                     </div>
-                    <input type="text" id="table-search-users"
+                    <input [(ngModel)]="searchPurchase" (input)="filterPurchase(searchPurchase)" type="text"
+                        id="table-search-users"
                         class="block p-2 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                         placeholder="Search for purchases">
                 </div>
@@ -56,7 +57,7 @@
                         <th scope="col" class="px-6 py-3">
                             Student
                         </th>
-                        <th scope="col" class="px-6 py-3">
+                        <th *ngIf="authService.isAdmin()" scope="col" class="px-6 py-3">
                             Action
                         </th>
                     </tr>
@@ -96,7 +97,7 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-6 py-4">
+                        <td *ngIf="authService.isAdmin()" class="px-6 py-4">
                             <div class="inline-flex">
                                 <a (click)="openEditModal(purchase)"
                                     class="cursor-pointer font-medium text-red-600 dark:text-blue-500 hover:underline">Edit</a>
@@ -136,13 +137,17 @@
 <div *ngIf="openModal" class="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
     <div class="relative p-4 w-full max-w-md max-h-full items-center">
         <div class="modal bg-white rounded-lg shadow dark:bg-gray-700">
-            <div class="flex items-center justify-between p-2 md:p-3 border-b rounded-t dark:border-gray-600">
+            <div
+                class="inline-flex w-full items-center justify-between p-2 md:p-3 border-b rounded-t dark:border-gray-600">
                 <p *ngIf="purchaseSelected" class="text-2xl font-semibold text-gray-900 dark:text-white">Edit purchase
                 </p>
                 <p *ngIf="!purchaseSelected" class="text-2xl font-semibold text-gray-900 dark:text-white">Create
                     purchase</p>
                 <button type="button" (click)="closeModal()" class="close transparent-close" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
                 </button>
             </div>
             <div class="modal-body overflow-auto">
@@ -179,6 +184,7 @@
                                 </li>
                             </ul>
                         </div>
+                        <div *ngIf="fieldErrors['eventId']" class="error">{{ fieldErrors['eventId'] }}</div>
                     </div>
 
                     <div class="m-2 relative">
@@ -197,6 +203,7 @@
                                 </li>
                             </ul>
                         </div>
+                        <div *ngIf="fieldErrors['studentId']" class="error">{{ fieldErrors['studentId'] }}</div>
                     </div>
 
                     <div class="flex gap-2">
@@ -218,6 +225,7 @@
                                 <div class="error" *ngIf="cost.errors['max']">The maximum cost is 1000€</div>
                             </div>
                         </div>
+                        <div *ngIf="fieldErrors['price']" class="error">{{ fieldErrors['price'] }}</div>
                     </div>
 
                     <div class="w-full flex justify-end">

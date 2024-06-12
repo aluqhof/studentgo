@@ -30,6 +30,7 @@ export class AdminUsersComponent {
   selectedEt: EventTypeResponse[] = [];
   imagePreview: string | null = null;
   fieldErrors: { [key: string]: string } = {};
+  searchTerm: string = '';
 
 
   constructor(private studentService: StudentService, private eventTypeService: EventTypeService) { }
@@ -66,7 +67,22 @@ export class AdminUsersComponent {
   }
 
   loadNewPage(page: number = 0) {
-    this.studentService.findAllStudents(page).subscribe({
+    this.studentService.findAllStudents(page, this.searchTerm).subscribe({
+      next: (data) => {
+        this.studentList = data.content;
+        this.countPurchases = data.totalElements;
+        this.currentPage = data.pageNumber;
+        this.pageSize = data.size;
+        this.totalPages = Math.ceil(this.countPurchases / this.pageSize);
+      },
+      error: (error) => {
+        console.error('Error getting purchases:', error);
+      }
+    });
+  }
+
+  filterStudents(searchTerm: string) {
+    this.studentService.findAllStudents(0, searchTerm).subscribe({
       next: (data) => {
         this.studentList = data.content;
         this.countPurchases = data.totalElements;

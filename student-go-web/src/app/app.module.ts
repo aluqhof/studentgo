@@ -20,6 +20,9 @@ import { AdminUsersComponent } from './ui/admin-users/admin-users.component';
 import { AdminOrganizersComponent } from './ui/admin-organizers/admin-organizers.component';
 import { AdminCitiesComponent } from './ui/admin-cities/admin-cities.component';
 import { AdminEventTypesComponent } from './ui/admin-event-types/admin-event-types.component';
+import { ModalRegisterComponent } from './components/modal-register/modal-register.component';
+import { CityEventsPageComponent } from './ui/city-events-page/city-events-page.component';
+import { EventCardComponent } from './components/event-card/event-card.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +38,10 @@ import { AdminEventTypesComponent } from './ui/admin-event-types/admin-event-typ
     AdminUsersComponent,
     AdminOrganizersComponent,
     AdminCitiesComponent,
-    AdminEventTypesComponent
+    AdminEventTypesComponent,
+    ModalRegisterComponent,
+    CityEventsPageComponent,
+    EventCardComponent
   ],
   imports: [
     BrowserModule,

@@ -27,6 +27,7 @@ export class AdminOrganizersComponent {
   f: any;
   imagePreview: string | null = null;
   fieldErrors: { [key: string]: string } = {};
+  searchTerm: string = ''
 
   constructor(private organizerService: OrganizerService, private studentService: StudentService) { }
 
@@ -46,7 +47,7 @@ export class AdminOrganizersComponent {
   }
 
   loadNewPage(page: number = 0) {
-    this.organizerService.findAllOrganizer(page).subscribe({
+    this.organizerService.findAllOrganizer(page, this.searchTerm).subscribe({
       next: (data) => {
         this.organizerList = data.content;
         this.countPurchases = data.totalElements;
@@ -55,7 +56,22 @@ export class AdminOrganizersComponent {
         this.totalPages = Math.ceil(this.countPurchases / this.pageSize);
       },
       error: (error) => {
-        console.error('Error getting purchases:', error);
+        console.error('Error getting organizers:', error);
+      }
+    });
+  }
+
+  filterOrganizers(searchTerm: string) {
+    this.organizerService.findAllOrganizer(0, searchTerm).subscribe({
+      next: (data) => {
+        this.organizerList = data.content;
+        this.countPurchases = data.totalElements;
+        this.currentPage = data.pageNumber;
+        this.pageSize = data.size;
+        this.totalPages = Math.ceil(this.countPurchases / this.pageSize);
+      },
+      error: (error) => {
+        console.error('Error getting organizers:', error);
       }
     });
   }

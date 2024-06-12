@@ -47,34 +47,47 @@ INSERT INTO city (name, photo_url) VALUES ('Sevilla', 'sevilla.jpg');
 INSERT INTO city (name, photo_url) VALUES ('Köln', 'koeln.jpg');
 INSERT INTO city (name, photo_url) VALUES ('Madrid', 'madrid.jpg');
 
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'Torneo de Fútbol 7', 37.38283, -5.97317, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 0);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'Degustación en grupo', 37.3824023, -5.99631554987113, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-19 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 200);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'Torneo de fifa por parejas', 37.386207, -5.99255572619863, 20.50, 'Estadio guapo', 1, 'Algo guapo', '2024-06-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 150);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'Concierto de la niña pastori', 37.386207, -5.99255572619863, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-26 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 200);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'Feria de artesanía', 50.941388888889, 6.9583333333333, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-27 10:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 300);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'Torneo de futbol', 50.936688, 6.960099, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-28 15:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 500);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'Exposición de arte contemporáneo', 50.934741, 6.979580, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-14 12:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 100);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'Festival de música indie', 50.976048, 7.015457, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-20 18:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 250);
-INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'Conferencia sobre inteligencia artificial', 50.963941, 6.955118, 20.50, 'Estadio guapo', 2, 'Algo guapo', '2024-06-21 09:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 120);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'Campus Food Festival', 37.38283, -5.97317, 2.50, 'University Quad', 1, 'Enjoy a variety of cuisines from different cultures at our annual Campus Food Festival. Taste, savor, and indulge in delicious food prepared by local chefs.', '2024-05-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 25);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'Gourmet Cooking Class', 37.3824023, -5.99631554987113, 10.50, 'Culinary Arts Building', 1, 'Join our Gourmet Cooking Class to learn how to prepare exquisite dishes from a professional chef. Perfect for food enthusiasts looking to enhance their culinary skills.', '2024-06-19 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 10);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'Vegan Food Fair', 37.386207, -5.99255572619863, 20.00, 'Green Hall', 1, 'Discover the best in vegan cuisine at our Vegan Food Fair. Sample plant-based dishes and learn about sustainable eating.', '2024-06-22 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 150);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'BBQ Cook-off', 37.386207, -5.99255572619863, 4.50, 'Sports Field', 1, 'Show off your grilling skills or just enjoy some mouthwatering BBQ at our BBQ Cook-off event. Compete for the title of best BBQ on campus.', '2024-06-26 08:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 200);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'International Street Food Market', 50.941388888889, 6.9583333333333, 2.50, 'Main Plaza', 2, 'Explore a diverse range of street food from around the world at our International Street Food Market. A perfect event for adventurous eaters.', '2024-06-27 10:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 300);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'Retro Gaming Night', 50.936688, 6.960099, 14.00, 'Tech Center', 2, 'Compete in our Campus Esports Tournament featuring popular games like League of Legends, Overwatch, and Fortnite. Win prizes and glory!', '2024-06-28 15:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 500);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'Board Game Bonanza', 50.934741, 6.979580, 10.00, 'Student Lounge', 2, 'Relive the nostalgia of classic video games at our Retro Gaming Night. Play your favorite old-school games and challenge your friends.', '2024-06-14 12:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 100);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'Virtual Reality Experience', 50.976048, 7.015457, 30.90, 'Community Center', 2, 'oin us for an evening of fun and strategy at our Board Game Bonanza. We have a wide selection of board games for all skill levels.', '2024-06-20 18:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 250);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'Gaming Marathon for Charity', 50.963941, 6.955118, 20.00, 'Innovation Lab', 2, 'Immerse yourself in the latest VR technology at our Virtual Reality Experience event. Try out cutting-edge VR games and experiences.', '2024-06-21 09:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 120);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('e3bd64f3-ae76-41e1-bcf9-0a817ccca950', 'Campus 5K Run', 40.418162, -3.676356, 40.00, 'Athletic Track', 3, 'Join fellow students in our Campus 5K Run. A great way to stay fit and healthy while supporting a charitable cause.', '2024-06-28 09:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 120);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('83134237-d6bd-493d-8f3b-dd62ee16177c', 'Intramural Basketball League', 40.43575, -3.710556, 10.00, 'Sports Complex', 3, 'Sign up for our Intramural Basketball League. Compete with your friends and other students in a fun and friendly environment.', '2024-07-01 12:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 50);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('46819fda-3562-4aac-92ab-55794b40796e', 'Ultimate Frisbee Tournament', 40.432472, -3.673794, 5.10, 'North Field', 3, 'Show off your ultimate frisbee skills at our Ultimate Frisbee Tournament. Teams will compete for the championship title.', '2024-07-09 19:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 40);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('2e16c4ff-f1c1-4359-9404-360e62464554', 'Yoga in the Park', 40.415932, -3.684938, 20.50, 'Central Park', 3, 'Relax and rejuvenate with our Yoga in the Park sessions. Suitable for all levels, join us for a peaceful yoga experience outdoors.', '2024-07-11 12:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 60);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('6c2c425f-d1fe-4209-bdf7-83d369fc60e5', 'Soccer Skills Clinic', 40.397668, -3.686219, 18.50, 'Soccer Stadium', 3, 'Improve your soccer skills at our Soccer Skills Clinic. Learn from experienced coaches and enhance your game.', '2024-06-21 09:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 36);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('ef112b3e-df82-4b84-8998-f43422a56314', 'Campus Battle of the Bands', 40.414268, -3.660725, 12.50, 'Amphitheater', 3, 'Watch as student bands compete for the title of best band on campus at our Campus Battle of the Bands. Enjoy live music and support your favorites.', '2024-07-21 09:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 120);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('e1f0c314-2249-4b57-802a-726b84475df3', 'Open Mic Night', 50.938268, 6.974593, 0.00, 'Coffee House', 2, 'Showcase your musical talent at our Open Mic Night. Sing, play an instrument, or perform spoken word in a supportive environment.', '2024-07-23 13:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 23);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('36486ae2-08d0-4122-a63c-20d5ad59c8ec', 'Jazz and Blues Night', 50.930164, 6.961427, 3.50, 'Music Hall', 2, 'Enjoy an evening of smooth jazz and soulful blues at our Jazz and Blues Night. Featuring performances by talented student musicians.', '2024-07-24 19:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 60);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('3a769927-216d-4167-adc2-df53b5440f2b', 'DJ Dance Party', 37.38808, -5.982356, 10.00, 'Student Union', 1, 'Dance the night away at our DJ Dance Party. With top DJs spinning the latest hits, its the perfect way to unwind and have fun.', '2024-07-29 22:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 30);
+INSERT INTO event (id, name, latitude, longitude, price, place, city_id, description, date_time, author, max_capacity) VALUES ('efd3ac3a-e074-40f9-980b-5c1a23d8ff30', 'Acoustic Coffeehouse', 37.399072, -6.005147, 20.50, 'Library Café', 1, 'Relax with a cup of coffee and enjoy live acoustic music at our Acoustic Coffeehouse event. Featuring performances by student singer-songwriters.', '2024-07-21 19:00:00', '5cf8b808-3b6e-4d9d-90d5-65c83b0e75b2', 100);
 
 
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 3);
 INSERT INTO event_event_type (event_id, event_type_id) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 3);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 2);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 4);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 4);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 4);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 3);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 3);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 3);
 INSERT INTO event_event_type (event_id, event_type_id) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 4);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 3);
-INSERT INTO event_event_type (event_id, event_type_id) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 3);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 4);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 4);
 INSERT INTO event_event_type (event_id, event_type_id) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 4);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('e3bd64f3-ae76-41e1-bcf9-0a817ccca950', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('83134237-d6bd-493d-8f3b-dd62ee16177c', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('46819fda-3562-4aac-92ab-55794b40796e', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('2e16c4ff-f1c1-4359-9404-360e62464554', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('6c2c425f-d1fe-4209-bdf7-83d369fc60e5', 1);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('ef112b3e-df82-4b84-8998-f43422a56314', 2);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('e1f0c314-2249-4b57-802a-726b84475df3', 2);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('36486ae2-08d0-4122-a63c-20d5ad59c8ec', 2);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('3a769927-216d-4167-adc2-df53b5440f2b', 2);
+INSERT INTO event_event_type (event_id, event_type_id) VALUES ('efd3ac3a-e074-40f9-980b-5c1a23d8ff30', 2);
 
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', 'd5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2');
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', 'a2f6b827-1042-4a7c-a9c3-84f1356d10c4');
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('04d0595e-45d5-4f63-8b53-1d79e9d84a5d', '9b3ee893-9181-47b8-91fc-63dd16c74f50');
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 'd5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2');
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', 'a2f6b827-1042-4a7c-a9c3-84f1356d10c4');
-INSERT INTO student_event_saved (student_id, event_id) VALUES ('e010f144-b376-4dbb-933d-b3ec8332ed0d', '9b3ee893-9181-47b8-91fc-63dd16c74f50');
 
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('123e4567-e89b-12d3-a456-426614174000', 20.0, current_timestamp, '9d782609-1b54-4cee-ad3d-5ce678be376d', '04d0595e-45d5-4f63-8b53-1d79e9d84a5d');
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('223e4567-e89b-12d3-a456-426614174001', 10.0, current_timestamp, '9d782609-1b54-4cee-ad3d-5ce678be376d', 'e010f144-b376-4dbb-933d-b3ec8332ed0d');
@@ -98,20 +111,30 @@ INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f23e4567-e89b-12d3-a456-426614174019', 30.0, current_timestamp, 'ae56ec32-98bf-4eb6-821d-741a0816b3bf', '23b9773b-b123-4f48-8a6d-ef732806d1f5');
 
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'nophotoevent.jpg');
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'nophoto.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('e3bd64f3-ae76-41e1-bcf9-0a817ccca950', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('83134237-d6bd-493d-8f3b-dd62ee16177c', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('46819fda-3562-4aac-92ab-55794b40796e', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('2e16c4ff-f1c1-4359-9404-360e62464554', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('6c2c425f-d1fe-4209-bdf7-83d369fc60e5', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('ef112b3e-df82-4b84-8998-f43422a56314', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('e1f0c314-2249-4b57-802a-726b84475df3', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('36486ae2-08d0-4122-a63c-20d5ad59c8ec', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('3a769927-216d-4167-adc2-df53b5440f2b', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('efd3ac3a-e074-40f9-980b-5c1a23d8ff30', 'nophotoevent.jpg');

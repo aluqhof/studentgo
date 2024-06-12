@@ -12,6 +12,7 @@ export class ModalLoginComponent {
 
   @Input() isModalOpen!: boolean;
   @Output() modalClosed = new EventEmitter<void>();
+  @Output() modalRegister = new EventEmitter<void>();
   form: any = {
     username: null,
     password: null
@@ -38,10 +39,13 @@ export class ModalLoginComponent {
     this.isModalOpen = true;
   }
 
+  openModalRegister() {
+    this.isModalOpen = false;
+    this.modalRegister.emit();
+  }
+
   onSubmit(): void {
     const { username, password } = this.form;
-    console.log(username + " " + password)
-
     this.authService.login(username, password).subscribe({
       next: data => {
         //this.tokenStorage.saveToken(data.accessToken);

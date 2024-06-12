@@ -20,4 +20,10 @@ public interface StudentRepository extends JpaRepository<Student, UUID> {
 
     @Query("SELECT s FROM Student s JOIN s.interests i WHERE i.id = :eventTypeId")
     List<Student> findByEventTypeId(@Param("eventTypeId") Long eventTypeId);
+
+    @Query("SELECT s FROM Student s WHERE " +
+            "(:term IS NULL OR LOWER(CAST(s.id AS string)) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+            "LOWER(s.name) LIKE LOWER(CONCAT('%', :term, '%')) OR " +
+            "LOWER(s.email) LIKE LOWER(CONCAT('%', :term, '%'))) ")
+    Page<Student> findAll(@Param("term") String term, Pageable pageable);
 }

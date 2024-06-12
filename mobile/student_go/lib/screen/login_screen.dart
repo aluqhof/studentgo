@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               builder: (context, state) {
                 if (state is DoLoginSuccess) {
-                  Future.microtask(() {
+                  Future.delayed(Duration.zero, () {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(

@@ -314,7 +314,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    state.eventDetails.place!,
+                                    state.eventDetails.place ??
+                                        'Place not found',
                                     style: GoogleFonts.actor(
                                         textStyle:
                                             const TextStyle(fontSize: 20)),
@@ -566,9 +567,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                                               ),
                                                               Text(
                                                                   truncateString(
-                                                                      state
-                                                                          .eventDetails
-                                                                          .place!,
+                                                                      state.eventDetails
+                                                                              .place ??
+                                                                          'Unknown place',
                                                                       20),
                                                                   style: GoogleFonts.actor(
                                                                       textStyle: const TextStyle(

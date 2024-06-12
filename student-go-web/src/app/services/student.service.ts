@@ -21,8 +21,8 @@ export class StudentService {
         return this.http.get<StudentShortListResponse>("http://localhost:8080/student/search?term=" + searchTerm)
     }
 
-    findAllStudents(page: number): Observable<StudentItemResponse> {
-        return this.http.get<StudentItemResponse>("http://localhost:8080/student/all?page=" + page)
+    findAllStudents(page: number, searchTerm: string): Observable<StudentItemResponse> {
+        return this.http.get<StudentItemResponse>("http://localhost:8080/student/all?page=" + page + "&term=" + searchTerm)
     }
 
     getStudentById(id: string): Observable<Student> {
