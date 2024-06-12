@@ -20,7 +20,8 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
     @Query("SELECT e FROM Event e " +
             "JOIN e.eventTypes et " +
             "WHERE e.city.id = :cityId AND " +
-            "(:name IS NULL OR e.name LIKE %:name%) AND " +
+            "(:name IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :name, '%'))" +
+            "OR LOWER(e.name) LIKE LOWER(CONCAT(:name, '%'))) AND " +
             "(:eventTypeIds IS NULL OR et.id IN :eventTypeIds) AND " +
             "(COALESCE(:startDate, CURRENT_TIMESTAMP) <= e.dateTime) AND " +
             "(COALESCE(:endDate, CURRENT_TIMESTAMP) >= e.dateTime) AND " +
@@ -41,8 +42,9 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
     Page<Event> findFutureEventsByCityPaged(@Param("cityId") Long cityId, Pageable pageable);
     //Esto deberia ir en orden de popularidad del organizador (reviews, eventos realizados...)
 
-    @Query("SELECT e FROM Event e ORDER BY e.dateTime ASC")
-    Page<Event> findFutureEventsPaged(Pageable pageable);
+    @Query("SELECT e FROM Event e WHERE e.dateTime > CURRENT_TIMESTAMP AND " +
+            "(:term IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :term, '%'))) ORDER BY e.dateTime ASC")
+    Page<Event> findFutureEventsPaged(Pageable pageable, @Param("term") String term);
 
     @Query("SELECT e FROM Event e " +
             "JOIN e.eventTypes et " +
@@ -64,15 +66,21 @@ public interface  EventRepository extends JpaRepository<Event, UUID> {
     @Query("SELECT DISTINCT s FROM Student s JOIN Purchase p ON s.id = CAST(p.author AS java.util.UUID) JOIN p.event e WHERE e.id = :eventId")
     List<Student> findStudentsByEventIdNoPageable(@Param("eventId") UUID eventId);
 
-    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime > CURRENT_TIMESTAMP ORDER BY e.dateTime ASC")
+    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime > CURRENT_TIMESTAMP" +
+            " AND (:term IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :term, '%'))) ORDER BY e.dateTime ASC")
     Page<Event> getAllByOrganizer(@Param("author") String author,
-                                  Pageable pageable);
+                                  Pageable pageable, @Param("term") String term);
 
-    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime < CURRENT_TIMESTAMP ORDER BY e.dateTime DESC")
+    @Query("SELECT e FROM Event e WHERE e.author = :author AND e.dateTime < CURRENT_TIMESTAMP" +
+            " AND (:term IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :term, '%'))) ORDER BY e.dateTime DESC")
     Page<Event> getAllByOrganizerPast(@Param("author") String author,
-                                      Pageable pageable);
+                                      Pageable pageable, @Param("term") String term);
+    @Query("SELECT e FROM Event e WHERE e.dateTime < CURRENT_TIMESTAMP" +
+            " AND (:term IS NULL OR LOWER(e.name) LIKE LOWER(CONCAT('%', :term, '%'))) ORDER BY e.dateTime DESC")
+    Page<Event> getAllPast(Pageable pageable, @Param("term") String term);
     @Query("SELECT e FROM Event e WHERE LOWER(CAST(e.id AS string)) LIKE %:term% OR LOWER(e.name) LIKE %:term%")
     Page<Event> findByIdOrNameContainingIgnoreCase(@Param("term") String term, Pageable pageable);
     @Query("SELECT e FROM Event e JOIN e.eventTypes et WHERE et.id = :eventTypeId")
     List<Event> findByEventTypeId(@Param("eventTypeId") Long eventTypeId);
+
 }

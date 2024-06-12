@@ -2,10 +2,7 @@ package com.salesianos.dam.StudentGoApi.dto.event;
 
 import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerShortResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.student.StudentListResponse;
-import com.salesianos.dam.StudentGoApi.model.Event;
-import com.salesianos.dam.StudentGoApi.model.EventType;
-import com.salesianos.dam.StudentGoApi.model.Organizer;
-import com.salesianos.dam.StudentGoApi.model.Student;
+import com.salesianos.dam.StudentGoApi.model.*;
 import com.salesianos.dam.StudentGoApi.repository.EventRepository;
 
 import java.time.LocalDateTime;

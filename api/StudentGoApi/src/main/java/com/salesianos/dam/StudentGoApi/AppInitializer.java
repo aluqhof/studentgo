@@ -27,8 +27,7 @@ public class AppInitializer {
                 String qrCode = qrCodeService.generateQRCode(purchase.getUuid().toString());
                 purchase.setQrCode(qrCode);
                 purchaseRepository.save(purchase);
-            } catch (Exception e) {
-                // Manejar cualquier excepción que pueda ocurrir al generar el código QR
+            } catch (Exception ignored) {
             }
         }
     }

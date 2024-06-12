@@ -18,8 +18,8 @@ export class PurchaseService {
     constructor(private http: HttpClient) { }
 
 
-    getAllPurchases(page: number): Observable<PurchaseListResponse> {
-        return this.http.get<PurchaseListResponse>("http://localhost:8080/purchase/all?page=" + page);
+    getAllPurchases(page: number, searchTerm: string): Observable<PurchaseListResponse> {
+        return this.http.get<PurchaseListResponse>("http://localhost:8080/purchase/all?page=" + page + "&term=" + searchTerm);
     }
 
     getPurchaseDetails(id: string): Observable<PurchaseDetails> {

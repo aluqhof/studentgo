@@ -1,5 +1,6 @@
 package com.salesianos.dam.StudentGoApi.controller;
 
+import com.salesianos.dam.StudentGoApi.dto.event.EventViewResponse;
 import com.salesianos.dam.StudentGoApi.dto.file.response.FileResponse;
 import com.salesianos.dam.StudentGoApi.exception.FileTypeException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
@@ -7,6 +8,14 @@ import com.salesianos.dam.StudentGoApi.model.City;
 import com.salesianos.dam.StudentGoApi.repository.CityRepository;
 import com.salesianos.dam.StudentGoApi.service.StorageService;
 import com.salesianos.dam.StudentGoApi.utils.MediaTypeUrlResource;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.BadRequestException;
 import org.springframework.core.io.Resource;
@@ -25,11 +34,26 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/city")
+@Tag(name = "City", description = "The city controller has different methods to obtain various information " +
+        "about the cities, such as methods for create, edit....")
 public class CityController {
 
     private final CityRepository cityRepository;
     private final StorageService storageService;
 
+    @Operation(summary = "Add a city (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 Created", description = "The city was created successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = City.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                         "id": 4,
+                                         "name": "Málaga",
+                                         "photoUrl": "malaga.png"
+                                     }
+                                                                        """)})}),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The creation was not successful", content = @Content),
+    })
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{name}")
     public ResponseEntity<City> addCity(@PathVariable("name") String name, @RequestPart("file") MultipartFile file) {
@@ -48,6 +72,21 @@ public class CityController {
         return ResponseEntity.created(createdURI).body(city);
     }
 
+    @Operation(summary = "Add a photo for a city (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 Created", description = "The image was uploaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FileResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "name": "logo-navbar-blue_596356.png",
+                                        "uri": "http://localhost:8080/download/logo-navbar-blue_596356.png",
+                                        "type": "image/png",
+                                        "size": 9306
+                                    }
+                                                                        """)})}),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The upload was not successfully", content = @Content),
+    })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload/{id}")
     public ResponseEntity<?> upload(@RequestPart("file") MultipartFile file, @PathVariable("id") Long cityId) {
 
@@ -75,6 +114,12 @@ public class CityController {
                 .build();
     }
 
+    @Operation(summary = "Download a photo from a specific city")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The image was downloaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MediaTypeUrlResource.class)))}),
+            @ApiResponse(responseCode = "404 Not Found", description = "The image was not found", content = @Content),
+    })
     @GetMapping("/download-photo/{id}")
     public ResponseEntity<Resource> getFile(@PathVariable("id") Long id){
 
@@ -88,17 +133,66 @@ public class CityController {
                 .body(resource);
     }
 
+    @Operation(summary = "Retrieves a list from all cities")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The list was provided successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = City[].class)), examples = {
+                            @ExampleObject(value = """
+                                    [
+                                         {
+                                             "id": 1,
+                                             "name": "Sevilla",
+                                             "photoUrl": "sevilla.jpg"
+                                         },
+                                         {
+                                             "id": 2,
+                                             "name": "Köln",
+                                             "photoUrl": "koeln.jpg"
+                                         },
+                                         {
+                                             "id": 3,
+                                             "name": "Madrid",
+                                             "photoUrl": "madrid.jpg"
+                                         },
+                                     ]
+                                                                        """)})}),
+    })
     @GetMapping("/all")
     public ResponseEntity<List<City>> getAllCities(){
         List<City> all = cityRepository.findAll();
         return ResponseEntity.ok(all);
     }
 
+    @Operation(summary = "Retrieves a city")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The city was provided successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = City.class)), examples = {
+                            @ExampleObject(value = """
+                                         {
+                                             "id": 1,
+                                             "name": "Sevilla",
+                                             "photoUrl": "sevilla.jpg"
+                                         }
+                                                                        """)})}),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<City> getCity(@PathVariable("id") Long id){
         return ResponseEntity.ok(cityRepository.findById(id).orElseThrow(() -> new NotFoundException("City")));
     }
 
+    @Operation(summary = "Edits a city")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The city was edited successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = City.class)), examples = {
+                            @ExampleObject(value = """
+                                         {
+                                             "id": 1,
+                                             "name": "Seville",
+                                             "photoUrl": "sevilla.jpg"
+                                         }
+                                                                        """)})}),
+            @ApiResponse(responseCode = "404 Not Found", description = "The city was not found", content = @Content),
+    })
     @PutMapping("/{id}/name/{name}")
     public City editCity(@PathVariable("id") Long id, @PathVariable("name") String name, @RequestPart(value = "file", required = false) MultipartFile file) throws BadRequestException {
         FileResponse response;

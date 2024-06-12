@@ -29,8 +29,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
 @RequiredArgsConstructor
 public class EventService {
@@ -43,7 +41,7 @@ public class EventService {
     private final StorageService storageService;
     private final ObjectMapper objectMapper;
 
-    public Event createEvent(EditEventAdminRequest addEventRequest, MultipartFile[] files,UserDefault user){
+    public Event createEvent(EditEventOrganizerRequest addEventRequest, MultipartFile[] files, UserDefault user){
         List<FileResponse> result = Arrays.stream(files)
                 .map(this::uploadFile)
                 .toList();
@@ -65,6 +63,44 @@ public class EventService {
                 .latitude(addEventRequest.latitude())
                 .longitude(addEventRequest.longitude())
                 .author(user.getId().toString())
+                .price(addEventRequest.price())
+                .city(cityRepository.findFirstByNameIgnoreCase(addEventRequest.cityId()).orElseThrow(()-> new NotFoundException("city")))
+                .dateTime(LocalDateTime.parse(addEventRequest.dateTime(), formatter))
+                .eventTypes(addEventRequest.eventTypes()
+                        .stream()
+                        .map(e -> eventTypeRepository.findFirstByNameIgnoreCase(e)
+                                .orElseThrow(() -> new NotFoundException("event type")))
+                        .toList())
+                .maxCapacity(addEventRequest.maxCapacity())
+                .urlPhotos(eventPhotos)
+                .build();
+
+        return eventRepository.save(event);
+    }
+
+    public Event createEventAdmin(EditEventRequestAdmin addEventRequest, MultipartFile[] files){
+        List<FileResponse> result = Arrays.stream(files)
+                .map(this::uploadFile)
+                .toList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        List<String> eventPhotos = new ArrayList<>();
+
+        for (MultipartFile file : files) {
+            String filename = file.getOriginalFilename();
+            if (filename != null && !filename.isBlank()) {
+                eventPhotos.add(filename);
+            }
+        }
+
+        Event event = Event.builder()
+                .name(addEventRequest.name())
+                .description(addEventRequest.description())
+                .latitude(addEventRequest.latitude())
+                .longitude(addEventRequest.longitude())
+                .author(organizerRepository.findById(UUID.fromString(addEventRequest.author())).orElseThrow(() -> new NotFoundException("Organizer")).getId().toString())
+                .price(addEventRequest.price())
                 .city(cityRepository.findFirstByNameIgnoreCase(addEventRequest.cityId()).orElseThrow(()-> new NotFoundException("city")))
                 .dateTime(LocalDateTime.parse(addEventRequest.dateTime(), formatter))
                 .eventTypes(addEventRequest.eventTypes()
@@ -80,22 +116,32 @@ public class EventService {
     }
 
     public Event createEvent(String addEventRequest, MultipartFile[] files, UserDefault user){
-        EditEventAdminRequest addEventDto = null;
+        EditEventOrganizerRequest addEventDto = null;
         try {
-            addEventDto = objectMapper.readValue(addEventRequest, EditEventAdminRequest.class);
+            addEventDto = objectMapper.readValue(addEventRequest, EditEventOrganizerRequest.class);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
         return createEvent(addEventDto, files, user);
     }
 
-    public MyPage<EventViewResponse> getEventsByOrganizer(Organizer organizer, Pageable pageable) {
+    public Event createEventAdmin(String addEventRequestAdmin, MultipartFile[] files){
+        EditEventRequestAdmin addEventDto = null;
+        try {
+            addEventDto = objectMapper.readValue(addEventRequestAdmin, EditEventRequestAdmin.class);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        return createEventAdmin(addEventDto, files);
+    }
+
+    public MyPage<EventViewResponse> getEventsByOrganizer(Organizer organizer, Pageable pageable, String term) {
         if(organizer == null){
             throw new PermissionException("You don't have permission to access to this resource");
         }
-        Page<Event> events = eventRepository.getAllByOrganizer(organizer.getId().toString(), pageable);
+        Page<Event> events = eventRepository.getAllByOrganizer(organizer.getId().toString(), pageable, term);
         return MyPage.of(events
-                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Organizer Events");
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Future Organizer Events");
     }
 
     private FileResponse uploadFile(MultipartFile file) {
@@ -113,13 +159,19 @@ public class EventService {
                 .build();
     }
 
-    public MyPage<EventViewResponse> getPastEventsByOrganizer(Organizer organizer, Pageable pageable)  {
+    public MyPage<EventViewResponse> getPastEventsByOrganizer(Organizer organizer, Pageable pageable, String term)  {
         if(organizer == null){
             throw new PermissionException("You don't have permission to access to this resource");
         }
-        Page<Event> events = eventRepository.getAllByOrganizerPast(organizer.getId().toString(), pageable);
+        Page<Event> events = eventRepository.getAllByOrganizerPast(organizer.getId().toString(), pageable, term);
         return MyPage.of(events
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Organizer Events");
+    }
+
+    public MyPage<EventViewResponse> getPastEvents(Pageable pageable, String term)  {
+        Page<Event> events = eventRepository.getAllPast(pageable, term);
+        return MyPage.of(events
+                .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Past Events");
     }
 
     public List<Event> getAllUpcomingEventsInCity(String cityName, String searchQuery,
@@ -203,8 +255,8 @@ public class EventService {
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
     }
 
-    public MyPage<EventViewResponse> getAllUpcomingEventsPaged(Pageable pageable){
-        return MyPage.of(eventRepository.findFutureEventsPaged(pageable)
+    public MyPage<EventViewResponse> getAllUpcomingEventsPaged(Pageable pageable, String term){
+        return MyPage.of(eventRepository.findFutureEventsPaged(pageable, term)
                 .map(event ->EventViewResponse.of(event, eventRepository.findStudentsByEventIdNoPageable(event.getId()))), "Upcoming Events");
     }
 
@@ -236,11 +288,11 @@ public class EventService {
     public EventDetailsResponse getEventById(UUID eventId){
         Event event = eventRepository.findById(eventId).orElseThrow(() -> new NotFoundException("event"));
         List<Student> students = eventRepository.findStudentsByEventIdNoPageable(event.getId());
-        Organizer organizer= organizerRepository.findById(UUID.fromString(event.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
+        Organizer organizer = organizerRepository.findById(UUID.fromString(event.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
         return EventDetailsResponse.of(event, students, organizer);
     }
 
-    public EventDetailsResponse editEventAdmin(String id, EditEventAdminRequest edit){
+    public EventDetailsResponse editEventOrganizer(String id, EditEventOrganizerRequest edit){
         Event eventSelected = eventRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("Event"));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
@@ -285,8 +337,55 @@ public class EventService {
         return EventDetailsResponse.of(eventSelected, students, organizer);
     }
 
+    public EventDetailsResponse editEventAdmin(String id, EditEventRequestAdmin edit){
+        Event eventSelected = eventRepository.findById(UUID.fromString(id)).orElseThrow(() -> new NotFoundException("Event"));
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+        if (edit.name() != null) {
+            eventSelected.setName(edit.name());
+        }
+        if (edit.dateTime() != null) {
+            eventSelected.setDateTime(LocalDateTime.parse(edit.dateTime(), formatter));
+        }
+        if (edit.description() != null) {
+            eventSelected.setDescription(edit.description());
+        }
+        if (edit.price() != null) {
+            eventSelected.setPrice(edit.price());
+        }
+        if (edit.maxCapacity() != null) {
+            eventSelected.setMaxCapacity(edit.maxCapacity());
+        }
+        if (edit.cityId() != null) {
+            eventSelected.setCity(cityRepository.findFirstByNameIgnoreCase(edit.cityId()).orElseThrow(() -> new NotFoundException("City")));
+        }
+        if (edit.latitude() != null) {
+            eventSelected.setLatitude(edit.latitude());
+        }
+        if (edit.longitude() != null) {
+            eventSelected.setLongitude(edit.longitude());
+        }
+        if (edit.eventTypes() != null) {
+            eventSelected.setEventTypes(
+                    edit.eventTypes()
+                            .stream()
+                            .map(et -> eventTypeRepository.findFirstByNameIgnoreCase(et)
+                                    .orElseThrow(() -> new NotFoundException("Event Type")))
+                            .collect(Collectors.toList())
+            );
+        }
+        eventSelected.setAuthor(organizerRepository.findById(UUID.fromString(edit.author())).orElseThrow(() ->  new NotFoundException("Organizer")).getId().toString());
+        eventRepository.save(eventSelected);
+        List<Student> students = eventRepository.findStudentsByEventIdNoPageable(eventSelected.getId());
+        Organizer organizer= organizerRepository.findById(UUID.fromString(eventSelected.getAuthor())).orElseThrow(() -> new NotFoundException("organizer"));
+
+        return EventDetailsResponse.of(eventSelected, students, organizer);
+    }
+
     public MyPage<EventShortResponse> getEventByIdOrName(String term, Pageable pageable) {
         Page<Event> events = eventRepository.findByIdOrNameContainingIgnoreCase(term, pageable);
         return MyPage.of(events.map(EventShortResponse::of), "Events");
     }
+
 }

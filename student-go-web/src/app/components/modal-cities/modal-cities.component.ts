@@ -50,6 +50,7 @@ export class ModalCitiesComponent {
   }
 
   selectCity(city: string): void {
-    this.closeModal(); // Use closeModal to ensure consistent behavior
+    this.closeModal();
+    this.router.navigate([`/city/${city}`]);
   }
 }

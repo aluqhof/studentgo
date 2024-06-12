@@ -87,8 +87,8 @@ public class StudentService {
         return MyPage.of(students.map(StudentShortResponse::of), "Students");
     }
 
-    public MyPage<StudentItemResponse> findAllStudents(Pageable pageable){
-        Page<Student> students = studentRepository.findAll(pageable);
+    public MyPage<StudentItemResponse> findAllStudents(Pageable pageable, String term){
+        Page<Student> students = studentRepository.findAll(term, pageable);
         return MyPage.of(students.map(StudentItemResponse::of), "Student");
     }
 

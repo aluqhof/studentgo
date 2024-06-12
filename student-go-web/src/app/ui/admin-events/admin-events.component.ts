@@ -7,6 +7,9 @@ import { EventTypeResponse } from '../../models/event-type-response.inteface';
 import { CityService } from '../../services/city.service';
 import { CityResponse } from '../../models/city-response.interface';
 import { EventTypeService } from '../../services/event-type.service';
+import { AuthService } from '../../services/auth.service';
+import { OrganizerService } from '../../services/organizer-service';
+import { Organizer } from '../../models/organizer-page-response.interface';
 
 @Component({
   selector: 'app-admin-events',
@@ -21,11 +24,11 @@ export class AdminEventsComponent {
   eventListPast: EventResponse[] = [];
   countFutureEvents = 0;
   currentPageFutureEvents = 0;
-  pageSizeFuture = 10; // Define el tamaño de la página para futuros eventos
+  pageSizeFuture = 10;
   totalPagesFuture = 0;
   countPastEvents = 0;
   currentPagePastEvents = 0;
-  pageSizePast = 10; // Define el tamaño de la página para eventos pasados
+  pageSizePast = 10;
   totalPagesPast = 0;
   selectedEvent!: EventDetailsResponse | undefined;
   eventDetails = {
@@ -38,8 +41,9 @@ export class AdminEventsComponent {
     maxCapacity: 0,
     latitude: 0,
     longitude: 0,
-    city: ''
+    city: '',
   };
+  author: string = '';
   f: any;
   imagePreviews: string[] = [];
   selectedImage: string | null = null;
@@ -52,14 +56,23 @@ export class AdminEventsComponent {
   selectedEt: EventTypeResponse[] = [];
   citySelected!: string;
   citiesUnselected: string[] = [];
-  files: File[] = [];  // Aquí almacenamos los archivos seleccionados
+  files: File[] = [];
+  fieldErrors: { [key: string]: string } = {};
+  filteredOrganizers: Organizer[] = [];
+  selectedOrganizer: Organizer | undefined;
+  searchOrganizer: string = '';
+  isSubmitEnabled: boolean = false;
+  pastEventList: EventResponse[] = [];
+  searchFuture: string = '';
+  searchPast: string = '';
 
-  constructor(private cityService: CityService, private eventTypeService: EventTypeService, private eventService: EventService) { }
+  constructor(private cityService: CityService, private eventTypeService: EventTypeService, private eventService: EventService, public authService: AuthService, private organizerService: OrganizerService) { }
 
   ngOnInit() {
     this.loadNewPageFuture();
     this.getAllCities();
     this.getAllEventTypes();
+    this.loadNewPagePast();
     //this.loadNewPagePast();
   }
 
@@ -85,19 +98,154 @@ export class AdminEventsComponent {
     });
   }
 
-  loadNewPageFuture(page: number = 0) {
-    this.eventService.getUpcomingEvents(page).subscribe({
-      next: (data) => {
-        this.eventList = data.content;
-        this.countFutureEvents = data.totalElements;
-        this.currentPageFutureEvents = data.pageNumber;
-        this.pageSizeFuture = data.size; // Assuming 'size' is part of the response
-        this.totalPagesFuture = Math.ceil(this.countFutureEvents / this.pageSizeFuture);
-      },
-      error: (error) => {
-        console.error('Error getting events:', error);
+  filterOrganizers(search: string) {
+    this.organizerService.searchOrganizer(search).subscribe({
+      next: async (data) => {
+        this.filteredOrganizers = data.content
+        this.selectedOrganizer = undefined;
       }
-    });
+    })
+  }
+
+  filterFutureEvents(search: string) {
+    if (this.authService.isAdmin()) {
+      this.eventService.getUpcomingEvents(0, this.searchFuture).subscribe({
+        next: async (data) => {
+          this.eventList = data.content;
+          this.countFutureEvents = data.totalElements;
+          this.currentPageFutureEvents = data.pageNumber;
+          this.pageSizeFuture = data.size;
+          this.totalPagesFuture = Math.ceil(this.countFutureEvents / this.pageSizeFuture);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      })
+    } else if (this.authService.isOrganizer()) {
+      this.eventService.getUpcomingEventsByOrganizer(0, this.searchFuture).subscribe({
+        next: async (data) => {
+          this.eventList = data.content;
+          this.countFutureEvents = data.totalElements;
+          this.currentPageFutureEvents = data.pageNumber;
+          this.pageSizeFuture = data.size;
+          this.totalPagesFuture = Math.ceil(this.countFutureEvents / this.pageSizeFuture);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      })
+    }
+  }
+
+  filterPastEvents(search: string) {
+    if (this.authService.isAdmin()) {
+      this.eventService.getPastEventsByAdmin(0, this.searchPast).subscribe({
+        next: async (data) => {
+          this.pastEventList = data.content;
+          this.countPastEvents = data.totalElements;
+          this.currentPagePastEvents = data.pageNumber;
+          this.pageSizePast = data.size;
+          this.totalPagesPast = Math.ceil(this.countPastEvents / this.pageSizePast);;
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      })
+    } else if (this.authService.isOrganizer()) {
+      this.eventService.getPastEventsByOrganizer(0, this.searchPast).subscribe({
+        next: async (data) => {
+          this.pastEventList = data.content;
+          this.countPastEvents = data.totalElements;
+          this.currentPagePastEvents = data.pageNumber;
+          this.pageSizePast = data.size;
+          this.totalPagesPast = Math.ceil(this.countPastEvents / this.pageSizePast);;
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      })
+    }
+  }
+
+  selectOrganizer(organizer: Organizer) {
+    this.searchOrganizer = organizer.username;
+    this.selectedOrganizer = organizer;
+    this.filteredOrganizers = [];
+    this.checkSubmitEnabled();
+  }
+
+  checkSubmitEnabled() {
+    this.isSubmitEnabled = !!this.selectedOrganizer; // Habilitar si ambos campos están seleccionados
+  }
+
+  getMinDate(): string {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const day = currentDate.getDate().toString().padStart(2, '0');
+    const hours = currentDate.getHours().toString().padStart(2, '0');
+    const minutes = currentDate.getMinutes().toString().padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  loadNewPageFuture(page: number = 0) {
+    if (this.authService.isAdmin()) {
+      this.eventService.getUpcomingEvents(page, this.searchFuture).subscribe({
+        next: (data) => {
+          this.eventList = data.content;
+          this.countFutureEvents = data.totalElements;
+          this.currentPageFutureEvents = data.pageNumber;
+          this.pageSizeFuture = data.size;
+          this.totalPagesFuture = Math.ceil(this.countFutureEvents / this.pageSizeFuture);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      });
+    } else if (this.authService.isOrganizer()) {
+      this.eventService.getUpcomingEventsByOrganizer(page, this.searchFuture).subscribe({
+        next: (data) => {
+          this.eventList = data.content;
+          this.countFutureEvents = data.totalElements;
+          this.currentPageFutureEvents = data.pageNumber;
+          this.pageSizeFuture = data.size;
+          this.totalPagesFuture = Math.ceil(this.countFutureEvents / this.pageSizeFuture);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      });
+    }
+  }
+
+  loadNewPagePast(page: number = 0) {
+    if (this.authService.isAdmin()) {
+      this.eventService.getPastEventsByAdmin(page, this.searchPast).subscribe({
+        next: (data) => {
+          this.pastEventList = data.content;
+          this.countPastEvents = data.totalElements;
+          this.currentPagePastEvents = data.pageNumber;
+          this.pageSizePast = data.size;
+          this.totalPagesPast = Math.ceil(this.countPastEvents / this.pageSizePast);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      });
+    } else if (this.authService.isOrganizer()) {
+      this.eventService.getPastEventsByOrganizer(page, this.searchPast).subscribe({
+        next: (data) => {
+          this.pastEventList = data.content;
+          this.countPastEvents = data.totalElements;
+          this.currentPagePastEvents = data.pageNumber;
+          this.pageSizePast = data.size;
+          this.totalPagesPast = Math.ceil(this.countPastEvents / this.pageSizePast);
+        },
+        error: (error) => {
+          console.error('Error getting events:', error);
+        }
+      });
+    }
   }
 
   addInterest(event: any) {
@@ -126,6 +274,10 @@ export class AdminEventsComponent {
 
   changePageFuture(page: number): void {
     this.loadNewPageFuture(page);
+  }
+
+  changePagePast(page: number): void {
+    this.loadNewPagePast(page);
   }
 
   getArrayFromNumber(length: number): number[] {
@@ -189,6 +341,8 @@ export class AdminEventsComponent {
           longitude: data.longitude,
           city: data.cityId
         };
+        this.searchOrganizer = data.organizer.username;
+        this.selectedOrganizer = data.organizer;
         this.eventTypes.forEach(et => {
           if (this.eventDetails.eventTypes.includes(et.name)) {
             this.selectedEt.push(et);
@@ -223,6 +377,8 @@ export class AdminEventsComponent {
     this.files = [];
     this.selectedEt = [];
     this.eventTypes = [];
+    this.selectedOrganizer = undefined
+    this.searchOrganizer = '';
     this.getAllEventTypes();
     this.eventDetails = {
       id: '',
@@ -338,29 +494,12 @@ export class AdminEventsComponent {
 
   onSubmit() {
     if (this.selectedEvent) {
-      this.eventService.editEventAdmin(this.eventDetails.id, {
-        name: this.eventDetails.name,
-        dateTime: this.formatDateString(this.eventDetails.date),
-        description: this.eventDetails.description,
-        price: this.eventDetails.price,
-        maxCapacity: this.eventDetails.maxCapacity,
-        cityId: this.citySelected,
-        latitude: this.eventDetails.latitude,
-        longitude: this.eventDetails.longitude,
-        eventTypes: this.selectedEt.map(et => et.name)
-      }).subscribe({
-        next: data => {
-          this.closeModal();
-          window.location.reload();
-        },
-        error: err => {
-          console.error('Hubo un error al editar el evento:', err);
-        }
-      });
-      return true;
-    } else {
-      this.eventService.createEvent(
-        {
+      if (this.files.length === 0 && this.imagePreviews.length === 0) {
+        this.fieldErrors['photo'] = "You have to choose a photo";
+        return false
+      }
+      if (this.authService.isOrganizer()) {
+        this.eventService.editEventOrganizer(this.eventDetails.id, {
           name: this.eventDetails.name,
           dateTime: this.formatDateString(this.eventDetails.date),
           description: this.eventDetails.description,
@@ -370,17 +509,95 @@ export class AdminEventsComponent {
           latitude: this.eventDetails.latitude,
           longitude: this.eventDetails.longitude,
           eventTypes: this.selectedEt.map(et => et.name)
-        },
-        this.files // Pasa los archivos directamente
-      ).subscribe({
-        next: data => {
-          this.closeModal();
-          window.location.reload();
-        },
-        error: err => {
-          console.error('Hubo un error al crear el evento:', err);
-        }
-      });
+        }).subscribe({
+          next: data => {
+            this.closeModal();
+            window.location.reload();
+          },
+          error: err => {
+            console.error('Hubo un error al editar el evento:', err);
+          }
+        });
+      } else if (this.authService.isAdmin()) {
+        this.eventService.editEventAdmin(this.eventDetails.id, {
+          name: this.eventDetails.name,
+          dateTime: this.formatDateString(this.eventDetails.date),
+          description: this.eventDetails.description,
+          price: this.eventDetails.price,
+          maxCapacity: this.eventDetails.maxCapacity,
+          cityId: this.citySelected,
+          latitude: this.eventDetails.latitude,
+          longitude: this.eventDetails.longitude,
+          eventTypes: this.selectedEt.map(et => et.name),
+          author: this.selectedOrganizer?.id!
+        }).subscribe({
+          next: data => {
+            this.closeModal();
+            window.location.reload();
+          },
+          error: err => {
+            console.error('Hubo un error al editar el evento:', err);
+          }
+        });
+      }
+      this.selectedOrganizer = undefined;
+      this.searchOrganizer = '';
+      return true;
+    } else {
+      if (this.files.length === 0) {
+        this.fieldErrors['photo'] = "You have to choose a photo";
+        return false
+      }
+      if (this.authService.isOrganizer()) {
+        this.eventService.createEventOrganizer(
+          {
+            name: this.eventDetails.name,
+            dateTime: this.formatDateString(this.eventDetails.date),
+            description: this.eventDetails.description,
+            price: this.eventDetails.price,
+            maxCapacity: this.eventDetails.maxCapacity,
+            cityId: this.citySelected,
+            latitude: this.eventDetails.latitude,
+            longitude: this.eventDetails.longitude,
+            eventTypes: this.selectedEt.map(et => et.name)
+          },
+          this.files // Pasa los archivos directamente
+        ).subscribe({
+          next: data => {
+            this.closeModal();
+            window.location.reload();
+          },
+          error: err => {
+            console.error('Hubo un error al crear el evento:', err);
+          }
+        });
+      } else if (this.authService.isAdmin()) {
+        this.eventService.createEventAdmin(
+          {
+            name: this.eventDetails.name,
+            dateTime: this.formatDateString(this.eventDetails.date),
+            description: this.eventDetails.description,
+            price: this.eventDetails.price,
+            maxCapacity: this.eventDetails.maxCapacity,
+            cityId: this.citySelected,
+            latitude: this.eventDetails.latitude,
+            longitude: this.eventDetails.longitude,
+            eventTypes: this.selectedEt.map(et => et.name),
+            author: this.selectedOrganizer?.id!
+          },
+          this.files // Pasa los archivos directamente
+        ).subscribe({
+          next: data => {
+            this.closeModal();
+            window.location.reload();
+          },
+          error: err => {
+            console.error('Hubo un error al crear el evento:', err);
+          }
+        });
+        this.selectedOrganizer = undefined;
+        this.searchOrganizer = '';
+      }
       return true;
     }
   }

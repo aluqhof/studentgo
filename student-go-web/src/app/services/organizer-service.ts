@@ -12,8 +12,8 @@ export class OrganizerService {
 
     constructor(private http: HttpClient) { }
 
-    findAllOrganizer(page: number): Observable<OrganizerList> {
-        return this.http.get<OrganizerList>("http://localhost:8080/organizer/all?page=" + page);
+    findAllOrganizer(page: number, searchTerm: string): Observable<OrganizerList> {
+        return this.http.get<OrganizerList>("http://localhost:8080/organizer/all?page=" + page + "&term=" + searchTerm);
     }
 
     getOrganizer(id: string): Observable<OrganizerResponse> {
@@ -26,5 +26,9 @@ export class OrganizerService {
 
     createOrganizer(add: OrganizerEditRequest) {
         return this.http.post("http://localhost:8080/auth/register-organizer", add)
+    }
+
+    searchOrganizer(term: string): Observable<OrganizerList> {
+        return this.http.get<OrganizerList>("http://localhost:8080/organizer/search?term=" + term);
     }
 }

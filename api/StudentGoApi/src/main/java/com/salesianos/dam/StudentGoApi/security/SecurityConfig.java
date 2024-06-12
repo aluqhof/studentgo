@@ -120,6 +120,7 @@ public class SecurityConfig {
                         antMatcher("/swagger/**"),
                         antMatcher("/swagger-ui/**"),
                         antMatcher("/api-docs"),
+                        antMatcher("/api-docs/**"),
                         antMatcher("/error")));
     }
 }

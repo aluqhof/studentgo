@@ -1,0 +1,139 @@
+<div *ngIf="isModalOpen"
+    class="fixed z-50 top-0 left-0 w-full h-full flex justify-center items-center bg-black bg-opacity-50">
+    <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow ">
+            <!-- Modal header -->
+            <div class="inline-flex w-full items-center justify-between p-4 md:p-5 border-b rounded-t ">
+                <p class="text-xl font-semibold text-gray-900 ">
+                    Sign up to our platform
+                </p>
+                <button type="button" (click)="closeModal()" class="close transparent-close" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-6 text-black">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+
+                </button>
+            </div>
+            <!-- Modal body -->
+            <div class="p-4 md:p-5">
+                <form class="space-y-4" *ngIf="!isLoggedIn" (ngSubmit)="f.form.valid && onSubmit()" #f="ngForm"
+                    novalidate>
+                    <div class="inline-flex w-full gap-2">
+                        <div>
+                            <label for="name" class="block mb-2 text-sm font-medium text-gray-900 ">Your
+                                full name</label>
+                            <input [(ngModel)]="form.name" type="name" name="name" id="name"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                                placeholder="johnwolf97" maxlength="50" #name="ngModel" required />
+                            <div class="alert-danger" *ngIf="name.errors && f.submitted">
+                                <div class="error" *ngIf="name.errors['required']">Name is required</div>
+                                <div class="error" *ngIf="name.errors['minlength']">Name must be at least 3
+                                    characters</div>
+                                <div class="error" *ngIf="name.errors['maxlength']">Name must be at most 50
+                                    characters</div>
+                            </div>
+                            <div *ngIf="fieldErrors['name']" class="error">{{ fieldErrors['name'] }}</div>
+                        </div>
+                        <div>
+                            <label for="username" class="block mb-2 text-sm font-medium text-gray-900 ">Your
+                                username</label>
+                            <input [(ngModel)]="form.username" type="text" name="username" id="username"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                                placeholder="John Wolf" maxlength="20" #username="ngModel" required />
+                            <div class="alert-danger" *ngIf="username.errors && f.submitted">
+                                <div class="error" *ngIf="username.errors['required']">Username is required</div>
+                                <div class="error" *ngIf="username.errors['minlength']">Username must be at least 3
+                                    characters</div>
+                                <div class="error" *ngIf="username.errors['maxlength']">Username must be at most 20
+                                    characters</div>
+                            </div>
+                            <div *ngIf="fieldErrors['username']" class="error">{{ fieldErrors['username'] }}</div>
+                        </div>
+                    </div>
+                    <div class="inline-flex w-full gap-2">
+                        <div>
+                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">Your
+                                password</label>
+                            <input [(ngModel)]="form.password" type="password" id="password" name="password"
+                                placeholder="••••••••"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                                required minlength="6" #password="ngModel" />
+                            <div class="alert-danger" *ngIf="password.errors && f.submitted">
+                                <div *ngIf="password.errors['required']" class="error">Password is required</div>
+                                <div class="error" *ngIf="password.errors['minlength']">Password must be at least 6
+                                    characters</div>
+                            </div>
+                            <div *ngIf="fieldErrors['password']" class="error">{{ fieldErrors['password'] }}</div>
+                        </div>
+                        <div>
+                            <label for="password" class="block mb-2 text-sm font-medium text-gray-900 ">Your
+                                password</label>
+                            <input [(ngModel)]="form.verifyPassword" type="password" id="verifyPassword"
+                                name="verifyPassword" placeholder="••••••••"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                                required minlength="6" #verifyPassword="ngModel" />
+                            <div class="alert-danger" *ngIf="verifyPassword.errors && f.submitted">
+                                <div *ngIf="verifyPassword.errors['required']" class="error">Password is required</div>
+                                <div class="error" *ngIf="verifyPassword.errors['minlength']">Password must be at least
+                                    6
+                                    characters</div>
+                            </div>
+                            <div *ngIf="fieldErrors['verifyPassword']" class="error">{{ fieldErrors['verifyPassword'] }}
+                            </div>
+                            <div *ngIf="fieldErrors['passwordDontMatch']" class="error">{{
+                                fieldErrors['passwordDontMatch'] }}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="email" class="block mb-2 text-sm font-medium text-gray-900 ">Email</label>
+                        <input [(ngModel)]="form.email" type="email" id="email" name="email"
+                            placeholder="john.wolf@mail.com"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                            required #email="ngModel" />
+                        <div class="alert-danger" *ngIf="email.errors && f.submitted">
+                            <div *ngIf="email.errors['required']" class="error">Email is required</div>
+                            <div class="error" *ngIf="email.errors['email']">The email format is invalid</div>
+                        </div>
+                        <div *ngIf="fieldErrors['email']" class="error">{{ fieldErrors['email'] }}</div>
+                    </div>
+                    <div>
+                        <label for="eventTypes" class="block mb-2 ml-2 text-sm font-medium text-gray-900">Event
+                            Types</label>
+                        <select id="interest" name="interest"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            (change)="addInterest($event)">
+                            <option value="">Choose a Event Type</option>
+                            <option *ngFor="let et of eventTypes" [value]="et | json">{{ et.name
+                                }}
+                            </option>
+                        </select>
+                        <div *ngIf="f.submitted && selectedEt.length === 0" class="error">
+                            At least one event type must be selected.
+                        </div>
+                        <div *ngIf="fieldErrors['eventTypes']" class="error">{{ fieldErrors['eventTypes'] }}</div>
+
+                        <div *ngIf="selectedEt.length > 0" class="mb-0.5 mt-1.5">
+                            <div style="display: flex; flex-wrap: wrap;">
+                                <div *ngFor="let selectedInterest of selectedEt"
+                                    (click)="removeInterest(selectedInterest)"
+                                    class="interest-container text-black text-sm cursor-pointer">
+                                    {{ selectedInterest.name }}
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="fieldErrors['interests']" class="error">{{ fieldErrors['interests'] }}</div>
+                    </div>
+
+                    <!--<div class="alert-danger" *ngIf="isLoginFailed">
+                        <p class="error">{{ errorMessage }}</p>
+                    </div>-->
+                    <button type="submit"
+                        class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

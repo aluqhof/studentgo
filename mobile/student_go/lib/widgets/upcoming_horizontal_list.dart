@@ -132,7 +132,7 @@ class _UpcomingHorizontalListState extends State<UpcomingHorizontalList> {
               )
             ],
           );
-        } else if (state is EventListInitial) {
+        } else if (state is EventListInitial || state is EventListLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TokenNotValidState) {
           Future.microtask(() {

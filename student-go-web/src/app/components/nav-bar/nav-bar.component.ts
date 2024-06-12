@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { CityResponse } from '../../models/city-response.interface';
 import { CityService } from '../../services/city.service';
 
 @Component({
@@ -13,16 +12,25 @@ export class NavBarComponent {
 
   openCityModal: boolean = false;
   isModalLoginOpen: boolean = false;
+  isModalRegisterOpen: boolean = false;
 
   constructor(public authService: AuthService, private router: Router, private cityService: CityService) { }
 
   openModal() {
-    this.isModalLoginOpen = false
+    this.isModalLoginOpen = false;
+    this.isModalRegisterOpen = false;
     this.openCityModal = true;
   }
 
   openModalLogin() {
-    this.isModalLoginOpen = true
+    this.isModalLoginOpen = true;
+    this.isModalRegisterOpen = false;
+    this.openCityModal = false;
+  }
+
+  openModalRegister() {
+    this.isModalLoginOpen = false;
+    this.isModalRegisterOpen = true;
     this.openCityModal = false;
   }
 
@@ -32,6 +40,10 @@ export class NavBarComponent {
 
   closeModalLogin() {
     this.isModalLoginOpen = false;
+  }
+
+  closeModalRegister() {
+    this.isModalRegisterOpen = false;
   }
 
   logout(): void {

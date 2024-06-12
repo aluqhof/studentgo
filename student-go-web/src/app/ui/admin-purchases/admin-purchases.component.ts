@@ -5,6 +5,7 @@ import { Event, PurchaseDetails } from '../../models/purchase-details.interface'
 import { EventService } from '../../services/events.service';
 import { StudentService } from '../../services/student.service';
 import { Content } from '../../models/student-short-list-response.interface';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-admin-purchases',
@@ -38,8 +39,10 @@ export class AdminPurchasesComponent {
   selectedStudent!: Content | undefined;
   selectedEvent!: Event | undefined;
   isSubmitEnabled: boolean = false;
+  fieldErrors: { [key: string]: string } = {};
+  searchPurchase: string = '';
 
-  constructor(private purchaseService: PurchaseService, private eventService: EventService, private studentService: StudentService) { }
+  constructor(private purchaseService: PurchaseService, private eventService: EventService, private studentService: StudentService, public authService: AuthService) { }
 
   ngOnInit() {
     this.loadNewPage();
@@ -47,7 +50,7 @@ export class AdminPurchasesComponent {
   }
 
   loadNewPage(page: number = 0) {
-    this.purchaseService.getAllPurchases(page).subscribe({
+    this.purchaseService.getAllPurchases(page, this.searchPurchase).subscribe({
       next: (data) => {
         this.purchaseList = data.content;
         this.countPurchases = data.totalElements;
@@ -59,6 +62,22 @@ export class AdminPurchasesComponent {
         console.error('Error getting purchases:', error);
       }
     });
+  }
+
+  filterPurchase(search: string) {
+    this.purchaseService.getAllPurchases(0, this.searchPurchase).subscribe({
+      next: (data) => {
+        this.purchaseList = data.content;
+        this.countPurchases = data.totalElements;
+        this.currentPage = data.pageNumber;
+        this.pageSize = data.size;
+        this.totalPages = Math.ceil(this.countPurchases / this.pageSize);
+      },
+      error: (error) => {
+        console.error('Error getting purchases:', error);
+      }
+    });
+
   }
 
   changePageFuture(page: number): void {
@@ -134,7 +153,6 @@ export class AdminPurchasesComponent {
 
   openModalCreate() {
     this.openModal = true;
-    this.f.resetForm(this.purchaseDetails);
   }
 
   openEditModal(purchase: Purchase) {
@@ -158,18 +176,18 @@ export class AdminPurchasesComponent {
         this.openModal = true;
       },
       error: (error) => {
-        console.error('Error getting event:', error);
+        console.error('Error getting purchase:', error);
       }
     });
-    //this.modalService.open(content, { ariaLabelledBy: 'modal-title' });
-    this.f.resetForm(this.purchaseDetails);
   }
 
   closeModal() {
     this.openModal = false;
     this.purchaseSelected = undefined;
     this.selectedEvent = undefined;
-    this.selectedStudent = undefined
+    this.selectedStudent = undefined;
+    this.searchTerm = '';
+    this.searchStudent = '';
     this.purchaseDetails = {
       id: '',
       date: '',
@@ -198,7 +216,12 @@ export class AdminPurchasesComponent {
           window.location.reload();
         },
         error: err => {
-          console.error('Hubo un error al editar el evento:', err);
+          if (err.status === 400 && err.error && err.error["Fields errors"]) {
+            this.fieldErrors = {};
+            err.error["Fields errors"].forEach((fieldError: any) => {
+              this.fieldErrors[fieldError.field] = fieldError.message;
+            });
+          }
         }
       });
       this.selectedEvent = undefined;

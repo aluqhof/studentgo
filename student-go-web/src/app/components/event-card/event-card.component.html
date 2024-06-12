@@ -1,0 +1,18 @@
+<div class="max-w-sm rounded-lg overflow-hidden shadow-l bg-white">
+    <div class="h-64"><img class="w-full h-full object-fit: cover max-width: 100%"
+            [src]="'http://localhost:8080/event/download-event-photo/'+ event.uuid +'/number/'+0"
+            alt="Sunset in the mountains"></div>
+    <div class="px-6 py-4">
+        <div class="font-bold text-xl mb-1 max-w-full text-ellipsis overflow-hidden whitespace-nowrap">{{event.name}}
+        </div>
+        <p class="text-gray-500 text-base">
+            {{formatDate(event.dateTime.toString())}}
+        </p>
+    </div>
+    <div class="px-6 pt-2 pb-2  text-ellipsis overflow-hidden whitespace-nowrap">
+        <span class="inline-block rounded-full px-3 py-1 text-sm font-medium text-white mr-2 mb-2"
+            *ngFor="let item of event.eventType" [style.backgroundColor]="convertColorCode(item.colorCode)">
+            {{ item.name }}
+        </span>
+    </div>
+</div>

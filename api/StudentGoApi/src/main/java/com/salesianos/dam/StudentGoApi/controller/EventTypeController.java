@@ -37,8 +37,8 @@ public class EventTypeController {
 
     @Operation(summary = "Get all event types")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200 Ok", description = "The list was provided succesful", content = {
-                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventTypeResponse.class)), examples = {
+            @ApiResponse(responseCode = "200 Ok", description = "The list was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventTypeResponse[].class)), examples = {
                             @ExampleObject(value = """
                                     [
                                         {
@@ -73,11 +73,39 @@ public class EventTypeController {
         return ResponseEntity.ok(eventTypeService.getAllEventTypes().stream().map(EventTypeResponse::of).toList());
     }
 
+    @Operation(summary = "Retrieves an event type")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 Ok", description = "The event type was provided successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventTypeResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "name": "Sports",
+                                        "iconRef": "0xe5e6",
+                                        "colorCode": "0xfff0635a"
+                                    }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "404 Not Found", description = "The event type provided does not exist", content = @Content),
+    })
     @GetMapping("/{id}")
     public ResponseEntity<EventTypeResponse> getEventType(@PathVariable("id") Long id){
         return ResponseEntity.ok(EventTypeResponse.of(eventTypeService.getEventTypeById(id)));
     }
 
+    @Operation(summary = "Creates an event type (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 Created", description = "The event type was created successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventTypeResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "name": "Sports",
+                                        "iconRef": "0xe5e6",
+                                        "colorCode": "0xfff0635a"
+                                    }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The payload provided is not correct", content = @Content),
+    })
     @PostMapping("/")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<EventTypeResponse> createEventType(@RequestBody @Valid EventTypeRequest add){
@@ -92,12 +120,32 @@ public class EventTypeController {
         return ResponseEntity.created(createdURI).body(EventTypeResponse.of(eventType));
     }
 
+    @Operation(summary = "Edits an event type (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The event type was edited successful", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = EventTypeResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    {
+                                        "id": 1,
+                                        "name": "Music",
+                                        "iconRef": "0xe5e6",
+                                        "colorCode": "0xfff0635a"
+                                    }
+                                                                        """) }) }),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The payload provided is not correct", content = @Content),
+            @ApiResponse(responseCode = "404 Not Found", description = "The event type provided was not found", content = @Content),
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public EventTypeResponse editEventType(@PathVariable("id") Long id, @RequestBody @Valid EventTypeRequest eventTypeRequest){
         return EventTypeResponse.of(eventTypeService.editEventType(id, eventTypeRequest));
     }
 
+    @Operation(summary = "Deletes an event type (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 No Content", description = "The event type was deleted successful"),
+            @ApiResponse(responseCode = "404 Not Found", description = "The event type provided was not found"),
+    })
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteEventType(@PathVariable("id") Long id){

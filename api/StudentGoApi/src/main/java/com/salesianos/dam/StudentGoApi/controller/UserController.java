@@ -22,6 +22,7 @@ import com.salesianos.dam.StudentGoApi.service.user.StudentService;
 import com.salesianos.dam.StudentGoApi.service.user.UserService;
 import com.salesianos.dam.StudentGoApi.utils.MediaTypeUrlResource;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -87,10 +88,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(JwtUserResponse.of(student, token));
     }
 
-    @Operation(summary = "Register organizer")
+    @Operation(summary = "Registers an organizer and sends an email with login credentials (Only Admin)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201 Created", description = "Register was succesful", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = JwtUserResponse.class), examples = {
+            @ApiResponse(responseCode = "201 Created", description = "Register was successful", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = OrganizerDetailsResponse.class), examples = {
                             @ExampleObject(value = """
                                     {
                                         "id": "481a235b-f7ef-4a8a-a117-34c7f0a7c293",
@@ -166,15 +167,52 @@ public class UserController {
         return ChangeUsernameResponse.of(userService.changeUsername(user, changeUsernameRequest));
     }
 
-    @Operation(summary = "Change username")
+    @Operation(summary = "Updates a student profile")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200 OK", description = "The username was changed successfully", content = {
-                    @Content(mediaType = "application/json", schema = @Schema(implementation = ChangeUsernameResponse.class), examples = {
+            @ApiResponse(responseCode = "200 OK", description = "The profile was updated successfully", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = StudentInfoResponse.class), examples = {
                             @ExampleObject(value = """
                                     {
-                                         "id": "04d0595e-45d5-4f63-8b53-1d79e9d84a5d",
-                                         "username": "alexluque1"
-                                     }
+                                        "id": "04d0595e-45d5-4f63-8b53-1d79e9d84a5d",
+                                        "username": "student1",
+                                        "name": "dfd",
+                                        "description": "Soy una persona a la que le encanta hacer deporte y salir con sus amigos",
+                                        "userPhoto": "nophoto.png",
+                                        "interests": [
+                                            {
+                                                "id": 1,
+                                                "name": "Sports",
+                                                "iconRef": "0xe5e6",
+                                                "colorCode": "0xfff0635a"
+                                            }
+                                        ],
+                                        "events": [
+                                            {
+                                                "uuid": "d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2",
+                                                "name": "Exposición de arte contemporáneo",
+                                                "latitude": 50.934741,
+                                                "longitude": 6.97958,
+                                                "cityId": "Köln",
+                                                "dateTime": "2024-06-14T12:00:00"
+                                            },
+                                            {
+                                                "uuid": "a2f6b827-1042-4a7c-a9c3-84f1356d10c4",
+                                                "name": "Festival de música indie",
+                                                "latitude": 50.976048,
+                                                "longitude": 7.015457,
+                                                "cityId": "Köln",
+                                                "dateTime": "2024-06-20T18:00:00"
+                                            },
+                                            {
+                                                "uuid": "9b3ee893-9181-47b8-91fc-63dd16c74f50",
+                                                "name": "Conferencia sobre inteligencia artificial",
+                                                "latitude": 50.963941,
+                                                "longitude": 6.955118,
+                                                "cityId": "Köln",
+                                                "dateTime": "2024-06-21T09:00:00"
+                                            }
+                                        ]
+                                    }
                                                                         """) }) }),
             @ApiResponse(responseCode = "400 Bad Request", content = @Content),
             @ApiResponse(responseCode = "401 Unauthorized", content = @Content),
@@ -187,6 +225,20 @@ public class UserController {
         return StudentInfoResponse.of(userService.updateProfile(user, updateProfileRequest));
     }
 
+    @Operation(summary = "Add profile photo for the user in session ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 Created", description = "The image was uploaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FileResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    [{
+                                        "name": "logo-navbar-blue_596356.png",
+                                        "uri": "http://localhost:8080/download/logo-navbar-blue_596356.png",
+                                        "type": "image/png",
+                                        "size": 9306
+                                    }]
+                                                                        """)})}),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The upload was not successfully", content = @Content),
+    })
     @PostMapping("/upload-profile-image")
     public ResponseEntity<?> upload(@RequestPart("file") MultipartFile file, @AuthenticationPrincipal UserDefault user) {
 
@@ -200,6 +252,21 @@ public class UserController {
         return ResponseEntity.created(URI.create(response.getUri())).body(response);
     }
 
+    @Operation(summary = "Add profile photo for an user (Only Admin)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201 Created", description = "The image was uploaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = FileResponse.class)), examples = {
+                            @ExampleObject(value = """
+                                    [{
+                                        "name": "logo-navbar-blue_596356.png",
+                                        "uri": "http://localhost:8080/download/logo-navbar-blue_596356.png",
+                                        "type": "image/png",
+                                        "size": 9306
+                                    }]
+                                                                        """)})}),
+            @ApiResponse(responseCode = "400 Bad Request", description = "The upload was not successfully", content = @Content),
+    })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/upload-profile-image/{id}")
     public ResponseEntity<?> uploadPhotoByUserId(@RequestPart("file") MultipartFile file, @PathVariable("id") String id) {
 
@@ -214,6 +281,10 @@ public class UserController {
         return ResponseEntity.created(URI.create(response.getUri())).body(response);
     }
 
+    @Operation(summary = "Deletes the current profile photo")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204 No Content", description = "The image was deleted successful"),
+    })
     @GetMapping("/delete-photo")
     public ResponseEntity<?> deletePhoto(@AuthenticationPrincipal UserDefault user) {
 
@@ -238,6 +309,11 @@ public class UserController {
                 .build();
     }
 
+    @Operation(summary = "Download the profile photo from the user in session")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The image was downloaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MediaTypeUrlResource.class)))}),
+    })
     @GetMapping("/download-profile-photo")
     public ResponseEntity<Resource> getFile(@AuthenticationPrincipal UserDefault user){
 
@@ -249,6 +325,12 @@ public class UserController {
                 .body(resource);
     }
 
+    @Operation(summary = "Download a photo from a specific user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200 OK", description = "The image was downloaded successfully", content = {
+                    @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MediaTypeUrlResource.class)))}),
+            @ApiResponse(responseCode = "404 Not Found", description = "The image was not found", content = @Content),
+    })
     @GetMapping("/download-profile-photo/{id}")
     public ResponseEntity<Resource> getFileByUserId(@PathVariable("id") String uuid){
 

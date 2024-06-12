@@ -1,36 +1,59 @@
 <app-sidebar-panel></app-sidebar-panel>
 <div class="p-4 sm:ml-64">
-    <div class="p-4 border-2 border-gray-200 border-dashed rounded-lg dark:border-gray-700">
+    <div class="p-4">
         <div class="grid grid-cols-3 gap-4 mb-4">
-            <div class="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 1v16M1 9h16" />
-                    </svg>
-                </p>
+            <div class="cursor-pointer" routerLink="/admin/events"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/image-banner.jpeg" class="cover w-full  border rounded-lg" alt="Events">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Events</p>
+                </div>
             </div>
-            <div class="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 1v16M1 9h16" />
-                    </svg>
-                </p>
+            <div class="cursor-pointer" routerLink="/admin/purchases"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/purchases.jpg" class="cover w-full  border rounded-lg" alt="Purchases">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Purchases</p>
+                </div>
             </div>
-            <div class="flex items-center justify-center h-24 rounded bg-gray-50 dark:bg-gray-800">
-                <p class="text-2xl text-gray-400 dark:text-gray-500">
-                    <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
-                        viewBox="0 0 18 18">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 1v16M1 9h16" />
-                    </svg>
-                </p>
+            <div class="cursor-pointer" routerLink="/admin/students"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/students.jpg" class="cover w-full  border rounded-lg" alt="Students">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Students</p>
+                </div>
             </div>
         </div>
-        <div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <div class="cursor-pointer" routerLink="/admin/organizers"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/organizers.jpg" class="cover w-full  border rounded-lg" alt="Organizers">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Organizers</p>
+                </div>
+            </div>
+            <div class="cursor-pointer" routerLink="/admin/cities"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/cities.jpg" class="cover w-full  border rounded-lg" alt="Cities">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Cities</p>
+                </div>
+            </div>
+            <div class="cursor-pointer" routerLink="/admin/event-types"
+                class="relative flex items-center justify-center bg-gray-50 dark:bg-gray-800 border rounded-lg">
+                <img src="../../../assets/event-types.jpeg" class="cover w-full  border rounded-lg" alt="Event Types">
+                <div class="absolute inset-0 bg-black opacity-50  border rounded-lg"></div>
+                <div class="absolute inset-0 flex items-center justify-center cursor-pointer border rounded-lgr">
+                    <p class="text-white md:text-3xl font-bold">Event Types</p>
+                </div>
+            </div>
+        </div>
+        <!--<div class="flex items-center justify-center h-48 mb-4 rounded bg-gray-50 dark:bg-gray-800">
             <p class="text-2xl text-gray-400 dark:text-gray-500">
                 <svg class="w-3.5 h-3.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none"
                     viewBox="0 0 18 18">
@@ -123,6 +146,6 @@
                     </svg>
                 </p>
             </div>
-        </div>
+        </div>-->
     </div>
 </div>

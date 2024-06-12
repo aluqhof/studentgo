@@ -3,6 +3,7 @@ package com.salesianos.dam.StudentGoApi.service.user;
 import com.salesianos.dam.StudentGoApi.MyPage;
 import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerItemResponse;
 import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerRequest;
+import com.salesianos.dam.StudentGoApi.dto.user.organizer.OrganizerShortResponse;
 import com.salesianos.dam.StudentGoApi.exception.EmailAlreadyExistException;
 import com.salesianos.dam.StudentGoApi.exception.NotFoundException;
 import com.salesianos.dam.StudentGoApi.exception.UsernameAlreadyExistsException;
@@ -69,8 +70,8 @@ public class OrganizerService {
         return organizerRepository.save(or);
     }
 
-    public MyPage<OrganizerItemResponse> getAll(Pageable pageable){
-        Page<Organizer> organizers = organizerRepository.findAll(pageable);
+    public MyPage<OrganizerItemResponse> getAll(Pageable pageable, String term){
+        Page<Organizer> organizers = organizerRepository.findAll(term, pageable);
         return MyPage.of(organizers.map(OrganizerItemResponse::of), "Organizers");
     }
 
@@ -105,5 +106,10 @@ public class OrganizerService {
         organizer.setDescription(update.description());
 
         return organizerRepository.save(organizer);
+    }
+
+    public MyPage<OrganizerShortResponse> findByUsername(String term, Pageable pageable){
+        Page<Organizer> organizers = organizerRepository.findByUsernameIgnoreCaseContaining(term, pageable);
+        return MyPage.of(organizers.map(OrganizerShortResponse::of), "Organizers");
     }
 }
