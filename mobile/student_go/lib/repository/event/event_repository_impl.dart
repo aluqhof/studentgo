@@ -23,7 +23,7 @@ class EventRepositoryImpl extends EventRepository {
     try {
       final response = await _httpClient.get(
         Uri.parse(
-            'http://192.168.1.153:8080/event/upcoming-limit/$city?page=$page&size=$size'),
+            'http://192.168.9.12:8080/event/upcoming-limit/$city?page=$page&size=$size'),
       );
 
       if (response.statusCode == 200) {
@@ -51,8 +51,8 @@ class EventRepositoryImpl extends EventRepository {
     try {
       final response = await _httpClient.get(
         Uri.parse(
-            'http://192.168.1.153:8080/event/according-limit/$city?page=$page&size=$size'),
-        //Uri.parse('http://192.168.1.153:8080/auth/login'),
+            'http://192.168.9.12:8080/event/according-limit/$city?page=$page&size=$size'),
+        //Uri.parse('http://192.168.9.12:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -80,8 +80,8 @@ class EventRepositoryImpl extends EventRepository {
     try {
       final response = await _httpClient.get(
         Uri.parse(
-            'http://192.168.1.153:8080/event/by-event-type/$city/$eventTypeId?page=$page&size=$size'),
-        //Uri.parse('http://192.168.1.153:8080/auth/login'),
+            'http://192.168.9.12:8080/event/by-event-type/$city/$eventTypeId?page=$page&size=$size'),
+        //Uri.parse('http://192.168.9.12:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -106,8 +106,8 @@ class EventRepositoryImpl extends EventRepository {
   Future<EventDetailsResponse> getEventDetails(String eventId) async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.1.153:8080/event/details/$eventId'),
-        //Uri.parse('http://192.168.1.153:8080/auth/login'),
+        Uri.parse('http://192.168.9.12:8080/event/details/$eventId'),
+        //Uri.parse('http://192.168.9.12:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -132,8 +132,8 @@ class EventRepositoryImpl extends EventRepository {
   Future<List<Content>> getAllEvents(String cityName) async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.1.153:8080/event/upcoming/$cityName'),
-        //Uri.parse('http://192.168.1.153:8080/auth/login'),
+        Uri.parse('http://192.168.9.12:8080/event/upcoming/$cityName'),
+        //Uri.parse('http://192.168.9.12:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -184,7 +184,7 @@ class EventRepositoryImpl extends EventRepository {
 
       final response = await _httpClient.get(
         Uri.parse(
-            'http://192.168.1.153:8080/event/upcoming/$city?&eventName=$name&eventTypes=$eventTypeString&start=$startFormatted&end=$endFormatted&min=$minPrice&max=$maxPrice'),
+            'http://192.168.9.12:8080/event/upcoming/$city?&eventName=$name&eventTypes=$eventTypeString&start=$startFormatted&end=$endFormatted&min=$minPrice&max=$maxPrice'),
       );
 
       if (response.statusCode == 200) {
@@ -214,7 +214,7 @@ class EventRepositoryImpl extends EventRepository {
     try {
       final response = await _httpClient.get(
         Uri.parse(
-            'http://192.168.1.153:8080/event/download-event-photo/$eventId/number/$index'),
+            'http://192.168.9.12:8080/event/download-event-photo/$eventId/number/$index'),
       );
 
       if (response.statusCode == 200) {
