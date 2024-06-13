@@ -36,7 +36,6 @@
 	<string>We need your location to show nearby events.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>For a better use of the app.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>We need your location to show nearby events even when the app is in the background.</string>
 	<key>UISupportedInterfaceOrientations</key>
