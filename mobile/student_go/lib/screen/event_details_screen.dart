@@ -297,37 +297,50 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         child: Row(
                           children: [
                             Container(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color:
-                                        const Color.fromRGBO(238, 240, 255, 1)),
-                                padding: const EdgeInsets.all(12),
-                                child: const Icon(
-                                  Icons.location_on,
-                                  size: 25,
-                                  color: Color.fromRGBO(86, 105, 255, 1),
-                                )),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: const Color.fromRGBO(238, 240, 255, 1),
+                              ),
+                              padding: const EdgeInsets.all(12),
+                              child: const Icon(
+                                Icons.location_on,
+                                size: 25,
+                                color: Color.fromRGBO(86, 105, 255, 1),
+                              ),
+                            ),
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 12.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
                                     state.eventDetails.place ??
                                         'Place not found',
                                     style: GoogleFonts.actor(
-                                        textStyle:
-                                            const TextStyle(fontSize: 20)),
+                                      textStyle: const TextStyle(fontSize: 20),
+                                    ),
                                   ),
-                                  Text(
-                                      truncateString(
-                                          '$_street, $_city, $_postalCode', 40),
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth:
+                                            MediaQuery.of(context).size.width *
+                                                0.7),
+                                    child: Text(
+                                      '$_street, $_city, $_postalCode dfajk jaklsjf klsajlkfdjsal jfldsjalf',
                                       style: GoogleFonts.actor(
-                                          textStyle: const TextStyle(
-                                              fontSize: 15,
-                                              color: Color.fromRGBO(
-                                                  112, 110, 143, 1))))
+                                        textStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color:
+                                              Color.fromRGBO(112, 110, 143, 1),
+                                        ),
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                      softWrap: false,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -1111,7 +1124,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             style: GoogleFonts.actor(
               textStyle: const TextStyle(
                 color: Color.fromRGBO(63, 56, 221, 1),
-                fontSize: 17,
+                fontSize: 14,
               ),
             ),
           ),
