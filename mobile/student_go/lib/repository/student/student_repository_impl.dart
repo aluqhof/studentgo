@@ -26,8 +26,8 @@ class StudentRepositoryImp extends StudentRepository {
   Future<StudentInfoResponse> getStudentProfile() async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.9.12:8080/student/'),
-        //Uri.parse('http://192.168.9.12:8080/auth/login'),
+        Uri.parse('http://172.20.10.11:8080/student/'),
+        //Uri.parse('http://172.20.10.11:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -47,8 +47,8 @@ class StudentRepositoryImp extends StudentRepository {
   Future<StudentInfoResponse> saveOrUnsaveEvent(String eventId) async {
     try {
       final response = await _httpClient.put(
-        Uri.parse('http://192.168.9.12:8080/student/save-unsave-event/$eventId'),
-        //Uri.parse('http://192.168.9.12:8080/auth/login'),
+        Uri.parse('http://172.20.10.11:8080/student/save-unsave-event/$eventId'),
+        //Uri.parse('http://172.20.10.11:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -68,8 +68,8 @@ class StudentRepositoryImp extends StudentRepository {
   Future<List<Content>> getAllSavedEvents() async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.9.12:8080/student/saved-events'),
-        //Uri.parse('http://192.168.9.12:8080/auth/login'),
+        Uri.parse('http://172.20.10.11:8080/student/saved-events'),
+        //Uri.parse('http://172.20.10.11:8080/auth/login'),
       );
 
       if (response.statusCode == 200) {
@@ -93,8 +93,8 @@ class StudentRepositoryImp extends StudentRepository {
       ChangeUsernameRequest changeUsernameRequest) async {
     try {
       final response = await _httpClient.put(
-        Uri.parse('http://192.168.9.12:8080/user/change-username'),
-        //Uri.parse('http://192.168.9.12:8080/auth/login'),
+        Uri.parse('http://172.20.10.11:8080/user/change-username'),
+        //Uri.parse('http://172.20.10.11:8080/auth/login'),
         body: changeUsernameRequest.toJson(),
       );
 
@@ -138,8 +138,8 @@ class StudentRepositoryImp extends StudentRepository {
       UpdateProfileRequest updateProfileRequest) async {
     try {
       final response = await _httpClient.put(
-        Uri.parse('http://192.168.9.12:8080/user/student/update'),
-        //Uri.parse('http://192.168.9.12:8080/auth/login'),
+        Uri.parse('http://172.20.10.11:8080/user/student/update'),
+        //Uri.parse('http://172.20.10.11:8080/auth/login'),
         body: updateProfileRequest.toJson(),
       );
 
@@ -183,7 +183,7 @@ class StudentRepositoryImp extends StudentRepository {
   Future<Uint8List> getUserPhoto() async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.9.12:8080/download-profile-photo'),
+        Uri.parse('http://172.20.10.11:8080/download-profile-photo'),
       );
 
       if (response.statusCode == 200) {
@@ -221,7 +221,7 @@ class StudentRepositoryImp extends StudentRepository {
   Future<Uint8List> getUserPhotoById(String id) async {
     try {
       final response = await _httpClient.get(
-        Uri.parse('http://192.168.9.12:8080/download-profile-photo/$id'),
+        Uri.parse('http://172.20.10.11:8080/download-profile-photo/$id'),
       );
 
       if (response.statusCode == 200) {
@@ -261,7 +261,7 @@ class StudentRepositoryImp extends StudentRepository {
       final prefs = await SharedPreferences.getInstance();
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse('http://192.168.9.12:8080/upload-profile-image'),
+        Uri.parse('http://172.20.10.11:8080/upload-profile-image'),
       );
 
       final file = File(image.path);

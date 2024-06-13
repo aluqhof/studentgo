@@ -346,7 +346,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                               .getInstance();
 
                                                       final url = Uri.parse(
-                                                          'http://192.168.9.12:8080/delete-photo');
+                                                          'http://172.20.10.11:8080/delete-photo');
                                                       final response =
                                                           await http.get(
                                                         url,

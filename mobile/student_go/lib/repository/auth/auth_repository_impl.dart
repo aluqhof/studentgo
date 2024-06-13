@@ -19,8 +19,8 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<LoginResponse> login(LoginDto loginDto) async {
     final SharedPreferences prefs = await _prefs;
     final response = await _httpClient.post(
-      Uri.parse('http://192.168.9.12:8080/auth/login'),
-      //Uri.parse('http://192.168.9.12:8080/auth/login'),
+      Uri.parse('http://172.20.10.11:8080/auth/login'),
+      //Uri.parse('http://172.20.10.11:8080/auth/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8'
       },
@@ -45,8 +45,8 @@ class AuthRepositoryImpl extends AuthRepository {
     try {
       final SharedPreferences prefs = await _prefs;
       final response = await _httpClient.post(
-        Uri.parse('http://192.168.9.12:8080/auth/register-student'),
-        //Uri.parse('http://192.168.9.12:8080/auth/register-student'),
+        Uri.parse('http://172.20.10.11:8080/auth/register-student'),
+        //Uri.parse('http://172.20.10.11:8080/auth/register-student'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8'
         },
