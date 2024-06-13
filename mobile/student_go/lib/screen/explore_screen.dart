@@ -56,15 +56,19 @@ class _ExploreScreenState extends State<ExploreScreen> {
         position.longitude,
       );
       Placemark placemark = placemarks.first;
-      setState(() {
-        _currentCity = placemark.locality ?? 'Unknown';
-        _currentCountry = placemark.country ?? 'Unknown';
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _currentCity = placemark.locality ?? 'Unknown';
+          _currentCountry = placemark.country ?? 'Unknown';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       throw Exception('Error obtaining location: $e');
     }
   }

@@ -58,17 +58,22 @@ class _EventCardVerticalListState extends State<EventCardVerticalList> {
         widget.result.longitude!,
       );
       Placemark placemark = placemarks.first;
-      setState(() {
-        _street = placemark.street ?? 'Unknown';
-        _postalCode = placemark.postalCode ?? '00000';
-        _city = placemark.locality ?? 'Unknown';
-        //_isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _street = placemark.street ?? 'Unknown';
+          _city = placemark.locality ?? 'Unknown';
+          _postalCode = placemark.postalCode ?? '00000';
+        });
+      }
     } catch (e) {
-      setState(() {
-        //_isLoading = false;
-      });
-      throw Exception('Error obtaining location: $e');
+      if (mounted) {
+        setState(() {
+          _street = 'Unknown';
+          _city = 'Unknown';
+          _postalCode = '00000';
+        });
+      }
+      throw Exception('Error obtaining street: $e');
     }
   }
 
@@ -79,6 +84,11 @@ class _EventCardVerticalListState extends State<EventCardVerticalList> {
     _eventRepository = EventRepositoryImpl();
     _eventImageBloc = EventImageBloc(_eventRepository)
       ..add(FetchEventImage(widget.result.uuid!, 0));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

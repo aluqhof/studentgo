@@ -73,26 +73,37 @@ class _MapEventsScreenState extends State<MapEventsScreen> {
         position.longitude,
       );
       Placemark placemark = placemarks.first;
-      setState(() {
-        _currentCity = placemark.locality ?? 'Unknown';
-        _currentCountry = placemark.country ?? 'Unknown';
-        _eventListBloc = _eventListBloc = EventListBloc(eventRepository)
-          ..add(FetchUpcomingListSearchableEvent(
-              _currentCity,
-              name,
-              List.empty(),
-              DateTime.now(),
-              DateTime.now().add(const Duration(days: 365)),
-              0,
-              1000000));
-        _initialCameraPosition = CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 12,
-        );
-      });
+      if(mounted){
+        setState(() {
+          _currentCity = placemark.locality ?? 'Unknown';
+          _currentCountry = placemark.country ?? 'Unknown';
+          _eventListBloc = _eventListBloc = EventListBloc(eventRepository)
+            ..add(FetchUpcomingListSearchableEvent(
+                _currentCity,
+                name,
+                List.empty(),
+                DateTime.now(),
+                DateTime.now().add(const Duration(days: 365)),
+                0,
+                1000000));
+          _initialCameraPosition = CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 12,
+          );
+        });
+      }
     } catch (e) {
+      if (mounted) {
+        setState(() {
+        });
+      }
       throw Exception('Error obtaining location: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> initialize() async {

@@ -54,14 +54,28 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
         longitude,
       );
       Placemark placemark = placemarks.first;
-      setState(() {
-        _street = placemark.street ?? 'Unknown';
-        _postalCode = placemark.postalCode ?? '00000';
-        _city = placemark.locality ?? 'Unknown';
-      });
+      if (mounted) {
+        setState(() {
+          _street = placemark.street ?? 'Unknown';
+          _city = placemark.locality ?? 'Unknown';
+          _postalCode = placemark.postalCode ?? '00000';
+        });
+      }
     } catch (e) {
-      throw Exception('Error obtaining location: $e');
+      if (mounted) {
+        setState(() {
+          _street = 'Unknown';
+          _city = 'Unknown';
+          _postalCode = '00000';
+        });
+      }
+      throw Exception('Error obtaining street: $e');
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

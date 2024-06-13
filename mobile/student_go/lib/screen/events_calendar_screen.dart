@@ -39,16 +39,18 @@ class _EventsCalendarScreenState extends State<EventsCalendarScreen> {
         position.longitude,
       );
       Placemark placemark = placemarks.first;
-      setState(() {
-        _currentCity = placemark.locality ?? 'Unknown';
-        _isLoading = false;
-        _calendarBloc = AllEventsCalendarBloc(eventRepository)
-          ..add(FetchAllEventsCalendar(_currentCity));
-      });
+      if (mounted) {
+        setState(() {
+          _currentCity = placemark.locality ?? 'Unknown';
+          _isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
       throw Exception('Error obtaining location: $e');
     }
   }
