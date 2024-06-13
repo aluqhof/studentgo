@@ -59,12 +59,14 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               builder: (context, state) {
                 if (state is DoLoginSuccess) {
-                  Future.delayed(Duration.zero, () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const HomeScreen()),
-                    );
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    if (ModalRoute.of(context)?.isCurrent ?? false) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      );
+                    }
                   });
                 } else if (state is DoLoginUserNotFoundException) {
                   error = "Incorrect username or password";
