@@ -190,7 +190,7 @@ class _EventCardVerticalListState extends State<EventCardVerticalList> {
                               const SizedBox(width: 2),
                               Expanded(
                                 child: Text(
-                                    '$_street, $_postalCode, $_city',
+                                  '$_street, $_postalCode, $_city',
                                   style: GoogleFonts.actor(
                                     textStyle: const TextStyle(
                                       color: Color.fromRGBO(116, 118, 136, 1),

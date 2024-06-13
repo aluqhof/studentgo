@@ -349,13 +349,12 @@ class _EventCardState extends State<EventCard> {
                                 width: 2,
                               ),
                               Expanded(
-                                child: Text(  
+                                child: Text(
                                   '$_street, $_postalCode, $_city',
                                   style: GoogleFonts.actor(
                                     textStyle: const TextStyle(
-                                      color: Color.fromRGBO(116, 118, 136, 1),
-                                      fontSize: 12,
-                                    ),
+                                        color: Color.fromRGBO(116, 118, 136, 1),
+                                        fontSize: 12),
                                     fontWeight: FontWeight.w100,
                                   ),
                                   overflow: TextOverflow.ellipsis,
