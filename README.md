@@ -86,6 +86,8 @@ To log in to platform, use the following credentials:
 - Username: student1
 - Password: user1234
 
+> Feel free to register new students or create new organizer accounts!
+
 ## Usage
 
 ### Mobile App
