@@ -86,6 +86,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
             value: _eventDetailsBloc,
           ),
           BlocProvider.value(value: _eventsSavedBloc),
+          BlocProvider.value(value: ProfileImageBloc(studentRepository)..add(FetchProfileImage()))
         ],
         child: BlocBuilder<EventDetailsBloc, EventDetailsState>(
           builder: (context, state) {
@@ -352,18 +353,45 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                             horizontal: 20.0, vertical: 10),
                         child: Row(
                           children: [
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color: const Color.fromRGBO(238, 240, 255, 1),
-                                  image: const DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: AssetImage(
-                                        'assets/img/fotoprueba3.jpg',
-                                      ))),
-                              padding: const EdgeInsets.all(12),
+                            BlocBuilder<ProfileImageBloc, ProfileImageState>(
+                              builder: (context, stateImage) {
+                                if(stateImage is ProfileImageInitial ||
+                                  stateImage is ProfileImageLoading){
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }else if (stateImage is ProfileImageSuccess) {
+                                  return Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: const Color.fromRGBO(
+                                            238, 240, 255, 1),
+                                        image: DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: MemoryImage(
+                                              stateImage.image,
+                                            ))),
+                                    padding: const EdgeInsets.all(12),
+                                  );
+                                }else{
+                                  return Container(
+                                    width: 50,
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: const Color.fromRGBO(
+                                            238, 240, 255, 1),
+                                        image: const DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: AssetImage(
+                                              'assets/img/nophoto.png',
+                                            ))),
+                                    padding: const EdgeInsets.all(12),
+                                  );
+                                }
+                              },
                             ),
                             Padding(
                               padding:
