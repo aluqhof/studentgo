@@ -328,7 +328,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                                             MediaQuery.of(context).size.width *
                                                 0.7),
                                     child: Text(
-                                      '$_street, $_city, $_postalCode dfajk jaklsjf klsajlkfdjsal jfldsjalf',
+                                      '$_street, $_city, $_postalCode',
                                       style: GoogleFonts.actor(
                                         textStyle: const TextStyle(
                                           fontSize: 15,
