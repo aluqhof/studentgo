@@ -148,10 +148,14 @@ class _AccordingHorizontalListState extends State<AccordingHorizontalList> {
           if (state.generalException.status == 401 ||
               state.generalException.status == 403) {
             _prefs.setString('token', '');
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (ModalRoute.of(context)?.isCurrent ?? false) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              }
+            });
             return const SizedBox();
           }
           if (state.generalException.status == 400) {

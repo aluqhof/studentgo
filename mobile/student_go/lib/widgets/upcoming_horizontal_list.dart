@@ -135,11 +135,13 @@ class _UpcomingHorizontalListState extends State<UpcomingHorizontalList> {
         } else if (state is EventListInitial || state is EventListLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is TokenNotValidState) {
-          Future.microtask(() {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const LoginScreen()),
-            );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (ModalRoute.of(context)?.isCurrent ?? false) {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+              );
+            }
           });
           return const CircularProgressIndicator();
         } else if (state is UpcomingListEntityException) {
