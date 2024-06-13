@@ -234,12 +234,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             textStyle: TextStyle(fontSize: 18)),
                       ),
                       onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                       
                       },
                     ),
                     ListTile(
@@ -253,12 +248,7 @@ class _DrawerWidgetState extends State<DrawerWidget> {
                             textStyle: TextStyle(fontSize: 18)),
                       ),
                       onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginScreen(),
-                          ),
-                        );
+                        
                       },
                     ),
                     ListTile(
