@@ -111,30 +111,22 @@ INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f
 INSERT INTO purchase (uuid, total_price, date_time, event_id, author) VALUES ('f23e4567-e89b-12d3-a456-426614174019', 30.0, current_timestamp, 'ae56ec32-98bf-4eb6-821d-741a0816b3bf', '23b9773b-b123-4f48-8a6d-ef732806d1f5');
 
 
-INSERT INTO event_photos (event_id, url_photo) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'nophotoevent.jpg');
-
-INSERT INTO event_photos (event_id, url_photo) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('e3bd64f3-ae76-41e1-bcf9-0a817ccca950', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('83134237-d6bd-493d-8f3b-dd62ee16177c', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('46819fda-3562-4aac-92ab-55794b40796e', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('2e16c4ff-f1c1-4359-9404-360e62464554', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('6c2c425f-d1fe-4209-bdf7-83d369fc60e5', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('ef112b3e-df82-4b84-8998-f43422a56314', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('e1f0c314-2249-4b57-802a-726b84475df3', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('36486ae2-08d0-4122-a63c-20d5ad59c8ec', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('3a769927-216d-4167-adc2-df53b5440f2b', 'nophotoevent.jpg');
-INSERT INTO event_photos (event_id, url_photo) VALUES ('efd3ac3a-e074-40f9-980b-5c1a23d8ff30', 'nophotoevent.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9d782609-1b54-4cee-ad3d-5ce678be376d', 'campus-food-festival.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('f13a8a04-afe2-4b12-a279-91b3e365073b', 'gourmet-cocking-class.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('62feb988-886b-44ad-ac0b-43acd928a7c3', 'vegan-food-fair.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('ae56ec32-98bf-4eb6-821d-741a0816b3bf', 'bbq-cook-of.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('39ff97ef-c4e2-4980-92a7-9d67b4d03749', 'international-street-food-market.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('2ab0b875-0b9c-4cd6-aa1c-de2dc561e2d0', 'retro-gaming-night.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('d5c3c5de-89d6-4c1f-b0c4-3e1f45d8d2a2', 'board-game-bonanza.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('a2f6b827-1042-4a7c-a9c3-84f1356d10c4', 'virtual-reality-experience.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('9b3ee893-9181-47b8-91fc-63dd16c74f50', 'gaming-marathon.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('e3bd64f3-ae76-41e1-bcf9-0a817ccca950', 'campus-5k-run.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('83134237-d6bd-493d-8f3b-dd62ee16177c', 'basketball-league.jpg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('46819fda-3562-4aac-92ab-55794b40796e', 'frisbee-tournament.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('2e16c4ff-f1c1-4359-9404-360e62464554', 'yoga-in-the-park.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('6c2c425f-d1fe-4209-bdf7-83d369fc60e5', 'soccer-skills.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('ef112b3e-df82-4b84-8998-f43422a56314', 'battle-of-the-bands.png');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('e1f0c314-2249-4b57-802a-726b84475df3', 'open-mic-night.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('36486ae2-08d0-4122-a63c-20d5ad59c8ec', 'jazz-and-blues.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('3a769927-216d-4167-adc2-df53b5440f2b', 'dj-dance.jpeg');
+INSERT INTO event_photos (event_id, url_photo) VALUES ('efd3ac3a-e074-40f9-980b-5c1a23d8ff30', 'coffehouse.jpeg');
